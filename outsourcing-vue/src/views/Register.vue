@@ -84,11 +84,11 @@ export default {
   methods: {
     submit: function (event) {
       axios
-      .post('./register')
-      .then(response => (this.info = response))
-      .catch(function (error) { // 请求失败处理
-        console.log(error);
-      });
+        .post('./register')
+        .then(response => (this.info = response))
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   }
 }

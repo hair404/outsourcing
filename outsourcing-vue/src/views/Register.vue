@@ -1,18 +1,13 @@
 <template>
-  <div class="register">
-    <div id="nav">
-      <ul>
-        <li><a href="./index.html">首页</a></li>
-        <li><a href="./search.html?type=0">全部招标</a></li>
-        <li><a href="./search.html?type=1">全部工作室</a></li>
-      </ul>
-    </div>
+  <div class="body">
+
+    <Head />
     <div class="hover">
       <div class="blur"></div>
       <div class="cover"></div>
       <i
         class="material-icons arrow_back"
-        onclick="window.location.href = './login.html';"
+        onclick="window.location.href='./login.html';"
         style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
       ></i>
       <div class="title">
@@ -31,55 +26,206 @@
       </div>
 
       <form
-        id="register_company"
-        onsubmit="return isEmpty(0)"
+        id="form"
+        @submit.prevent="submit"
         class="content"
       >
         <input
-          name="account"
+          v-model="account"
           placeholder="公司名"
           type="text"
           required
         >
         <input
-          name="name"
+          v-model="name"
           placeholder="联系人姓名"
           type="text"
           required
         >
         <input
-          name="phone"
+          v-model="phone"
           placeholder="电话"
           type="text"
           required
         >
         <input
-          name="password"
+          v-model="password"
           placeholder="密码"
           type="password"
           required
         >
         <input
-          name="repeatpassword"
+          v-model="repeatpassword"
           placehrolder="重复密码"
-          onblur="checkpassword(0)"
           type="password"
           required
         >
         <input
-          name="email"
+          v-model="email"
           placeholder="邮箱"
           type="email"
           required
         >
-        <button type="submit">注册</button>
+        <button>注册</button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import Head from '@/components/Head.vue'
+import axios from 'axios'
+
 export default {
-  name: 'register'
+  name: 'register',
+  components: {
+    Head
+  },
+  methods: {
+    submit: function (event) {
+      axios
+      .post('./register')
+      .then(response => (this.info = response))
+      .catch(function (error) { // 请求失败处理
+        console.log(error);
+      });
+    }
+  }
 }
+
 </script>
+
+<style scoped lang="scss">
+.title {
+  top: 10%;
+}
+
+.body {
+  background-image: url("../assets/backimg.jpg");
+  height: 100%;
+  background-position: center;
+  overflow: hidden;
+}
+
+.content input {
+  margin-top: 10px;
+  height: 30px;
+}
+
+form {
+  top: 55%;
+}
+
+form button {
+  width: 100%;
+  margin-top: 20px;
+  height: 30px;
+}
+
+a {
+  text-decoration: none;
+  outline: none;
+  color: #000000;
+}
+
+.hover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 550px;
+  width: 400px;
+}
+
+.cover {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  transition: 200ms;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: transparent;
+  border-radius: 3px;
+  box-shadow: grey 0px 1px 4px;
+}
+
+.cover:hover {
+  box-shadow: grey 0px 1px 10px;
+}
+
+.blur {
+  position: absolute;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  z-index: -2;
+  background-image: url("../assets/backimg.jpg");
+  filter: blur(4px);
+  background-position: center;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  text-align: center;
+}
+
+form {
+  position: absolute;
+  transform: translate(0, -50%);
+  width: 100%;
+  text-align: center;
+}
+
+input {
+  border: transparent;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  transition: 200ms;
+}
+
+input:hover {
+  background: white;
+  box-shadow: grey 0px 1px 4px;
+}
+
+.content {
+  width: 80%;
+  padding-left: 10%;
+  padding-bottom: 20px;
+  height: fit-content;
+}
+
+.content input {
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  height: 50px;
+}
+
+.register {
+  cursor: pointer;
+  padding-top: 10px;
+  font-size: 15px;
+}
+
+.img {
+  cursor: pointer;
+}
+
+button {
+  padding: 5px;
+  border: transparent;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  transition: 200ms;
+}
+
+button:hover {
+  background: white;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px;
+}
+</style>

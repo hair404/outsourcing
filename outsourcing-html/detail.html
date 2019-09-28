@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+    <title>人力和项目服务平台</title>
+    <link rel="icon" type="image/x-icon" href="./img/logo.ico" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link href="./css/material-design-icons.css" rel="stylesheet">
+    <link type="text/css" rel="styleSheet" href="./css/main.css" />
+    <link type="text/css" rel="styleSheet" href="./css/detail.css" />
+</head>
+
+<body style="background-color: rgb(246, 246, 246);">
+    <div id="notify" class="card notify" style="display: none;"></div>
+    <div class="top">
+        <div class="head">
+            <div class="blur"></div>
+            <div class="cover"></div>
+            <div class="wrapper">
+                <img>
+                <div class="nav">
+                    <ul>
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./search.html?type=0">全部招标</a></li>
+                        <li><a>全部工作室</a></li>
+                    </ul>
+                </div>
+                <div style="float: right;height: 42px;padding-right: 10px;">
+                    <div class="account" onmouseover="display(0);" id="person">
+                        <div>游客</div>
+                        <img id="personalPic">
+                    </div>
+                    <div class="card info" onmouseleave="display(1)">
+                        <div class="card" style="height: 84px;" id="info">
+                            <div style="line-height: 42px;text-align: center;">您是：游客</div>
+                            <div style="line-height: 42px;text-align: center;"></div>
+                        </div>
+                        <ul id="option" class="selection" style="width: 100%;list-style: none;">
+                            <li style="line-height: 42px;text-align: center;"><a>我的项目</a></li>
+                            <li style="line-height: 42px;text-align: center;"><a>我的收藏</a></li>
+                            <li style="line-height: 42px;text-align: center;"><a>登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="message">消息</div>
+            </div>
+        </div>
+        <div class="background">
+            <div class="logo"><img src="./img/logo2.png"></div>
+            <form id="search" class="_search">
+                <input type="text" placeholder="你想搜索">
+                <button type="submit" style="background: transparent;border: transparent;"><i class="material-icons search" style="line-height: 30px;color: #00a1d6;cursor: pointer;"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="wrapper" style="height: 42px;">
+        <div class="categories nav">
+            <ul id="ctg">
+                <li><a>首页</a></li>
+                <li><a>网站开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>前端开发</a></li>
+                        <li><a>网站维护</a></li>
+                    </ul>
+                </li>
+                <li><a>移动应用开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>安卓APP</a></li>
+                        <li><a>苹果APP</a></li>
+                    </ul>
+                </li>
+                <li><a>H5开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>H5模板</a></li>
+                        <li><a>H5定制</a></li>
+                    </ul>
+                </li>
+                <li><a>UI设计</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>网站UI</a></li>
+                        <li><a>移动UI</a></li>
+                    </ul>
+                </li>
+                <li><a>测试运维</a></li>
+                <li><a>云服务</a></li>
+                <li><a>IT综合服务</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="wrapper">
+        <div id="process" style="text-align: center;margin-bottom: 2%;">
+            <div class="select-card process">匹配工作室</div>
+            <div class="select-card process">工作室工作</div>
+            <div class="select-card process">验收成果</div>
+        </div>
+        <div class="card" style="width: 98%;min-height: 500px;position: relative;margin: 0 auto;height: fit-content;">
+            <div id="prj_info" class="select-card-content">
+                <div style="font-size: 20px;">需求信息</div>
+                <div>需求标题：</div>
+                <div>需求类别：</div>
+                <div>发布公司：</div>
+                <div>发布日期：</div>
+                <div>截止日期：</div>
+                <div>预算金额：</div>
+                <div>详细介绍：</div>
+            </div>
+            <div id="enroll" class="select-card select-card-hover" style="width: 100px;bottom: 3%;position: absolute;margin-left: 5%;display: none;">我要投标</div>
+
+            <div id="modal" style="display: none">
+                <div class="modal_backgrd" onclick="$('modal').children[0].setAttribute('style','background: rgba(0, 0, 0, 0);');$('modal').children[1].setAttribute('style','top: 150%');$('modal').setAttribute('style','display: none;')"></div>
+                <div class="card modal">
+                    <div style="position: absolute;top: 25px;width: 100%;text-align: center;font-size: 16px;">相关信息</div>
+                    <form id="change" class="content" style="margin-top: 70px;padding-left: 10%;" onsubmit="return false;">
+                        <textarea name="info" type="text" placeholder="告诉我们原因" style="width: 100%;height: 300px" required></textarea>
+                        <input type="submit" class="select-card select-card-hover" style="width: 100px;height: 42px;" value="确认">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="wrapper">
+        <div id="container" class="container" style="top: 20px;"></div>
+
+        <div class="card" id="state1" style="display: none;">
+            <div class="card" style="height: 106px;">
+                <div style="margin-left: 5%;font-size: 20px;line-height: 64px;display: inline-block;">审核进度</div>
+                <div id="submit" class="select-card select-card-hover" style="display: none;">提交文件</div>
+                <div id="pay" class="select-card select-card-hover" style="display: none;">支付违约金</div>
+                <input type="file" style="display: none;" id="fileInput">
+                <div style="width: 90%;margin: 0 auto;">
+                    <div class="filename">文件名</div>
+                    <div class="date">日期</div>
+                    <div class="passed">当前状态</div>
+                    <div style="line-height: 42px;display: inline-block;">操作</div>
+                </div>
+            </div>
+            <table id="table" class="table">
+            </table>
+        </div>
+
+        <div></div>
+    </div>
+</body>
+
+<!-- firebase -->
+<script src="./js/firebase/firebase-app.js"></script>
+<script src="./js/firebase/firebase-messaging.js"></script>
+<script src="./js/firebase/firebase.js"></script>
+
+<script src="./js/utils.js"></script>
+<script src="./js//main.js"></script>
+<script>
+    var myid;
+    var mytype;
+
+    var id = window.location.href.split("?id=")[1];
+    sync_info($("person"), $("info"), $("option"), function () {
+        sendAjax("post", "project_info", "id=" + id, function (response) {
+            initFirebase();
+            var json = JSON.parse(response);
+            $("prj_info").children[1].innerText += json.prjname;
+            $("prj_info").children[2].innerText += translate_ctg(json.tag) + "-" + translate_subctg(json.tag, json.subtag);
+            $("prj_info").children[3].innerText += json.companyName;
+            $("prj_info").children[4].innerText += json.releasedata;
+            $("prj_info").children[5].innerText += json.deadline;
+            $("prj_info").children[6].innerText += json.price;
+            $("prj_info").children[7].innerText += json.info;
+            $("process").children[json.state].setAttribute("class", "select-card select-card-selected process");
+            switch (json.state) {
+                case 0:
+                    todo(JSON.stringify(json.enroll));
+                    if (json.companyID == "self") {
+                        $("enroll").innerText = "我要上推荐";
+                        $("enroll").onclick = function () {
+                            if ($("change").children[0].tagName == "TEXTAREA") {
+                                $("change").children[0].remove();
+                                $("change").innerHTML = '<input type="button" style="width: 100%;background: transparent;" value="支付费用" onclick="">' +
+                                    '<input name="duetime" type="date" placeholder="到期时间" style="width: 100%" required>' + $("change").innerHTML;
+                                $("change").onsubmit = function () {
+                                    sendAjax("post", "ad_register_prj", serialize(this) + "&id=" + id, function (response) {
+                                        if (response == "success")
+                                            notify("注册成功！此项目将会上首页");
+                                    });
+                                    return false;
+                                };
+                            }
+                            transition();
+                        }
+                        $("enroll").setAttribute("style", "width: 100px;bottom: 3%;position: absolute;margin-left: 5%;");
+                        for (let i = 0; i < json.enroll.length - 1; i++) {
+                            $name("project")[i].children[2].innerHTML += "<div id=\"select\" class=\"select-card select-card-hover\" style=\"width: 90%; margin-left: 5%\">中标</div>";
+                            $name("project")[i].children[2].children[2].onclick = function (e) {
+                                e.stopPropagation();
+                                sendAjax("post", "company_action", "id=" + id + "&action=select&studioid=" + json.enroll[i + 1].id, function (response) {
+                                    if (response == "success")
+                                        notify("选择成功！请在后续步骤中缴纳首付款");
+                                });
+                            }
+                        }
+                    }
+                    if (mytype == 1) {
+                        $("enroll").onclick = function () {
+                            sendAjax("post", "studio_action", "id=" + id + "&action=tender", function () {
+                                if (response == "success")
+                                    notify("投标成功！请留意通知");
+                            });
+                        }
+                        $("enroll").setAttribute("style", "width: 100px;bottom: 3%;position: absolute;margin-left: 5%;");
+                    }
+                    break;
+                case 1:
+                    $("state1").setAttribute("style", "width: 98%;height: fit-content;min-height: 500px;position: relative;margin: 0 auto;top: 20px;margin-bottom: 20px;");
+                    if (json.companyID == "self") if (json.companyhasPaid == 0) {
+                        $("enroll").innerText = "撤销项目";
+                        $("enroll").onclick = function () {
+                            $("change").onsubmit = function () {
+                                sendAjax("post", "company_action", serialize(this) + "&id=" + id + "&action=cancel", function (response) {
+                                    if (response == "success")
+                                        notify("申请成功！请留意通知");
+                                });
+                                return false;
+                            };
+                            transition();
+                        }
+                        $("enroll").setAttribute("style", "width: 100px;bottom: 3%;position: absolute;margin-left: 5%;");
+                    } else {
+                        $("pay").innerText = "支付首付款";
+                        $("pay").onclick = () => {
+                            sendAjax("post", "company_action", "id=" + id + "&action=pay&fileid=0");//TODO
+                        }
+                        $("pay").setAttribute("style", "float: right;width: 100px;margin-top: 20px;");
+                    }
+                    if (json.studioID == "self") if (json.studiohasPaid == 0) {
+                        $("enroll").innerText = "我要申诉";
+                        $("enroll").onclick = function () {
+                            $("change").onsubmit = function () {
+                                sendAjax("post", "studio_action", serialize(this) + "&id=" + id + "&action=complain", function (response) {
+                                    if (response == "success")
+                                        notify("申请成功！请留意通知");
+                                });
+                                return false;
+                            };
+                            transition();
+                        }
+                        $("enroll").setAttribute("style", "width: 100px;bottom: 3%;position: absolute;margin-left: 5%;");
+                    } else {
+                        $("submit").setAttribute("style", "float: right;width: 100px;margin-top: 20px;");
+                        $("pay").onclick = () => {
+                            sendAjax("post", "studio_action", "id=" + id + "&action=pay");//TODO
+                        }
+                        $("pay").setAttribute("style", "float: right;width: 100px;margin-top: 20px;");
+                    }
+                    $("submit").onclick = function () {
+                        $("fileInput").click();
+                    }
+                    $("fileInput").onchange = function () {
+                        var fd = new FormData();
+                        fd.append("file", $("fileInput").files[0], "file");
+                        fd.append("prjid", id);
+                        sendAjax("post", "upload_img", fd, function (response) {
+                            if (response == "success") {
+                                notify("上传成功");
+                            }
+                        })
+                    }
+                    for (const file of json.file) {
+                        var row = document.createElement("tr");
+                        row.innerHTML = "<td class=\"filename-cell\"><a href=" + file.url + ">" + file.name + "</a></td>" +
+                            "<td style=\"width: fit-content\">" + file.date + "</td>" +
+                            "<td style=\"width: fit-content\";>" + translate_passed(file.ispassed) + "</td>";
+                        if (json.companyID == "self")
+                            row += "<td style=\"width: fit-content\"><a onclick='examine(0," + file.id + ")'>通过</a>&nbsp;<a onclick='examine(0," + file.id + ")'>不通过</a></td>";
+                        else if (file.ispassed == 3 && json.studioID == "self") {
+                            var td = document.createElement("td");
+                            td.setAttribute("style", "width: fit-content");
+                            td.innerText = "申诉";
+                            td.onclick = function () {
+                                $("change").onsubmit = function () {
+                                    sendAjax("post", "studio_action", serialize(this) + "&id=" + id + "&action=complain", function (response) {
+                                        if (response == "success")
+                                            notify("申请成功！请留意通知");
+                                    });
+                                    return false;
+                                };
+                                transition();
+                            }
+                            row += td;
+                        }
+                        $("table").innerHTML += row;
+                    }
+                    break;
+                case 2:
+                    $("prj_info").innerHTML += "<div style='color: red;'>此项目已成功完成并处于关闭状态</div>";
+                    break;
+                case 3:
+                    $("prj_info").innerHTML += "<div>此项目中途失败，理由：" + json.reason + "</div>";
+                    $("enroll").innerText = "我要申诉";
+                    $("enroll").onclick = function () {
+                        $("change").onsubmit = function () {
+                            sendAjax("post", "studio_action", serialize(this) + "&id=" + id + "&action=complain", function (response) {
+                                if (response == "success")
+                                    notify("申请成功！请留意通知");
+                            });
+                            return false;
+                        };
+                        transition();
+                    }
+                    $("enroll").setAttribute("style", "width: 100px;bottom: 3%;position: absolute;margin-left: 5%;");
+                    break;
+            }
+        });
+    });
+
+    function examine(a, fileid) {
+        sendAjax("post", "examine", "id=" + fileid + "&action=" + a, function (response) {
+            if (response == "success")
+                notify("递交成功");
+        });
+    }
+</script>
+
+</html>

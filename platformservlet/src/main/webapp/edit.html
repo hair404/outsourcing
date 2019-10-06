@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+    <title>人力和项目服务平台</title>
+    <link rel="icon" type="image/x-icon" href="./img/logo.ico" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link href="./css/material-design-icons.css" rel="stylesheet">
+    <link type="text/css" rel="styleSheet" href="./css/main.css" />
+    <link type="text/css" rel="styleSheet" href="./css/detail.css" />
+</head>
+
+<body style="background-color: rgb(246, 246, 246);">
+    <div id="notify" class="card notify" style="display: none;"></div>
+    <div class="top">
+        <div class="head">
+            <div class="blur"></div>
+            <div class="cover"></div>
+            <div class="wrapper">
+                <img>
+                <div class="nav">
+                    <ul>
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./search.html?type=0">全部招标</a></li>
+                        <li><a href="./search.html?type=1">全部工作室</a></li>
+                    </ul>
+                </div>
+                <div style="float: right;height: 42px;padding-right: 10px;">
+                    <div class="account" onmouseover="display(0);" id="person">
+                        <div>游客</div>
+                        <img id="personalPic">
+                    </div>
+                    <div class="card info" onmouseleave="display(1)">
+                        <div class="card" style="height: 84px;" id="info">
+                            <div style="line-height: 42px;text-align: center;">您是：游客</div>
+                            <div style="line-height: 42px;text-align: center;"></div>
+                        </div>
+                        <ul id="option" class="selection" style="width: 100%;list-style: none;">
+                            <li style="line-height: 42px;text-align: center;"><a>我的项目</a></li>
+                            <li style="line-height: 42px;text-align: center;"><a>我的收藏</a></li>
+                            <li style="line-height: 42px;text-align: center;"><a>登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="message">消息</div>
+            </div>
+        </div>
+        <div class="background">
+            <div class="logo"><img src="./img/logo2.png"></div>
+            <form id="search" class="_search">
+                <input type="text" placeholder="你想搜索">
+                <button type="submit" style="background: transparent;border: transparent;"><i class="material-icons search" style="line-height: 30px;color: #00a1d6;cursor: pointer;"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="wrapper" style="height: 42px;">
+        <div class="categories nav">
+            <ul id="ctg">
+                <li><a>首页</a></li>
+                <li><a>网站开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>前端开发</a></li>
+                        <li><a>网站维护</a></li>
+                    </ul>
+                </li>
+                <li><a>移动应用开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>安卓APP</a></li>
+                        <li><a>苹果APP</a></li>
+                    </ul>
+                </li>
+                <li><a>H5开发</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>H5模板</a></li>
+                        <li><a>H5定制</a></li>
+                    </ul>
+                </li>
+                <li><a>UI设计</a>
+                    <ul class="selection card" style="width: 100px;position: absolute;">
+                        <li><a>网站UI</a></li>
+                        <li><a>移动UI</a></li>
+                    </ul>
+                </li>
+                <li><a>测试运维</a></li>
+                <li><a>云服务</a></li>
+                <li><a>IT综合服务</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="wrapper">
+        <img id="img" style="float: left;max-width: 150px;margin: 3.5px;border-radius: 200px;">
+        <input type="file" style="display: none;" id="fileInput" name="upload" accept="image/jpg,image/jpeg,image/png">
+        <div style="float: left;">
+            <form id="change" class="content">
+                <input name="username" type="text" placeholder="公司名" required>
+                <input name="name" type="text" placeholder="真实名字" required>
+                <input name="password" type="password" placeholder="密码">
+                <div style="width: 800px;display: none;">
+                    <select id="select" style="width: 100px;height: 50px;" onchange="addctg(parseInt(this.value));">
+                        <option value="0">请选择</option>
+                    </select>
+                </div>
+                <input name="email" type="email" placeholder="邮箱" required>
+                <input name="phone" type="text" placeholder="电话" required>
+                <textarea style="height: 200px;" name="info" placeholder="介绍" required></textarea>
+                <input type="submit" class="select-card select-card-hover" style="width: 100px;height: 42px;" value="保存">
+            </form>
+        </div>
+    </div>
+</body>
+
+<!-- firebase -->
+<script src="./js/firebase/firebase-app.js"></script>
+<script src="./js/firebase/firebase-messaging.js"></script>
+<script src="./js/firebase/firebase.js"></script>
+
+<script src="./js/utils.js"></script>
+<script src="./js/main.js"></script>
+<script>
+    var myid;
+    var mytype;
+
+    sync_info($("person"), $("info"), $("option"));
+
+    for (let i = 1; i < 8; i++) {
+        $("select").innerHTML += "<option id=" + i + " value='" + i + "'>" + translate_ctg(i) + "</option>";
+    }
+
+    sendAjax("post", "center", "", function (response) {
+        initFirebase();
+        var json = JSON.parse(response);
+        $("img").setAttribute("src", json.img);
+        $("change").children[0].value = json.username;
+        $("change").children[1].value = json.name;
+        if (mytype == 1) {
+            $("change").children[3].setAttribute("style", "width: 800px;");
+            for (const tag of json.tag) {
+                addctg(tag);
+            }
+        }
+        $("change").children[4].value = json.email;
+        $("change").children[5].value = json.phone;
+        $("change").children[6].value = json.info;
+    });
+
+    $("img").onclick = function () {
+        $("fileInput").click();
+    }
+
+    $("fileInput").onchange = function () {
+        var fd = new FormData();
+        fd.append("img", $("fileInput").files[0], "icon");
+        sendAjax("post", "upload_img", fd, function (response) {
+            if (response != null) {
+                $("img").setAttribute("src", response);
+                notify("上传成功");
+            }
+        })
+    }
+
+    $("change").onsubmit = function () {
+        var data = serialize(this);
+        var tagString = "&tag=0&password=0";
+        if (mytype == 1) {
+            var tags = [];
+            for (const tag of $("change").children[3].getElementsByTagName("div")) {
+                tags.push(tag.getAttribute("value"));
+            }
+            tagString = "&tag=[" + tags.toString() + "]";
+        }
+        data += tagString;
+        sendAjax("post", "edit", data, function (response) {
+            if (response == "success")
+                notify("成功");
+        });
+        return false;
+    }
+
+    function addctg(a) {
+        var div = document.createElement("div");
+        div.setAttribute("class", "select-card");
+        div.setAttribute("style", "width: 100px;");
+        div.setAttribute("value", a);
+        div.onclick = function () {
+            this.remove();
+            $("select").innerHTML += "<option id=" + a + " value='" + a + "'>" + translate_ctg(a) + "</option>";
+        }
+        div.innerText = translate_ctg(a);
+        $("change").children[3].insertBefore(div, $("select"));
+        $(a).remove();
+        $("select").value = 0;
+    }
+</script>
+
+</html>

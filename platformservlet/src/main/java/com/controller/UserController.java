@@ -113,7 +113,7 @@ public class UserController {
 			String email = user.getEmail();
 			String img_url = user.getImg();
 			Integer user_type = user.getType();
-			Integer id_check = user.getUser_id();
+			Integer id_check = user.getAccount_id();
 			String info = user.getInfo();
 			String name = user.getName();
 			HashMap<String, Object> basic = new HashMap<>();
@@ -190,7 +190,7 @@ public class UserController {
 			JSONArray array = new JSONArray();
 			array.put(0);
 			array.put(projectDao.getCompletedProject(id));
-			json.put("id", user.getUuid());
+			json.put("id", user.getAccount_id());
 			json.put("type", user.getType());
 			json.put("img", user.getImg());
 			json.put("username", user.getUsername());

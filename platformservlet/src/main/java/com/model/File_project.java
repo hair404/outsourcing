@@ -1,19 +1,20 @@
 package com.model;
 
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+@Getter 
 @Setter
 @Entity
-@Table(name = "tag")
-public class Tag {
-		@Id
-		private Integer id;
-		private Integer user_id;
-		private Integer tag;
+@Table(name = "file_project")
+public class File_project {
+	@Id
+	private int id;
+	private String url;
+	private int prj_id;
+
 }

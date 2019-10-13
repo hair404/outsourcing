@@ -3,22 +3,14 @@ package com.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
-import org.json.JSONArray;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import com.model.Account;
 import com.model.UserInfo;
 
 @Repository
@@ -37,7 +29,7 @@ public class UserDao {
 			@Override
 			public UserInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				UserInfo user = new UserInfo();
-				user.setUser_id(rs.getInt("id"));
+				user.setAccount_id(rs.getInt("id"));
 				user.setUsername(rs.getString("username"));
 				user.setTel(rs.getString("tel"));
 				user.setEmail(rs.getString("email"));
@@ -56,7 +48,7 @@ public class UserDao {
 
 	public void insertInfo(String name, String tel, String password, String email, String username, Integer type, String uuid, String entity) {
 		String sqlCom = "insert into user(name, tel,email, username, type, uuid, entity) values (?,?,?,?,?,?,?)";
-		jdbcTemplate.update(sqlCom, name, tel, email, username, type);
+		jdbcTemplate.update(sqlCom, name, tel, email, username, type);	
 	}
 	
 //update

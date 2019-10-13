@@ -24,9 +24,11 @@ public class ImgController {
 	ImgService imgService;
 	@Autowired
 	ResourceLoader resourceLoader;
-	public static final String ROOT = "F:/img/user_img";
+	public static final String root_user = "F:/img/user_img";
+	public static final String root_prj = "F:/img/prj_img";
 
-	@PostMapping("upload_userimg" )
+	 
+  	@PostMapping("upload_userimg" )
 	public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Integer id = (Integer) session.getAttribute("id");
@@ -55,11 +57,19 @@ public class ImgController {
 			}
 			return "false";
 	}
-
+	
 	@GetMapping(value = "/userimg/{filename:.+}",produces ="application/octet-stream;charset = utf-8")
-	public ResponseEntity<?> getFile(@PathVariable String filename) {
+	public ResponseEntity<?> get_user_img(@PathVariable String filename) {
 		try {
-			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
+			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_user, filename).toString()));
+		} catch (Exception e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	@GetMapping(value = "/prjimg/{filename:.+}",produces ="application/octet-stream;charset = utf-8")
+	public ResponseEntity<?> get_prj_img(@PathVariable String filename) {
+		try {
+			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_prj, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();
 		}

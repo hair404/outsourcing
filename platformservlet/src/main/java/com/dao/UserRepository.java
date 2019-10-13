@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Long>{
 	@Query("select u from com.model.UserInfo u where u.tel =:tel")
 	public UserInfo getInfoByTel(@Param("tel") String tel);
 	
-	@Query("select u from com.model.UserInfo u where u.user_id =:user_id")
-	public UserInfo getInfoById(@Param("user_id") Integer user_id);
+	@Query("select u from com.model.UserInfo u where u.account_id =:account_id")
+	public UserInfo getInfoById(@Param("account_id") Integer account_id);
 	
 }

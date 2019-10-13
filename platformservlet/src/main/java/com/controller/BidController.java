@@ -8,4 +8,8 @@ public class BidController {
 		
 		return null;
 	}
+	@PostMapping("studio_action")
+	 public String studio_action() {
+		return null;
+	}
 }

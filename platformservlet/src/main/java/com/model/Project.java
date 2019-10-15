@@ -16,7 +16,7 @@ public class Project {
 		private String solr_id;
 		private String  prjname;
 		private Integer tag;
-	    private Integer sub_tag;
+	    private Integer subtag;
 		private String img;
 		private String releaseTime;
 		private String deadline;
@@ -25,6 +25,9 @@ public class Project {
 		private Integer ifAd;
 		private float price;
 		private Integer companyID;
-		private Integer studio_id;
-	}
+		private Integer studioID;
+		private Integer companyhasPaid;
+		private Integer studiohasPaid;
+		private String entity;
+}
 

@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.dao.BidRepository;
 import com.dao.File_project_repository;
 import com.dao.ProjectRepository;
+import com.dao.ReasonRepository;
 import com.dao.UserRepository;
 import com.model.Bid;
 import com.model.File_project;
@@ -29,11 +30,13 @@ public class ProjectService {
 	ProjectRepository projectRepository;
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	ReasonRepository reasonRepository;
 
 	// a project information(the bid system)
-	public String get_info(Integer project_id, Integer company_id) {
+	public String get_info(Integer project_id, Integer user_id) {
 		Project project = projectRepository.get_info(project_id);
-		UserInfo company = userRepository.getInfoById(company_id);
+		UserInfo company = userRepository.getInfoById( user_id);
 		JSONObject project_info = new JSONObject(project);
 		project_info.put("companyName",	company.getUsername());
 	
@@ -44,7 +47,7 @@ public class ProjectService {
 			for (int i=0;i<rs.size();i++) {
 			   Bid bid = rs.get(i);
 			   Integer company_id_check = bid.getCompany_id();
-				if(company_id_check==company_id) {
+				if(company_id_check==user_id) {
 					   project_info.put("companyID", "self");
 				   }
 				Integer account_id = bid.getProject_id();
@@ -56,14 +59,41 @@ public class ProjectService {
 				user_info.put("prjname", prjname);
 				enroll.add(user_info);
 				project_info.put("enroll", enroll);	
-				System.out.println(user_info);
-				System.out.println(user);
 				}
 		}
-
+		else if(project.getState()==1) {
+			File_project file= fpj.get_file(project_id);
+			Integer user_id_check = project.getCompanyID();
+			String entity = userRepository.getInfoById(user_id).getEntity();
+			if(user_id_check==user_id&&entity.equals("company")) {
+				   project_info.put("companyID", "self");
+			   }
+			else project_info.put("studioID", "self");
+			String studio_name = userRepository.getInfoById(project.getStudioID()).getUsername();
+			project_info.put("studioName", studio_name);
+			JSONObject file_info = new JSONObject(file);
+			file_info.put("name", file.getPrj_id());
+			project_info.put("file", file_info);
+		}
+		else if(project.getState()==2||project.getState()==3) {
+			String entity = userRepository.getInfoById(user_id).getEntity();
+			Integer user_id_check = project.getCompanyID();
+			if(user_id_check==user_id&&entity.equals("company")) {
+				   project_info.put("companyID", "self");
+			   }
+			else project_info.put("studioID", "self");
+			String studio_name = userRepository.getInfoById(project.getStudioID()).getUsername();
+			project_info.put("studioName", studio_name);
+			project_info.remove("companyhasPaid");
+			project_info.remove("studiohasPaid");
+			if(project.getState()==3) {
+				String reason = reasonRepository.get_reason_studio_id(project.getStudioID(),project.getId()).getReason();
+				project_info.put("reason", reason);
+			}
+		}
 		return project_info.toString();
 	}
-
+	
 	public void upload(MultipartFile file, int prj_id) {
 		String fileName = file.getOriginalFilename();
 		String filePath = "F://file//" + prj_id + "/";

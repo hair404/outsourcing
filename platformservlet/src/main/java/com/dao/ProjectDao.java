@@ -33,7 +33,7 @@ public class ProjectDao {
 				project.setId(rs.getInt("id"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
-				project.setSub_tag(rs.getInt("sub_tag"));
+				project.setSubtag(rs.getInt("sub_tag"));
 				project.setImg(rs.getString("img"));
 				project.setPrice(rs.getFloat("price"));
 				return project;
@@ -51,7 +51,7 @@ public class ProjectDao {
 				project.setId(rs.getInt("uuid"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
-				project.setSub_tag(rs.getInt("sub_tag"));
+				project.setSubtag(rs.getInt("sub_tag"));
 				project.setImg(rs.getString("img"));
 				project.setPrice(rs.getFloat("price"));
 				return project;

@@ -34,7 +34,6 @@ public class ProjectController {
 //		HttpSession session = request.getSession();
 //		Integer user_id = (Integer) session.getAttribute("id");
 	Integer account_id = 1;
-	userRepository.getInfoById(account_id);
 		return projectService.get_info(project_id,account_id);
 		
 	}

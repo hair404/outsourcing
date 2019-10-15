@@ -1,10 +1,9 @@
-package com.controller;
+ package com.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +27,7 @@ public class FileController {
 			HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		
-		//Integer id = (Integer) session.getAttribute("id");// user's id;
-		Integer id =1;
+		Integer id = (Integer) session.getAttribute("id");// user's id;
 		if (file.isEmpty()) {
 			return "null";
 		} else {

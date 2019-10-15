@@ -12,19 +12,19 @@ import lombok.Setter;
 @Table(name = "project")
 public class Project {
 		@Id
-		private Integer uuid;
-		private String id;
+		private Integer id;
+		private String solr_id;
 		private String  prjname;
 		private Integer tag;
 	    private Integer sub_tag;
 		private String img;
 		private String releaseTime;
-		private String info;
-		private String state;
-		private Integer ifAd;
 		private String deadline;
+		private String info;
+		private Integer state;
+		private Integer ifAd;
 		private float price;
-		private Integer companyId;
-		private String studioId;
+		private Integer companyID;
+		private Integer studio_id;
 	}
 

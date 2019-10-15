@@ -12,14 +12,12 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dao.ProjectDao;
-import com.model.UserInfo;
-import com.service.AdService;
+import com.dao.UserRepository;
 import com.service.ProjectService;
 
 @RestController
@@ -28,7 +26,18 @@ public class ProjectController {
 	ProjectService projectService;
 	@Autowired
 	ProjectDao projectDao;
+	@Autowired
+    UserRepository userRepository;
 	
+	@PostMapping("project_info")
+	public String info(HttpServletRequest request, @RequestParam("id") Integer project_id){
+//		HttpSession session = request.getSession();
+//		Integer user_id = (Integer) session.getAttribute("id");
+	Integer account_id = 1;
+	userRepository.getInfoById(account_id);
+		return projectService.get_info(project_id,account_id);
+		
+	}
 
 	@PostMapping("register_prj")
 	public String register(HttpServletRequest request, HttpServletResponse response, 

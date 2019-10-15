@@ -4,14 +4,11 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
-import javax.sql.RowSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.model.Project;
@@ -22,15 +19,18 @@ public class ProjectDao {
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	ProjectRepository projectRepository;
-
-
+	
+	
+	
+	
+    //user's project information 
 	public List<Project> getCompletedProject(Integer id) {
 		String sql = "select * from project where state=1 and (CompanyId=? or studioId=?)";
 		List<Project> projectList = (List<Project>) jdbcTemplate.query(sql, new RowMapper<Project>() {
 			@Override
 			public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Project project = new Project();
-				project.setUuid(rs.getInt("id"));
+				project.setId(rs.getInt("id"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
 				project.setSub_tag(rs.getInt("sub_tag"));
@@ -48,7 +48,7 @@ public class ProjectDao {
 			@Override
 			public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Project project = new Project();
-				project.setUuid(rs.getInt("uuid"));
+				project.setId(rs.getInt("uuid"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
 				project.setSub_tag(rs.getInt("sub_tag"));

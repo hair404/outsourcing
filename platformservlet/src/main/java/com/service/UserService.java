@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.dao.UserDao;
 import com.dao.UserRepository;
-import com.model.Account;
-import com.model.UserInfo;
 
 @Service
 public class UserService {

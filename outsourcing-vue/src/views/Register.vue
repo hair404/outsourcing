@@ -56,8 +56,9 @@
         >
         <input
           v-model="repeatpassword"
-          placehrolder="重复密码"
+          placeholder="重复密码"
           type="password"
+          @click="check"
           required
         >
         <input
@@ -81,14 +82,33 @@ export default {
   components: {
     Head
   },
+  data () {
+    return {
+      account: '',
+      name: '',
+      phone: '',
+      password: '',
+      repeatpassword: '',
+      email: ''
+    }
+  },
   methods: {
     submit: function (event) {
+      let data = new FormData()
+      data.append('account', this.account)
+      data.append('name', this.name)
+      data.append('phone', this.phone)
+      data.append('password', this.password)
+      data.append('email', this.email)
       axios
-        .post('./register')
+        .post('.register?', data)
         .then(response => (this.info = response))
         .catch(function (error) {
           console.log(error)
         })
+    },
+    check: function () {
+
     }
   }
 }
@@ -193,7 +213,7 @@ input:hover {
 }
 
 .content {
-  width: 80%;
+  padding-right: 10%;
   padding-left: 10%;
   padding-bottom: 20px;
   height: fit-content;

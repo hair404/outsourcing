@@ -1,10 +1,7 @@
 package com.model;
 
-import java.sql.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -17,7 +14,6 @@ import lombok.Setter;
 @Table(name = "file")
 public class File {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	private String filename;
 	private String url;

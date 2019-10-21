@@ -12,14 +12,12 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dao.ProjectDao;
-import com.model.UserInfo;
-import com.service.AdService;
+import com.dao.UserRepository;
 import com.service.ProjectService;
 
 @RestController
@@ -28,6 +26,17 @@ public class ProjectController {
 	ProjectService projectService;
 	@Autowired
 	ProjectDao projectDao;
+	@Autowired
+    UserRepository userRepository;
+	
+	@PostMapping("project_info")
+	public String info(HttpServletRequest request, @RequestParam("id") Integer project_id){
+//		HttpSession session = request.getSession();
+//		Integer user_id = (Integer) session.getAttribute("id");
+	Integer account_id = 1;
+		return projectService.get_info(project_id,account_id);
+		
+	}
 
 	@PostMapping("register_prj")
 	public String register(HttpServletRequest request, HttpServletResponse response, 
@@ -43,33 +52,35 @@ public class ProjectController {
 		 Integer ifAd = 0;
 		 Integer state = 0;
 		 String entity = "project";
-		 String uuid = UUID.randomUUID().toString();
+		 String solr_id= UUID.randomUUID().toString();
 			HttpSession session = request.getSession();
 			Integer id = (Integer) session.getAttribute("id");
 			id=1;
-			if (file.isEmpty()) {
+			if (file.isEmpty()) 
 				return "null";
-			}
+			else {
 			if(id!=null)
 			{
 				String fileName = file.getOriginalFilename();
 				String suffixName = fileName.substring(fileName.lastIndexOf("."));
 				String filePath = "F://img//prj_img//";
-				fileName = uuid + suffixName;
+				fileName = solr_id + suffixName;
 				File dest = new File(filePath + fileName);
 				if (!dest.getParentFile().exists()) {
 					dest.getParentFile().mkdirs();
 				}
 				try {
-					String img = "http://localhost:8080/prj_img/" + fileName;
+					String img = "http://localhost:8080/prjimg/" + fileName;
 					file.transferTo(dest);
-					projectDao.insertPrj(name, tag, sub_tag, img, releaseTime, info, state, ifAd, deadline, price, id, uuid, entity);
+					projectDao.insertPrj(name, tag, sub_tag, img, releaseTime, info, state, ifAd, deadline, price, id, solr_id, entity);
 					return "success";
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				}
+			}
 				return "false";
+				
 }
    @PostMapping("my_prj")
     public JSONArray myPrj(@RequestParam("state") Integer state,HttpServletRequest request) {

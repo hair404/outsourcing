@@ -28,13 +28,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.dao.AdRepository;
 import com.dao.ProjectDao;
 import com.dao.TagDao;
 import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.model.Account;
-import com.model.Ad;
 import com.model.Project;
 import com.model.Tag;
 import com.model.UserInfo;
@@ -180,19 +178,24 @@ public class DemoApplicationTests {
 //		}
 //		System.out.println(json);
 //	}
-	public void myPrj() {
-		  // HttpSession session =request.getSession();
-		   //Integer id = (Integer) session.getAttribute("id");
-		   Integer id =1;
-		   Integer state = 1;
-		   JSONArray array = new JSONArray();
-		   if(id!=null) {
-			   array.put(0);
-			   array.put(projectDao.getProjectById(state, id));
-		   }
-		   System.out.println(array);
-		  
-	   }
+//	public void myPrj() {
+//		  // HttpSession session =request.getSession();
+//		   //Integer id = (Integer) session.getAttribute("id");
+//		   Integer id =1;
+//		   Integer state = 1;
+//		   JSONArray array = new JSONArray();
+//		   if(id!=null) {
+//			   array.put(0);
+//			   array.put(projectDao.getProjectById(state, id));
+//		   }
+//		   System.out.println(array);
+//		  
+//	   }
+	public void uuid() {
+		UUID i = UUID.randomUUID();
+		System.out.println(i);
+		
+	}
 }
 
 //	}

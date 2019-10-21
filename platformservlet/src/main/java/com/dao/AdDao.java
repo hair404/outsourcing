@@ -1,24 +1,28 @@
 package com.dao;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import com.model.Ad;
+
+import com.model.Ad_project;
 
 @Repository
 public class AdDao {
 	@Autowired
-	AdRepository adPrjRepository;
+	AdProjectRepository adPrjRepository;
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
-	public List<Ad> queryAd() {
+	public List<Ad_project> queryAd() {
 		Sort sort = new Sort(Sort.Direction.DESC, "weight");
-		List<Ad> listAd = adPrjRepository.findAll(sort);
+		List<Ad_project> project = adPrjRepository.findAll(sort);
+		List<Ad_project> listAd = new ArrayList<>();
+		listAd.addAll(project);
 		return listAd;
 	}
 	

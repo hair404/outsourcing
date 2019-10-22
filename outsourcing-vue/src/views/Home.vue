@@ -1,13 +1,18 @@
 <template>
-  <HelloWorld />
+  <div>
+    <!-- <Card
+      id="123"
+      :img="require('../assets/head.jpg')"
+    /> -->
+  </div>
 </template>
 
 <script>
-import HelloWorld from '../components/HelloWorld';
+import Card from '../components/Card'
 
 export default {
   components: {
-    HelloWorld,
-  },
-};
+    Card
+  }
+}
 </script>

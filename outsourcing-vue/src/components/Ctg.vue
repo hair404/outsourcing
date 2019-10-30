@@ -5,46 +5,21 @@
   >
     <div class="categories nav">
       <ul id="ctg">
-        <li><a>首页</a></li>
-        <li><a>网站开发</a>
+        <li
+          v-for="(item,i) in ctg"
+          :key="i"
+        ><a>{{item.name}}</a>
           <ul
             class="selection card"
-            style="width: 100px;position: absolute;"
+            style="width: 100px;position: absolute"
           >
-            <li><a>前端开发</a></li>
-            <li><a>网站维护</a></li>
+            <li
+              v-for="subctg in item.subctg"
+              :key="subctg"
+            ><a>{{subctg}}</a></li>
           </ul>
         </li>
-        <li><a>移动应用开发</a>
-          <ul
-            class="selection card"
-            style="width: 100px;position: absolute;"
-          >
-            <li><a>安卓APP</a></li>
-            <li><a>苹果APP</a></li>
-          </ul>
-        </li>
-        <li><a>H5开发</a>
-          <ul
-            class="selection card"
-            style="width: 100px;position: absolute;"
-          >
-            <li><a>H5模板</a></li>
-            <li><a>H5定制</a></li>
-          </ul>
-        </li>
-        <li><a>UI设计</a>
-          <ul
-            class="selection card"
-            style="width: 100px;position: absolute;"
-          >
-            <li><a>网站UI</a></li>
-            <li><a>移动UI</a></li>
-          </ul>
-        </li>
-        <li><a>测试运维</a></li>
-        <li><a>云服务</a></li>
-        <li><a>IT综合服务</a></li>
+
       </ul>
     </div>
   </div>
@@ -52,7 +27,35 @@
 
 <script>
 export default {
-  name: 'Ctg'
+  name: 'Ctg',
+  data () {
+    return {
+      ctg: [{
+        name: '首页'
+      },
+      {
+        name: '网站开发',
+        subctg: [
+          '前端开发', '网站维护'
+        ]
+      },
+      {
+        name: '移动应用开发',
+        subctg: ['安卓APP', '苹果APP']
+      },
+      {
+        name: 'H5开发',
+        subctg: ['H5模板', 'H5定制']
+      },
+      {
+        name: 'UI设计',
+        subctg: ['网站UI', '移动UI']
+      },
+      { name: '测试运维' },
+      { name: '云服务' },
+      { name: 'IT综合服务' }]
+    }
+  }
 }
 </script>
 
@@ -66,9 +69,11 @@ export default {
   padding: 0;
   display: inline;
   transition: 300ms;
+  line-height: 39px;
 }
 
 .categories > ul > li:hover > a {
+  color: #00a1d6 !important;
   border-bottom: 3px solid #00a1d6;
 }
 
@@ -92,7 +97,7 @@ export default {
 .nav > ul > div > li {
   float: left;
   text-align: center;
-  line-height: 42px;
+  height: 42px;
   transition: 300ms;
 }
 
@@ -104,7 +109,6 @@ export default {
 }
 
 .nav > ul > li:hover,
-.message:hover,
 .nav > ul > div > li:hover {
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.2);

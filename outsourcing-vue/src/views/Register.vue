@@ -1,5 +1,18 @@
 <template>
   <div class="body">
+    <v-snackbar
+      color="error"
+      v-model="snackbar"
+    >
+      {{ text }}
+      <v-btn
+        text
+        color="red"
+        @click="snackbar = false"
+      >
+        关闭
+      </v-btn>
+    </v-snackbar>
 
     <Head />
     <div class="hover">
@@ -89,11 +102,18 @@ export default {
       phone: '',
       password: '',
       repeatpassword: '',
-      email: ''
+      email: '',
+      snackbar: false,
+      text: ''
     }
   },
   methods: {
-    submit: function (event) {
+    submit: function () {
+      if (this.password !== this.repeatpassword) {
+        this.text = '密码不匹配!'
+        this.snackbar = true
+        return false
+      }
       let data = new FormData()
       data.append('account', this.account)
       data.append('name', this.name)
@@ -108,7 +128,10 @@ export default {
         })
     },
     check: function () {
-
+      if (this.password.length < 6) {
+        this.text = '密码太短!'
+        this.snackbar = true
+      }
     }
   }
 }

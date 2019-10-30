@@ -14,13 +14,23 @@
           style="overflow:hidden"
         >
           <img>
-          <div class="nav">
+          <div class="nav d-none d-sm-flex">
             <ul>
-              <li><a href="./index.html">首页</a></li>
-              <li><a href="./search.html?type=0">全部招标</a></li>
-              <li><a href="./search.html?type=1">全部工作室</a></li>
+              <li>
+                <router-link to="/home">首页</router-link>
+              </li>
+              <li>
+                <router-link to="/search">全部招标</router-link>
+              </li>
+              <li>
+                <router-link to="/search">全部工作室</router-link>
+              </li>
             </ul>
           </div>
+          <v-icon
+            class="d-flex d-sm-none"
+            color="black"
+          >mdi-menu</v-icon>
           <div style="float: right;height: 42px;padding-right: 10px;">
             <div
               class="account"
@@ -53,6 +63,7 @@
               </ul>
             </div>
           </div>
+          <div class="message">收藏</div>
           <div class="message">消息</div>
         </div>
       </div>
@@ -73,10 +84,12 @@
           <button
             type="submit"
             style="background: transparent;border: transparent;"
-          ><i
-              class="material-icons search"
-              style="line-height: 30px;color: #00a1d6;cursor: pointer;"
-            ></i></button>
+          >
+            <v-icon
+              color="primary"
+              style="line-height: 30px;cursor: pointer;"
+            >mdi-file-search</v-icon>
+          </button>
         </form>
       </v-parallax>
     </div>
@@ -200,6 +213,7 @@ export default {
   width: 170px;
   border: 0px;
   background: transparent;
+  color: black;
 }
 
 ._search:hover {

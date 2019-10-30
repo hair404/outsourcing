@@ -2,9 +2,15 @@
   <div style="width: 60%;height: 42px;margin: 0 auto;">
     <div class="nav">
       <ul>
-        <li><a href="./index.html">首页</a></li>
-        <li><a href="./search.html?type=0">全部招标</a></li>
-        <li><a href="./search.html?type=1">全部工作室</a></li>
+        <li>
+          <router-link to="/home">首页</router-link>
+        </li>
+        <li>
+          <router-link to="/search">全部招标</router-link>
+        </li>
+        <li>
+          <router-link to="/search">全部工作室</router-link>
+        </li>
       </ul>
     </div>
   </div>

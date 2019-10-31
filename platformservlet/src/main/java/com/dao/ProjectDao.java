@@ -33,7 +33,7 @@ public class ProjectDao {
 				project.setId(rs.getInt("id"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
-				project.setSubtag(rs.getInt("sub_tag"));
+				project.setSubtag(rs.getInt("subtag"));
 				project.setImg(rs.getString("img"));
 				project.setPrice(rs.getFloat("price"));
 				return project;
@@ -48,10 +48,10 @@ public class ProjectDao {
 			@Override
 			public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Project project = new Project();
-				project.setId(rs.getInt("uuid"));
+				project.setId(rs.getInt("id"));
 				project.setTag(rs.getInt("tag"));
 				project.setPrjname(rs.getString("prjname"));
-				project.setSubtag(rs.getInt("sub_tag"));
+				project.setSubtag(rs.getInt("subtag"));
 				project.setImg(rs.getString("img"));
 				project.setPrice(rs.getFloat("price"));
 				return project;
@@ -62,7 +62,7 @@ public class ProjectDao {
 
 	public void insertPrj(String name, Integer tag, Integer sub_tag, String img, Date releaseTime, String info,
 			Integer state, Integer ifAd, Date deadline, float price, Integer companyId, String solr_id, String entity) {
-		String sqlCom = "insert into project(prjname,tag,sub_tag,img,releaseTime,info,state,ifAd,deadline,price,companyId,solr_id,entity) "
+		String sqlCom = "insert into project(prjname,tag,subtag,img,releaseTime,info,state,ifAd,deadline,price,companyId,solr_id,entity) "
 				+ "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		jdbcTemplate.update(sqlCom, name, tag, sub_tag, img, releaseTime, info, state, ifAd, deadline, price,
 				companyId,solr_id,entity);

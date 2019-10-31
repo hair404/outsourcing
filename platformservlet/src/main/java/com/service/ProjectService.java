@@ -13,7 +13,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.dao.BidRepository;
 import com.dao.File_project_repository;
 import com.dao.ProjectRepository;
-import com.dao.ReasonRepository;
+import com.dao.CancelReasonRepository;
 import com.dao.UserRepository;
 import com.model.Bid;
 import com.model.File_project;
@@ -31,7 +31,7 @@ public class ProjectService {
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
-	ReasonRepository reasonRepository;
+	CancelReasonRepository reasonRepository;
 
 	// a project information(the bid system)
 	public String get_info(Integer project_id, Integer user_id) {

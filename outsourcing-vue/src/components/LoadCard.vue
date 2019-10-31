@@ -8,7 +8,7 @@
       <v-card
         :elevation="hover ? 12 : 2"
         class="mx-auto my-2"
-        max-width="374"
+        min-width="200"
         width="24%"
       >
         <v-img
@@ -42,6 +42,7 @@ export default {
   name: 'LoadCard',
   data () {
     return {
+      type: 0,
       index: 1,
       cards: []
     }

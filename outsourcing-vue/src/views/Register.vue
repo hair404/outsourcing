@@ -25,6 +25,7 @@
       ></i>
       <div class="title">
         <button
+          name="type"
           id="company"
           checked
         >发包公司</button>
@@ -44,7 +45,7 @@
         class="content"
       >
         <input
-          v-model="account"
+          v-model="username"
           placeholder="公司名"
           type="text"
           required
@@ -97,7 +98,7 @@ export default {
   },
   data () {
     return {
-      account: '',
+      username: '',
       name: '',
       phone: '',
       password: '',
@@ -115,7 +116,7 @@ export default {
         return false
       }
       let data = new FormData()
-      data.append('account', this.account)
+      data.append('username', this.account)
       data.append('name', this.name)
       data.append('phone', this.phone)
       data.append('password', this.password)

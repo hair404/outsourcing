@@ -54,7 +54,6 @@
           >
             个人中心
           </v-btn>
-
           <v-btn
             color="primary"
             text
@@ -79,6 +78,7 @@ export default {
   data () {
     return {
       info: {},
+      activities: [],
       carousels: []
     }
   },
@@ -90,10 +90,19 @@ export default {
           this.info = response.data
         })
         .catch(error => { console.log(error) })
+    },
+    loadActivities () {
+      Axios
+        .post('/Platform/activity', 'type=basic')
+        .then(response => {
+          this.activities = response.data
+        })
+        .catch(error => { console.log(error) })
     }
   },
   created () {
     this.loadinfo()
+    this.loadActivities()
   }
 }
 </script>

@@ -14,16 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import com.service.ImgService;
+
+import com.dao.ImgDao;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class ImgController {
 	@Autowired
-	ImgService imgService;
-	@Autowired
 	ResourceLoader resourceLoader;
+	@Autowired
+	ImgDao imgDao;
+	
 	public static final String root_user = "F:/img/user_img";
 	public static final String root_prj = "F:/img/prj_img";
 
@@ -48,7 +50,7 @@ public class ImgController {
 			try {
 				String url = "http://localhost:8080/userimg/" + fileName;
 				file.transferTo(dest);
-				imgService.insert(url, id);
+				imgDao.insert(url, id);
 				return url;
 			} catch (IOException e) {
 				e.printStackTrace();

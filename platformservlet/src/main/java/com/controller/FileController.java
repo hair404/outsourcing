@@ -27,7 +27,8 @@ public class FileController {
 			HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		
-		Integer id = (Integer) session.getAttribute("id");// user's id;
+		//Integer id = (Integer) session.getAttribute("id");// user's id;
+		Integer id =1;
 		if (file.isEmpty()) {
 			return "null";
 		} else {

@@ -10,12 +10,12 @@ import lombok.Setter;
 @Getter 
 @Setter
 @Entity
-@Table(name = "reason")
+@Table(name = "complain_reason")
 
-public class Reason {
+public class Complain_reason {
 	@Id
 	private Integer id;
-	private Integer studioid;
+	private Integer entity;//1 for company,2 for studio
 	private String reason;
 	private Integer project_id;
 }

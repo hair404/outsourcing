@@ -7,6 +7,7 @@ import Search from './views/Search.vue'
 import Edit from './views/Edit'
 import Display from './views/Display'
 import Center from './views/Center'
+import Login from './views/Login'
 
 Vue.use(Router)
 
@@ -39,6 +40,11 @@ export default new Router({
           component: Center
         }
       ]
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/register',

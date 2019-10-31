@@ -120,9 +120,10 @@ export default {
       data.append('phone', this.phone)
       data.append('password', this.password)
       data.append('email', this.email)
+      data.append('type', 0)
       axios
-        .post('.register?', data)
-        .then(response => (this.info = response))
+        .post('/Platform/register', data)
+        .then(response => (this.$router.push({ path: './home' })))
         .catch(function (error) {
           console.log(error)
         })

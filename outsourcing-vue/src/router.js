@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from './views/Login.vue'
+import Register from './views/Register.vue'
 import Index from './views/Index.vue'
 import Detail from './views/Detail.vue'
 import Home from './views/Home.vue'
@@ -8,8 +9,6 @@ import Center from './views/Center.vue'
 import Edit from './views/Edit.vue'
 import Search from './views/Search.vue'
 import Display from './views/Display.vue'
-
-
 
 Vue.use(Router)
 

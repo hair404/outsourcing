@@ -61,7 +61,6 @@
 import top from '../components/'
 import categories from '../components/'
 
-
 Vue.component("top",{
   template:top
 });

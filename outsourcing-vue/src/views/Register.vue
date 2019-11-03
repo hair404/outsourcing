@@ -23,34 +23,20 @@
         onclick="window.location.href='./login.html';"
         style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
       ></i>
-      <!-- <div class="title">
-        <button
-          id="company"
-          :click="type = 0"
-        >发包公司</button>
-        <button
-          id="studio"
-          :click="type = 1"
-        >工作室</button>
-        <button
-          id="manager"
-          :click="type = 2"
-        >管理员</button>
-      </div> -->
       <h1>注册</h1>
       <form
         id="form"
         @submit.prevent="submit"
         class="content"
       >
-        <select>
+        <select v-model="type">
           <option value="0">发包公司</option>
           <option value="1">工作室</option>
           <option value="2">管理员</option>
         </select>
         <input
           v-model="username"
-          placeholder="公司名"
+          :placeholder="userTypeName[type]"
           type="text"
           required
         >
@@ -102,6 +88,7 @@ export default {
   },
   data () {
     return {
+      userTypeName: ['公司名', '工作室名', '管理员名称'],
       username: '',
       name: '',
       phone: '',

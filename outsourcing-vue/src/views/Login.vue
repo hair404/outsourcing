@@ -1,11 +1,15 @@
 <template>
   <div class="backimg">
+
     <Head></Head>
     <div class="hover">
       <div class="blur"></div>
       <div class="cover"></div>
       <h1 class="title">人力和项目服务平台</h1>
-      <form id="login" @submit.prevent="submit">
+      <form
+        id="login"
+        @submit.prevent="submit"
+      >
         <div class="content">
           <input
             v-model="username"
@@ -25,16 +29,29 @@
           />
         </div>
         <div>
-          <input v-model="type" type="radio" name="type" value="0" checked />发包公司
-          <input v-model="type" type="radio" name="type" value="1" />工作室
-          <input v-model="type" type="radio" name="type" value="2" />管理员
+          <input
+            v-model="type"
+            type="radio"
+            name="type"
+            value="0"
+            checked
+          />发包公司
+          <input
+            v-model="type"
+            type="radio"
+            name="type"
+            value="1"
+          />工作室
+          <input
+            v-model="type"
+            type="radio"
+            name="type"
+            value="2"
+          />管理员
         </div>
         <br />
         <div class="button">
-          <a
-            style="width: 80%;height: 30px;text-decoration:none;color:black;cursor:pointer"
-           
-          >登录</a>
+          <a style="width: 80%;height: 30px;text-decoration:none;color:black;cursor:pointer">登录</a>
           <br />
           <br />
           <v-btn
@@ -61,7 +78,7 @@ export default {
   data () {
     return {
       username: '',
-      password: '',
+      password: ''
     }
   },
   methods: {
@@ -70,10 +87,10 @@ export default {
       data.append('username', this.username)
       data.append('password', this.password)
       axios
-        .post('.Login?', data)
+        .post('/Platform/Login', data)
         .then(response => {
-          if(response='success'){
-            this.$router.push({ path: "/index" });
+          if (response === 'success') {
+            this.$router.push({ path: '/index' })
           }
         })
         .catch(function (error) {

@@ -1,50 +1,12 @@
-function sendAjax (type, url, data, todo) {
-  var xmlhttp = new XMLHttpRequest()
-  xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-      todo(xmlhttp.responseText)
-    }
-  }
-  if (type == 'post') {
-    xmlhttp.open(type, url, true)
-    if (data instanceof FormData) { xmlhttp.setRequestHeader('Content-type', 'multipart/form-data') } else {
-      xmlhttp.setRequestHeader(
-        'Content-type',
-        'application/x-www-form-urlencoded'
-      )
-    }
-    xmlhttp.send(data)
-  } else {
-    xmlhttp.open(type, url + data, true)
-    xmlhttp.send()
-  }
+/* eslint-disable */
+export default {
+  name: 'utils',
+  translate: translate,
+  translate_ctg: translate_ctg,
+  translate_subctg: translate_subctg
 }
 
-function $ (id) {
-  return document.getElementById(id)
-}
-
-function $name (name) {
-  return document.getElementsByName(name)
-}
-
-function serialize (form) {
-  var data = ''
-  for (const input of form.getElementsByTagName('input')) {
-    if (input.type == 'text' || input.type == 'date' || input.type == 'email') { data += '&' + input.name + '=' + input.value }
-  }
-  for (const textarea of form.getElementsByTagName('textarea')) {
-    data += '&' + textarea.name + '=' + textarea.value
-  }
-  return data.substring(1, data.length)
-}
-
-FormData.prototype.add = (name, value) => {
-  this.append(name, value)
-  return this
-}
-
-function translate (a) {
+function translate(a) {
   switch (a) {
     case 0:
       return '企业'
@@ -56,7 +18,7 @@ function translate (a) {
   return '游客'
 }
 
-function translate_ctg (a) {
+function translate_ctg(a) {
   switch (a) {
     case 0:
       return '全部'
@@ -77,7 +39,7 @@ function translate_ctg (a) {
   }
 }
 
-function translate_subctg (a, b) {
+function translate_subctg(a, b) {
   switch (a) {
     case 1:
       switch (b) {
@@ -111,7 +73,7 @@ function translate_subctg (a, b) {
   return '全部'
 }
 
-function translate_state (a) {
+function translate_state(a) {
   switch (a) {
     case 0:
       return '匹配工作室'
@@ -122,7 +84,7 @@ function translate_state (a) {
   }
 }
 
-function translate_passed (a) {
+function translate_passed(a) {
   switch (a) {
     case 0:
       return '未审核'
@@ -133,7 +95,7 @@ function translate_passed (a) {
   }
 }
 
-function translate_manager (type, state) {
+function translate_manager(type, state) {
   switch (type) {
     case 0:
       switch (state) {

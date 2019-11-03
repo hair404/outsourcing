@@ -34,7 +34,6 @@
             type="radio"
             name="type"
             value="0"
-            checked
           />发包公司
           <input
             v-model="type"
@@ -68,31 +67,31 @@
 </template>
 
 <script>
-import Head from "@/components/Head.vue";
-import axios from "axios";
+import Head from '@/components/Head.vue'
+import axios from 'axios'
 export default {
-  name: "Login",
+  name: 'Login',
   components: {
     Head
   },
   data () {
     return {
-      username: "",
-      password: "",
-      type: ''
+      username: '',
+      password: '',
+      type: 0
     }
   },
   methods: {
     submit: function (event) {
-      let data = new FormData();
-      data.append("username", this.username)
-      data.append("password", this.password)
-      data.append("type", this.type)
+      let data = new FormData()
+      data.append('username', this.username)
+      data.append('password', this.password)
+      data.append('type', this.type)
       axios
-        .post("./Login", data)
+        .post('./Login', data)
         .then(response => {
-          if ((response = "success")) {
-            this.$router.push({ path: "/index" })
+          if ((response === 'success')) {
+            this.$router.push({ path: '/index' })
           }
         })
         .catch(function (error) {

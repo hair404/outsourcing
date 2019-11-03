@@ -23,27 +23,31 @@
         onclick="window.location.href='./login.html';"
         style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
       ></i>
-      <div class="title">
+      <!-- <div class="title">
         <button
-          name="type"
           id="company"
-          checked
+          :click="type = 0"
         >发包公司</button>
         <button
-          name="type"
           id="studio"
+          :click="type = 1"
         >工作室</button>
         <button
-          name="type"
           id="manager"
+          :click="type = 2"
         >管理员</button>
-      </div>
-
+      </div> -->
+      <h1>注册</h1>
       <form
         id="form"
         @submit.prevent="submit"
         class="content"
       >
+        <select>
+          <option value="0">发包公司</option>
+          <option value="1">工作室</option>
+          <option value="2">管理员</option>
+        </select>
         <input
           v-model="username"
           placeholder="公司名"
@@ -105,7 +109,8 @@ export default {
       repeatpassword: '',
       email: '',
       snackbar: false,
-      text: ''
+      text: '',
+      type: 0
     }
   },
   methods: {
@@ -116,17 +121,19 @@ export default {
         return false
       }
       let data = new FormData()
-      data.append('username', this.account)
+      data.append('username', this.username)
       data.append('name', this.name)
       data.append('phone', this.phone)
       data.append('password', this.password)
       data.append('email', this.email)
-      data.append('type', 0)
+      data.append('type', this.type)
       axios
         .post('/Platform/register', data)
         .then(response => (this.$router.push({ path: './home' })))
         .catch(function (error) {
           console.log(error)
+          this.text = '服务器错误'
+          this.snackbar = true
         })
     },
     check: function () {
@@ -150,11 +157,6 @@ export default {
   height: 100%;
   background-position: center;
   overflow: hidden;
-}
-
-.content input {
-  margin-top: 10px;
-  height: 30px;
 }
 
 form {
@@ -225,14 +227,16 @@ form {
   text-align: center;
 }
 
-input {
+input,
+select {
   border: transparent;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 3px;
   transition: 200ms;
 }
 
-input:hover {
+input:hover,
+select:hover {
   background: white;
   box-shadow: grey 0px 1px 4px;
 }
@@ -244,11 +248,20 @@ input:hover {
   height: fit-content;
 }
 
+.content select,
 .content input {
   margin-top: 20px;
   display: block;
   width: 100%;
-  height: 50px;
+  height: 42px;
+}
+
+h1 {
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
 }
 
 .register {

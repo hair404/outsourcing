@@ -36,6 +36,22 @@ body {
   background-color: rgb(246, 246, 246);
 }
 
+.theme--light.v-icon {
+  background-color: transparent !important;
+}
+
+.theme--light.v-card {
+  background-color: #ffffff !important;
+}
+
+.theme--light.v-btn {
+  background-color: #ffffff !important;
+}
+
+.theme--light {
+  background-color: rgb(246, 246, 246) !important;
+}
+
 .card {
   display: block;
   background-color: white;
@@ -52,7 +68,12 @@ body {
   width: 60%;
   margin: 0 auto;
   min-width: 400px;
-  height: 100%;
+}
+
+@media screen and (max-width: 1200px) {
+  .wrapper {
+    width: 90%;
+  }
 }
 
 .selection li:hover {

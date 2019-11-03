@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="wrapper"
-    style="height: 42px;"
-  >
+  <div class="wrapper">
     <div class="categories nav">
       <ul id="ctg">
         <li
@@ -19,7 +16,6 @@
             ><a>{{subctg}}</a></li>
           </ul>
         </li>
-
       </ul>
     </div>
   </div>

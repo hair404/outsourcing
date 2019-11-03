@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Register from './views/Register.vue'
+import Login from './views/Login.vue'
 import Index from './views/Index.vue'
+import Detail from './views/Detail.vue'
 import Home from './views/Home.vue'
+import Center from './views/Center.vue'
+import Edit from './views/Edit.vue'
 import Search from './views/Search.vue'
-import Edit from './views/Edit'
-import Display from './views/Display'
-import Center from './views/Center'
-import Login from './views/Login'
+import Display from './views/Display.vue'
+
+
 
 Vue.use(Router)
 
@@ -19,16 +21,15 @@ export default new Router({
       component: Index,
       redirect: { name: 'home' },
       children: [
-        { path: '/home', name: 'home', component: Home },
         {
-          path: '/search',
-          name: 'search',
-          component: Search
+          path: '/home',
+          name: 'home',
+          component: Home
         },
         {
-          path: '/edit',
-          name: 'edit',
-          component: Edit
+          path: '/center',
+          name: 'center',
+          component: Center
         },
         {
           path: '/display',
@@ -36,9 +37,19 @@ export default new Router({
           component: Display
         },
         {
-          path: '/center',
-          name: 'center',
-          component: Center
+          path: '/edit',
+          name: 'edit',
+          component: Edit
+        },
+        {
+          path: '/search',
+          name: 'search',
+          component: Search
+        },
+        {
+          path: '/detail',
+          name: 'detail',
+          component: Detail
         }
       ]
     },

@@ -96,7 +96,8 @@ export default {
   data() {
     return {
       id: "",
-      action: ""
+      action: "",
+      info:'',
     };
   },
   computed:{

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from './views/Login.vue'
+import Register from './views/Register.vue'
 import Index from './views/Index.vue'
 import Detail from './views/Detail.vue'
 import Home from './views/Home.vue'
@@ -19,7 +20,7 @@ export default new Router({
       path: '/',
       name: 'index',
       component: Index,
-      children: [
+      children:[
         {
           path: '/home',
           name: 'home',
@@ -49,13 +50,18 @@ export default new Router({
           path: '/detail',
           name: 'detail',
           component: Detail
-        }
+        },
       ]
     },
     {
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
     }
   ]
 })

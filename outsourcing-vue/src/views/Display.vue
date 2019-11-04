@@ -1,5 +1,7 @@
 <template>
   <div>
+        <Nav></Nav>
+    <Ctg></Ctg>
     <div
       id="modal"
       style="display: none"

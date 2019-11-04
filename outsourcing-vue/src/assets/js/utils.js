@@ -1,32 +1,12 @@
-export function sendAjax(type, url, data, todo) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            todo(xmlhttp.responseText);
-        }
-    }
-    if (type == "post") {
-        xmlhttp.open(type, url, true);
-        if (data instanceof FormData)
-            xmlhttp.setRequestHeader("Content-type", "multipart/form-data");
-        else
-            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xmlhttp.send(data);
-    } else {
-        xmlhttp.open(type, url + data, true);
-        xmlhttp.send();
-    }
-}
-
-export function $(id) {
+function $(id) {
     return document.getElementById(id);
 }
 
-export function $name(name) {
+ function $name(name) {
     return document.getElementsByName(name);
 }
 
-export function serialize(form) {
+ function serialize(form) {
     var data = "";
     for (const input of form.getElementsByTagName("input")) {
         if (input.type == "text" || input.type == "date" || input.type == "email")
@@ -43,7 +23,7 @@ FormData.prototype.add = (name, value) => {
     return this;
 }
 
-export function translate(a) {
+function translate(a) {
     switch (a) {
         case 0:
             return "企业";
@@ -54,8 +34,7 @@ export function translate(a) {
     }
     return "游客";
 }
-
-export function translate_ctg(a) {
+function translate_ctg(a) {
     switch (a) {
         case 0:
             return "全部";
@@ -76,7 +55,7 @@ export function translate_ctg(a) {
     }
 }
 
-export function translate_subctg(a, b) {
+ function translate_subctg(a, b) {
     switch (a) {
         case 1:
             switch (b) {
@@ -109,8 +88,7 @@ export function translate_subctg(a, b) {
     }
     return "全部";
 }
-
-export function translate_state(a) {
+function translate_state(a) {
     switch (a) {
         case 0:
             return "匹配工作室";
@@ -121,7 +99,7 @@ export function translate_state(a) {
     }
 }
 
-export function translate_passed(a) {
+function translate_passed(a) {
     switch (a) {
         case 0:
             return "未审核";
@@ -131,8 +109,7 @@ export function translate_passed(a) {
             return "未通过";
     }
 }
-
-export function translate_manager(type, state) {
+ function translate_manager(type, state) {
     switch (type) {
         case 0:
             switch (state) {
@@ -157,4 +134,16 @@ export function translate_manager(type, state) {
                     return "待处理";
             }
     }
+}
+
+export{
+    $,
+    $name,
+    serialize,
+    translate,
+    translate_ctg,
+    translate_manager,
+    translate_passed,
+    translate_state,
+    translate_subctg
 }

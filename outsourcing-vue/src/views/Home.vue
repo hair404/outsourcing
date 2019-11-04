@@ -1,5 +1,7 @@
 <template>
   <div>
+        <Nav></Nav>
+    <Ctg></Ctg>
     <!-- <Card
       id="123"
       :img="require('../assets/head.jpg')"

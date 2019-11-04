@@ -1,5 +1,5 @@
-var index = 1;
 var todo = function todo(response) {
+    var index = 1;
     var json = JSON.parse(response);
     for (let i = index - 1; i < json.length + index - 2; i++) {
         const jsonObject = json[i - (index - 1) + 1];
@@ -86,6 +86,13 @@ var todo = function todo(response) {
     index += json.length - 1;
 };
 
+function $name(name) {
+    return document.getElementsByName(name);
+}
+function $(id) {
+    return document.getElementById(id);
+}
+
 var projects = $name("project");
 var projects_length = projects.length;
 
@@ -101,10 +108,7 @@ if (window.innerHeight >= 800)
     length = 5 + sizeofRow * 4;
 else
     length = 5 + sizeofRow;
-$("search").onsubmit = function () {
-    window.location.href = "./search.html?type=0&ctg=0&subctg=0&keyword=" + $("search").children[0].value;
-    return false;
-}
+
 
 function sync_info(person, info, option, callback) {
     sendAjax("post", "info", "type=basic", function todo(response) {
@@ -151,6 +155,7 @@ function generate_link() {
 }
 
 function load(length) {
+    var index = 1;
     sendAjax("post", "recommend", "first=" + index + "&end=" + (index + length - 1), todo);
 }
 
@@ -181,4 +186,15 @@ function notify(body, link) {
         $("notify").onclick = () => {
             window.open(link);
         }
+}
+
+export {
+    notify,
+    initFirebase,
+    transition,
+    display,
+    load,
+    generate_link,
+    sync_info,
+    todo,
 }

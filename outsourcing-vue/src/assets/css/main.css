@@ -1,6 +1,6 @@
 @font-face {
     font-family: NewYahei;
-    src: url('../fonts/Yahei/msyh.ttc');
+    src: url('../font/myh.ttf');
 }
 
 * {
@@ -57,7 +57,7 @@ a {
     height: 100%;
     width: 100%;
     z-index: -2;
-    background-image: url('../img/head.jpg');
+    background-image: url('../head.jpg');
     filter: blur(4px);
 }
 
@@ -178,7 +178,7 @@ a {
 
 .background {
     margin-top: -42px;
-    background-image: url("../img/head.jpg");
+    background-image: url("../head.jpg");
     position: relative;
     height: 170px;
     z-index: 9;

@@ -1,104 +1,153 @@
 <template>
   <div>
-    <div
-      id="notify"
-      class="card notify"
-      style="display: none;"
-    ></div>
-    <div class="top">
-      <div class="head">
-        <div class="blur"></div>
-        <div class="cover"></div>
+    <div class="head">
+      <div style="overflow: hidden;width: 100%;height: 42px;position: absolute;z-index: -1">
+        <img
+          src="../assets/head.jpg"
+          class="blur"
+        ></div>
+      <div class="cover"></div>
+      <div
+        class="wrapper"
+        style="overflow:hidden"
+      >
+        <div class="nav d-none d-sm-flex">
+          <ul>
+            <li
+              v-for="(item,i) in menu"
+              :key="i"
+            >
+              <router-link :to="{name:item.path,params:{type:i - 1}}">{{item.name}}</router-link>
+            </li>
+          </ul>
+        </div>
+        <v-icon
+          class="nav d-flex d-sm-none"
+          style="line-height:42px;"
+          color="black"
+          @click="drawer = !drawer"
+        >mdi-menu</v-icon>
         <div
-          class="wrapper"
-          style="overflow:hidden"
+          v-if="!isLoged"
+          style="float: right;line-height: 42px;"
+          @click="$router.push({path:'/Login'})"
+        >游客</div>
+        <div
+          v-else
+          style="float: right;height: 42px;"
         >
-          <img>
-          <div class="nav d-none d-sm-flex">
-            <ul>
-              <li>
-                <router-link to="/home">首页</router-link>
-              </li>
-              <li>
-                <router-link to="/search">全部招标</router-link>
-              </li>
-              <li>
-                <router-link to="/search">全部工作室</router-link>
-              </li>
-            </ul>
-          </div>
-          <v-icon
-            class="d-flex d-sm-none"
-            color="black"
-          >mdi-menu</v-icon>
-          <div style="float: right;height: 42px;padding-right: 10px;">
-            <div
-              class="account"
-              onmouseover="display(0);"
-              id="person"
-            >
-              <div>游客</div>
-              <img id="personalPic">
-            </div>
-            <div
-              class="card info"
-              onmouseleave="display(1)"
-            >
-              <div
-                class="card"
-                style="height: 84px;"
-                id="info"
-              >
-                <div style="line-height: 42px;text-align: center;">您是：游客</div>
-                <div style="line-height: 42px;text-align: center;"></div>
-              </div>
-              <ul
-                id="option"
-                class="selection"
-                style="width: 100%;list-style: none;"
-              >
-                <li style="line-height: 42px;text-align: center;"><a>我的项目</a></li>
-                <li style="line-height: 42px;text-align: center;"><a>我的收藏</a></li>
-                <li style="line-height: 42px;text-align: center;"><a>登录</a></li>
-              </ul>
+          <div
+            class="nav d-none d-sm-flex"
+            style="float: right;height: 42px;"
+          >
+            <div class="account">
+              <div>{{nick}}</div>
+              <img :src="'/Platform'+img" />
             </div>
           </div>
           <div class="message">收藏</div>
           <div class="message">消息</div>
         </div>
       </div>
-      <v-parallax
-        height="170"
-        src="../assets/head_bkgrd.jpg"
-        style="margin-top:-42px"
-      >
-        <div class="logo"><img src="../assets/logo2.png"></div>
-        <form
-          id="search"
-          class="_search"
-        >
-          <input
-            type="text"
-            placeholder="你想搜索"
-          >
-          <button
-            type="submit"
-            style="background: transparent;border: transparent;"
-          >
-            <v-icon
-              color="primary"
-              style="line-height: 30px;cursor: pointer;"
-            >mdi-file-search</v-icon>
-          </button>
-        </form>
-      </v-parallax>
     </div>
+    <v-parallax
+      height="170"
+      src="../assets/head_bkgrd.jpg"
+      style="margin-top:-42px"
+    >
+      <div class="logo"><img src="../assets/logo2.png"></div>
+      <form
+        id="search"
+        class="_search"
+      >
+        <input
+          type="text"
+          placeholder="你想搜索"
+        >
+        <button
+          type="submit"
+          style="background: transparent;border: transparent;"
+        >
+          <v-icon
+            color="primary"
+            style="line-height: 30px;cursor: pointer;"
+          >mdi-file-search</v-icon>
+        </button>
+      </form>
+    </v-parallax>
+    <v-navigation-drawer
+      v-model="drawer"
+      absolute
+      temporary
+    >
+      <v-list-item>
+        <v-list-item-avatar>
+          <v-img :src="'/Platform'+img"></v-img>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{nick}}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider />
+      <v-list shaped>
+        <v-list-item-group
+          v-model="menuSelected"
+          color="primary"
+        >
+          <v-list-item
+            v-for="(item,i) in menu"
+            :key="i"
+          >
+            <v-list-item-title @click="$router.push({path:item.path})">{{item.name}}</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+      <v-divider />
+      <v-list rounded>
+        <v-subheader>分类</v-subheader>
+        <template v-for="(item,i) in ctg.slice(1)">
+          <v-list-item
+            :key="i"
+            v-if="item.subctg == null"
+          >
+            <v-list-item-title>{{item.name}}</v-list-item-title>
+          </v-list-item>
+          <v-list-group
+            :key="i"
+            v-else
+          >
+            <template v-slot:activator>
+              <v-list-item-title>{{item.name}}</v-list-item-title>
+            </template>
+            <v-list-item
+              v-for="(subctg,i) in item.subctg"
+              :key="i"
+            >
+              <v-list-item-title>{{subctg}}</v-list-item-title>
+            </v-list-item>
+          </v-list-group>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Nav'
+  name: 'Nav',
+  props: {
+    isLoged: Boolean,
+    nick: String,
+    img: String,
+    ctg: Array
+  },
+  data () {
+    return {
+      drawer: null,
+      menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
+      menuSelected: 0
+    }
+  }
 }
 </script>
 
@@ -119,16 +168,15 @@ export default {
 .head {
   height: 42px;
   position: relative;
-  z-index: 200;
+  z-index: 6;
   background-color: transparent;
 }
 .blur {
   position: absolute;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
+  opacity: 1;
+  left: 50%;
+  transform: translate(-50%, 0);
   z-index: -2;
-  background-image: url("../assets/head.jpg");
   filter: blur(4px);
 }
 .cover {
@@ -147,7 +195,6 @@ export default {
 
 .account {
   padding-left: 10px;
-  padding-right: 10px;
   height: 100%;
   transition: 300ms;
 }

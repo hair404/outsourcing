@@ -18,34 +18,24 @@
     <div class="hover">
       <div class="blur"></div>
       <div class="cover"></div>
-      <i
-        class="material-icons arrow_back"
-        onclick="window.location.href='./login.html';"
-        style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
-      ></i>
-      <div class="title">
-        <button
-          id="company"
-          checked
-        >发包公司</button>
-        <button
-          name="type"
-          id="studio"
-        >工作室</button>
-        <button
-          name="type"
-          id="manager"
-        >管理员</button>
-      </div>
-
+      <v-icon
+        @click="$router.push({path:'/login'})"
+        style="cursor: pointer;position:absolute;margin-left:10%;margin-top:25px;z-index:10"
+      >mdi-arrow-left-circle</v-icon>
+      <h1>注册</h1>
       <form
         id="form"
         @submit.prevent="submit"
         class="content"
       >
+        <select v-model="type">
+          <option value="0">发包公司</option>
+          <option value="1">工作室</option>
+          <option value="2">管理员</option>
+        </select>
         <input
-          v-model="account"
-          placeholder="公司名"
+          v-model="username"
+          :placeholder="userTypeName[type]"
           type="text"
           required
         >
@@ -97,14 +87,16 @@ export default {
   },
   data () {
     return {
-      account: '',
+      userTypeName: ['公司名', '工作室名', '管理员名称'],
+      username: '',
       name: '',
       phone: '',
       password: '',
       repeatpassword: '',
       email: '',
       snackbar: false,
-      text: ''
+      text: '',
+      type: 0
     }
   },
   methods: {
@@ -115,16 +107,19 @@ export default {
         return false
       }
       let data = new FormData()
-      data.append('account', this.account)
+      data.append('username', this.username)
       data.append('name', this.name)
       data.append('phone', this.phone)
       data.append('password', this.password)
       data.append('email', this.email)
+      data.append('type', this.type)
       axios
-        .post('localhost:8080/register?', data)
-        .then(response => (this.info = response))
+        .post('/Platform/register', data)
+        .then(response => (this.$router.push({ path: './home' })))
         .catch(function (error) {
           console.log(error)
+          this.text = '服务器错误'
+          this.snackbar = true
         })
     },
     check: function () {
@@ -146,13 +141,10 @@ export default {
 .body {
   background-image: url("../assets/backimg.jpg");
   height: 100%;
+  width: 100%;
+  position: absolute;
   background-position: center;
   overflow: hidden;
-}
-
-.content input {
-  margin-top: 10px;
-  height: 30px;
 }
 
 form {
@@ -223,14 +215,16 @@ form {
   text-align: center;
 }
 
-input {
+input,
+select {
   border: transparent;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 3px;
   transition: 200ms;
 }
 
-input:hover {
+input:hover,
+select:hover {
   background: white;
   box-shadow: grey 0px 1px 4px;
 }
@@ -242,11 +236,20 @@ input:hover {
   height: fit-content;
 }
 
+.content select,
 .content input {
   margin-top: 20px;
   display: block;
   width: 100%;
-  height: 50px;
+  height: 42px;
+}
+
+h1 {
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
 }
 
 .register {

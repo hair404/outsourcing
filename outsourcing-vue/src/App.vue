@@ -14,7 +14,6 @@
   font-family: "NewYahei", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
 }
 
 * {
@@ -32,8 +31,12 @@ a {
 
 html,
 body {
-  height: 100%;
   background-color: rgb(246, 246, 246);
+}
+
+.v-item-group.theme--light.v-tabs-items,
+.v-tabs-bar {
+  background-color: rgb(246, 246, 246) !important;
 }
 
 .card {
@@ -52,7 +55,12 @@ body {
   width: 60%;
   margin: 0 auto;
   min-width: 400px;
-  height: 100%;
+}
+
+@media screen and (max-width: 1200px) {
+  .wrapper {
+    width: 90%;
+  }
 }
 
 .selection li:hover {

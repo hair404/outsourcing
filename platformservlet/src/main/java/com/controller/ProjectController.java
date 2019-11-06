@@ -31,9 +31,8 @@ public class ProjectController {
 	
 	@PostMapping("project_info")
 	public String info(HttpServletRequest request, @RequestParam("id") Integer project_id){
-//		HttpSession session = request.getSession();
-//		Integer user_id = (Integer) session.getAttribute("id");
-	Integer account_id = 1;
+		HttpSession session = request.getSession();
+		Integer account_id = (Integer) session.getAttribute("id");
 		return projectService.get_info(project_id,account_id);
 		
 	}

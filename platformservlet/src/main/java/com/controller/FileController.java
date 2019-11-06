@@ -26,9 +26,7 @@ public class FileController {
 	public String upload(@RequestParam("file") MultipartFile file, @RequestParam("prjid") Integer prj_id,
 			HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		
-		//Integer id = (Integer) session.getAttribute("id");// user's id;
-		Integer id =1;
+		Integer id = (Integer) session.getAttribute("id");
 		if (file.isEmpty()) {
 			return "null";
 		} else {

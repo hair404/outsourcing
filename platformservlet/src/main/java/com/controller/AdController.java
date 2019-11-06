@@ -37,4 +37,6 @@ public class AdController {
 	public String recommend(@RequestParam("first") Integer first, @RequestParam("end") Integer end) {
 	return adService.recommend_ad(first, end).toString();
 	}
+	
+	
 }

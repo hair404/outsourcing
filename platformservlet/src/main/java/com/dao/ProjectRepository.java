@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.model.Project;
 
+
 public interface ProjectRepository extends JpaRepository<Project, Long> {
    
 	@Query("select u from com.model.Project u where u.id =:id")

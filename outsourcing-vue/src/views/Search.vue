@@ -1,124 +1,94 @@
 <template>
-  <div>
-    <div class="wrapper class">
-      <div
-        class="nav"
-        style="width: 100%;border-top-left-radius: 3px;border-top-right-radius: 3px;"
+  <div class="wrapper">
+    <v-card>
+      <div class="label">类型</div>
+      <v-btn-toggle
+        v-model="type"
+        tile
+        color="primary"
+        group
       >
-        <div style="float: left;line-height: 42px;padding-left: 3%;padding-right: 3%">类型</div>
-        <ul
-          class="selection-blue"
-          id="type"
-        >
-          <li><a>招标</a></li>
-          <li><a>工作室</a></li>
-        </ul>
-      </div>
+        <v-btn
+          v-for="(item,i) in types"
+          :key="i"
+          :value="i"
+        >{{item}}</v-btn>
+      </v-btn-toggle>
+      <br>
       <div
-        class="nav"
-        style="width: 100%;border-radius: 0px"
-      >
-        <div style="float: left;line-height: 42px;padding-left: 3%;padding-right: 3%">分类</div>
-        <ul
-          class="selection-blue"
-          id="categories"
+        class="label"
+        style="float: left"
+      >分类</div>
+      <div style="overflow-x: auto">
+        <v-btn-toggle
+          v-model="ctg"
+          tile
+          color="primary"
+          group
         >
-          <li><a class="selection-blue-selected">全部</a></li>
-          <li><a>网站开发</a></li>
-          <li><a>移动应用开发</a></li>
-          <li><a>H5开发</a></li>
-          <li><a>UI设计</a></li>
-          <li><a>测试运维</a></li>
-          <li><a>云服务</a></li>
-          <li><a>IT综合服务</a></li>
-        </ul>
+          <v-btn
+            v-for="(item,i) in utils.ctg.slice(1)"
+            :key="i"
+            :value="i"
+          >{{item.name}}</v-btn>
+        </v-btn-toggle>
       </div>
-      <div
-        class="nav"
-        style="width: 100%;border-bottom-left-radius: 3px;border-bottom-right-radius: 3px;"
+      <div class="label">子类</div>
+      <v-btn-toggle
+        v-model="subctg"
+        tile
+        color="primary"
+        group
       >
-        <div style="float: left;line-height: 42px;padding-left: 3%;padding-right: 3%">子类</div>
-        <ul
-          class="selection-blue"
-          id="subcategories"
-        >
-          <li><a class="selection-blue-selected">全部</a></li>
-          <div style="display: none">
-            <li><a>前端开发</a></li>
-            <li><a>网站维护</a></li>
-          </div>
-          <div style="display: none">
-            <li><a>安卓APP</a></li>
-            <li><a>苹果APP</a></li>
-          </div>
-          <div style="display: none">
-            <li><a>H5模板</a></li>
-            <li><a>H5定制</a></li>
-          </div>
-          <div style="display: none">
-            <li><a>网站UI</a></li>
-            <li><a>移动UI</a></li>
-          </div>
-        </ul>
-      </div>
-    </div>
+        <v-btn
+          v-for="(item,i) in utils.getReal(utils.ctg[ctg + 1].subctg)"
+          :key="i"
+          :value="i"
+        >{{item}}</v-btn>
+      </v-btn-toggle>
+    </v-card>
+    <LoadCard
+      :type="1 - type"
+      address="search"
+      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg})"
+      :number="20"
+      ref="LoadCard"
+    />
   </div>
 </template>
 
 <script>
-// import Card from '../components/Card'
+import utils from '../js/utils'
+import LoadCard from '../components/LoadCard'
 
 export default {
   components: {
-
+    LoadCard
+  },
+  data () {
+    return {
+      utils: utils,
+      types: ['招标', '工作室'],
+      type: utils.getReal(this.$route.params.type, 0),
+      ctg: utils.getReal(this.$route.params.ctg, 0),
+      subctg: utils.getReal(this.$route.params.subctg, 0),
+      keyword: String
+    }
+  },
+  watch: {
+    ctg: function () {
+      this.subctg = 0
+    }
   }
 }
 </script>
 
 <style>
-.class {
-  height: 126px;
-  border: 1px lightgray solid;
-  margin-top: 10px;
-  background-color: white;
-  transition: 300ms;
-  border-radius: 3px;
-}
-
-.class > div {
-  height: 42px;
-}
-
-.class:hover {
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px;
-}
-.nav {
-  float: left;
-}
-
-.nav ul {
-  list-style: none;
-}
-
-.nav > ul > li,
-.nav > ul > div > li {
-  float: left;
+.label {
+  display: inline-block;
+  width: 42px;
   text-align: center;
-  line-height: 42px;
-  transition: 300ms;
-}
-
-.nav > ul > li > a,
-.nav > ul > div > li > a {
-  display: block;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.nav > ul > li:hover,
-.message:hover,
-.nav > ul > div > li:hover {
-  cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.2);
+  margin-left: 6px;
+  line-height: 56px;
 }
 </style>

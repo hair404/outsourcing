@@ -9,7 +9,7 @@
         v-for="i in 4"
         :key="i"
         class="mx-auto"
-        min-width="200"
+        min-width="180"
         width="24%"
         type="card"
       ></v-skeleton-loader>
@@ -23,12 +23,12 @@
       <v-card
         :elevation="hover ? 12 : 2"
         class="mx-auto my-2"
-        min-width="200"
+        min-width="180"
         width="24%"
       >
         <v-img
           class="white--text align-end"
-          height="250"
+          height="200"
           :src="'Platform' + item.img"
         >
           <v-card-title>
@@ -44,13 +44,13 @@
             <span
               v-for="(tag ,i) in item.tag"
               :key="i"
-            >{{utils.translate_ctg(tag)}} </span>
+            >{{utils.ctg[tag].name}} </span>
           </div>
           <div
             v-else
             class="d-flex flex-wrap"
           >
-            <span>{{utils.translate_ctg(item.tag)}}-{{item.subtag == null ? 0: utils.translate_subctg(item.tag[0], item.subtag)}}</span>
+            <span>{{utils.ctg[item.tag].name}}-{{item.subtag == null ? 0: utils.ctg[item.tag].subctg[item.subtag]}}</span>
             <v-spacer />
             <span style="color:red;font-size: 20px;">{{item.price}}</span>
           </div>
@@ -65,6 +65,13 @@
         </v-card-actions>
       </v-card>
     </v-hover>
+    <v-pagination
+      v-if="!isActiveLoad"
+      v-model="page"
+      style="height: 84px"
+      :length="total/number"
+      circle
+    ></v-pagination>
   </div>
 </template>
 
@@ -75,7 +82,11 @@ import utils from '../js/utils'
 export default {
   name: 'LoadCard',
   props: {
-    type: Number
+    isActiveLoad: Boolean, // 是否瀑布流式加载，否则分页式加载
+    number: Number, // 一次加载数目
+    type: Number, // 卡片类型
+    address: String, // 接口
+    extraParam: String // 额外参数
   },
   data () {
     return {
@@ -83,32 +94,59 @@ export default {
       loaded: false,
       index: 1,
       cards: [],
-      isDelay: false
+      isDelay: false,
+      total: 0,
+      page: 1
     }
   },
   methods: {
     load (number) {
       Axios
-        .post('/Platform/' + (this.type === 0 ? 'recommend_studio' : 'recommend_program'), 'first=' + this.index + '&end=' + (this.index + number - 1))
+        .post('/Platform/' + this.address, 'first=' + this.index + '&end=' + (this.index + number - 1) + utils.getReal(this.extraParam, '', a => { return '&' + a }))
         .then(response => {
           this.loaded = true
           this.cards.push.apply(this.cards, response.data)
           this.index += number
         })
         .catch(error => { console.log(error) })
+    },
+    update () {
+      Axios
+        .post('/Platform/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
+        .then(response => {
+          this.loaded = true
+          this.total = response.data[0]
+          this.cards = response.data.slice(1)
+          this.index += this.number
+        })
+        .catch(error => { console.log(error) })
     }
   },
   mounted () {
-    this.load(4 * 4)
-    window.addEventListener('scroll', () => {
-      if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
-        this.load(4 * 4)
-        this.isDelay = true
-        setTimeout(() => {
-          this.isDelay = false
-        }, 2000)
+    if (this.isActiveLoad) {
+      this.load(4 * 4)
+      window.addEventListener('scroll', () => {
+        if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
+          this.load(4 * 4)
+          this.isDelay = true
+          setTimeout(() => {
+            this.isDelay = false
+          }, 2000)
+        }
+      })
+    } else {
+      this.update()
+    }
+  },
+  watch: {
+    extraParam: function () {
+      if (!this.isActiveLoad) {
+        this.loaded = false
+        this.cards.length = 0
+        this.index = 0
+        this.update()
       }
-    })
+    }
   },
   destroyed () {
     window.removeEventListener('scroll', this.load)

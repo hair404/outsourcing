@@ -1,76 +1,51 @@
 /* eslint-disable */
+
+const type = ['企业', '工作室', '管理员', '游客']
+
+const ctg = [
+  {
+    name: '首页'
+  },
+  {
+    name: '网站开发',
+    subctg: ['前端开发', '网站维护']
+  },
+  {
+    name: '移动应用开发',
+    subctg: ['安卓APP', '苹果APP']
+  },
+  {
+    name: 'H5开发',
+    subctg: ['H5模板', 'H5定制']
+  },
+  {
+    name: 'UI设计',
+    subctg: ['网站UI', '移动UI']
+  },
+  { name: '测试运维' },
+  { name: '云服务' },
+  { name: 'IT综合服务' }
+]
+
+function toFormData(a) {
+  var fd = []
+  for (var k in a) {
+    fd.push(k + '=' + a[k])
+  }
+  return fd.join('&')
+}
+
+function getReal(a, d, callback) {
+  if (!a) return d
+  if (callback) return callback(a)
+  return a
+}
+
 export default {
-  name: 'utils',
-  translate: translate,
-  translate_ctg: translate_ctg,
-  translate_subctg: translate_subctg
-}
-
-function translate(a) {
-  switch (a) {
-    case 0:
-      return '企业'
-    case 1:
-      return '工作室'
-    case 2:
-      return '管理员'
-  }
-  return '游客'
-}
-
-function translate_ctg(a) {
-  switch (a) {
-    case 0:
-      return '全部'
-    case 1:
-      return '网站开发'
-    case 2:
-      return '移动应用开发'
-    case 3:
-      return 'H5开发'
-    case 4:
-      return 'UI设计'
-    case 5:
-      return '测试运维'
-    case 6:
-      return '云服务'
-    case 7:
-      return 'IT综合服务'
-  }
-}
-
-function translate_subctg(a, b) {
-  switch (a) {
-    case 1:
-      switch (b) {
-        case 1:
-          return '前端开发'
-        case 2:
-          return '网站维护'
-      }
-    case 2:
-      switch (b) {
-        case 1:
-          return '安卓APP'
-        case 2:
-          return '苹果APP'
-      }
-    case 3:
-      switch (b) {
-        case 1:
-          return 'H5模板'
-        case 2:
-          return 'H5定制'
-      }
-    case 4:
-      switch (b) {
-        case 1:
-          return '网站UI'
-        case 2:
-          return '移动UI'
-      }
-  }
-  return '全部'
+  type,
+  ctg,
+  toFormData,
+  getReal
 }
 
 function translate_state(a) {

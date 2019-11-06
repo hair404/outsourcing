@@ -17,7 +17,7 @@
               v-for="(item,i) in menu"
               :key="i"
             >
-              <router-link :to="item.path">{{item.name}}</router-link>
+              <router-link :to="{name:item.path,params:{type:i - 1}}">{{item.name}}</router-link>
             </li>
           </ul>
         </div>
@@ -29,7 +29,8 @@
         >mdi-menu</v-icon>
         <div
           v-if="!isLoged"
-          style="float: right;height: 42px;"
+          style="float: right;line-height: 42px;"
+          @click="$router.push({path:'/Login'})"
         >游客</div>
         <div
           v-else
@@ -97,11 +98,35 @@
             v-for="(item,i) in menu"
             :key="i"
           >
-            <v-list-item-content>
-              <v-list-item-title @click="$router.push({path:item.path})">{{item.name}}</v-list-item-title>
-            </v-list-item-content>
+            <v-list-item-title @click="$router.push({path:item.path})">{{item.name}}</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
+      </v-list>
+      <v-divider />
+      <v-list rounded>
+        <v-subheader>分类</v-subheader>
+        <template v-for="(item,i) in ctg.slice(1)">
+          <v-list-item
+            :key="i"
+            v-if="item.subctg == null"
+          >
+            <v-list-item-title>{{item.name}}</v-list-item-title>
+          </v-list-item>
+          <v-list-group
+            :key="i"
+            v-else
+          >
+            <template v-slot:activator>
+              <v-list-item-title>{{item.name}}</v-list-item-title>
+            </template>
+            <v-list-item
+              v-for="(subctg,i) in item.subctg"
+              :key="i"
+            >
+              <v-list-item-title>{{subctg}}</v-list-item-title>
+            </v-list-item>
+          </v-list-group>
+        </template>
       </v-list>
     </v-navigation-drawer>
   </div>
@@ -113,12 +138,13 @@ export default {
   props: {
     isLoged: Boolean,
     nick: String,
-    img: String
+    img: String,
+    ctg: Array
   },
   data () {
     return {
       drawer: null,
-      menu: [{ name: '首页', path: '/home' }, { name: '全部招标', path: '/search' }, { name: '全部工作室', path: '/search' }],
+      menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
       menuSelected: 0
     }
   }

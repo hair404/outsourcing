@@ -14,7 +14,6 @@
   font-family: "NewYahei", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
 }
 
 * {
@@ -32,23 +31,11 @@ a {
 
 html,
 body {
-  height: 100%;
   background-color: rgb(246, 246, 246);
 }
 
-.theme--light.v-icon {
-  background-color: transparent !important;
-}
-
-.theme--light.v-card {
-  background-color: #ffffff !important;
-}
-
-.theme--light.v-btn {
-  background-color: #ffffff !important;
-}
-
-.theme--light {
+.v-item-group.theme--light.v-tabs-items,
+.v-tabs-bar {
   background-color: rgb(246, 246, 246) !important;
 }
 

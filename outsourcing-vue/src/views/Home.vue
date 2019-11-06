@@ -82,12 +82,16 @@
         <LoadCard
           width="100%"
           :type="0"
+          address="recommend_studio"
+          isActiveLoad
         ></LoadCard>
       </v-tab-item>
       <v-tab-item>
         <LoadCard
           width="100%"
           :type="1"
+          address="recommend_program"
+          isActiveLoad
         ></LoadCard>
       </v-tab-item>
     </v-tabs>

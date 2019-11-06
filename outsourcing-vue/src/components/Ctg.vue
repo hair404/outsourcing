@@ -24,33 +24,8 @@
 <script>
 export default {
   name: 'Ctg',
-  data () {
-    return {
-      ctg: [{
-        name: '首页'
-      },
-      {
-        name: '网站开发',
-        subctg: [
-          '前端开发', '网站维护'
-        ]
-      },
-      {
-        name: '移动应用开发',
-        subctg: ['安卓APP', '苹果APP']
-      },
-      {
-        name: 'H5开发',
-        subctg: ['H5模板', 'H5定制']
-      },
-      {
-        name: 'UI设计',
-        subctg: ['网站UI', '移动UI']
-      },
-      { name: '测试运维' },
-      { name: '云服务' },
-      { name: 'IT综合服务' }]
-    }
+  props: {
+    ctg: Array
   }
 }
 </script>

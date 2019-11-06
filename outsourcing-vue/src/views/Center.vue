@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="wrapper mt-4">
+  <div class="wrapper">
+    <!-- <div class="wrapper mt-4">
       <v-card outlined>
         <div
           id="basicinfo"
@@ -161,6 +161,20 @@
         </table>
       </div>
 
+    </div> -->
+    <div class="d-flex flex-wrap">
+      <v-card
+        class="mx-auto my-2"
+        width="49%"
+        height="200"
+        min-width="360"
+      ></v-card>
+      <v-card
+        class="mx-auto my-2"
+        width="49%"
+        height="200"
+        min-width="360"
+      ></v-card>
     </div>
   </div>
 </template>

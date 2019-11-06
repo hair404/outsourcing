@@ -18,11 +18,10 @@
     <div class="hover">
       <div class="blur"></div>
       <div class="cover"></div>
-      <i
-        class="material-icons arrow_back"
-        onclick="window.location.href='./login.html';"
-        style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
-      ></i>
+      <v-icon
+        @click="$router.push({path:'/login'})"
+        style="cursor: pointer;position:absolute;margin-left:10%;margin-top:25px;z-index:10"
+      >mdi-arrow-left-circle</v-icon>
       <h1>注册</h1>
       <form
         id="form"
@@ -142,6 +141,8 @@ export default {
 .body {
   background-image: url("../assets/backimg.jpg");
   height: 100%;
+  width: 100%;
+  position: absolute;
   background-position: center;
   overflow: hidden;
 }

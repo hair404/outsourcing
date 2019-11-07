@@ -23,5 +23,6 @@ public class UserInfo {
 	private String email;
 	private Integer type;
 	private String img;
+	private String avatar;
 	private String entity;
 }

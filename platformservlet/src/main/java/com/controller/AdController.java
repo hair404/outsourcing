@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dao.AdDao;
 import com.service.AdService;
 
 @RestController
 public class AdController {
-	@Autowired
-	AdDao adDao;
 	@Autowired
 	AdService adService;
 	
@@ -28,15 +25,18 @@ public class AdController {
 			@RequestParam("price") float price,
 			@RequestParam("img") String img
 		) {
-		adDao.insert(dueTime, prjName, tag,subTag, price, ad_price, img);
+		adService.insert_ad_project(prjName, dueTime, ad_price, tag, subTag, price, img);
 		   
 		return "success";
 	}
 
-	@RequestMapping(value = "recommend",produces = "application/json")
-	public String recommend(@RequestParam("first") Integer first, @RequestParam("end") Integer end) {
-	return adService.recommend_ad(first, end).toString();
+	@RequestMapping("recommend_project")
+	public String recommend_pro(@RequestParam("first") Integer first) {
+	return adService.recommend_ad_project(first-1);
 	}
-	
-	
+	@RequestMapping("recommend_studio")
+	public String recommend_stu(@RequestParam("first") Integer first) {
+	return adService.recommend_ad_studio(first-1);
+	}
+		
 }

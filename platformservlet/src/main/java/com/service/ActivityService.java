@@ -18,7 +18,7 @@ public class ActivityService {
 		String fileName = file.getOriginalFilename();
 		String filePath = "F:/img/activity_img/";
 		File dest = new File(filePath + fileName);
-		String img_url = "http://localhost:8080/activity_img/" + fileName;
+		String img_url = "/activity_img/" + fileName;
 		try {
 			Activity ac = new Activity();
 			ac.setUrl(url);

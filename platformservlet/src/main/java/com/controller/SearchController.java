@@ -49,16 +49,16 @@ public class SearchController {
 		query.setStart(first);
 		query.setRows(number);
 		query.set("df", "text");
-		if (type == 0) {
+		if (type == 1) {
 			if (ctg == 0 & subctg == 0)
 				query.setFilterQueries("entity:project");
 			else if (ctg == 0 & subctg != 0) {
 				query.addFilterQuery("entity:project");
-				query.addFilterQuery("sub_tag:" + subctg);
+				query.addFilterQuery("subtag:" + subctg);
 			} else {
 				query.addFilterQuery("entity:project");
 				query.addFilterQuery("tag:" + ctg);
-				query.addFilterQuery("sub_tag:" + subctg);
+				query.addFilterQuery("subtag:" + subctg);
 			}
 		} else {
 			query.setFilterQueries("entity:studio");

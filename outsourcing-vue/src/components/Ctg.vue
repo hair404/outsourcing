@@ -1,6 +1,9 @@
 <template>
   <div class="wrapper">
-    <div class="categories nav">
+    <div
+      class="categories nav"
+      style="overflow-x: auto"
+    >
       <ul id="ctg">
         <li
           v-for="(item,i) in ctg"
@@ -62,14 +65,16 @@ export default {
 
 .nav ul {
   list-style: none;
+  display: inline-flex;
 }
 
 .nav > ul > li,
 .nav > ul > div > li {
-  float: left;
   text-align: center;
   height: 42px;
   transition: 300ms;
+  display: inline-block;
+  width: max-content;
 }
 
 .nav > ul > li > a,

@@ -1,15 +1,15 @@
 <template>
-  <div class="d-flex flex-wrap">
+  <div class="d-flex flex-wrap mx-auto">
     <div
       v-if="!loaded"
-      class="d-flex flex-wrap"
+      class="d-flex flex-wrap justify-start"
       style="width: 100%"
     >
       <v-skeleton-loader
         v-for="i in 4"
         :key="i"
         class="mx-auto"
-        min-width="180"
+        min-width="170"
         width="24%"
         type="card"
       ></v-skeleton-loader>
@@ -20,56 +20,58 @@
       :key="i"
       v-slot:default="{ hover }"
     >
-      <v-card
-        :elevation="hover ? 12 : 2"
-        class="mx-auto my-2"
-        min-width="180"
-        width="24%"
-      >
-        <v-img
-          class="white--text align-end"
-          height="200"
-          :src="'Platform' + item.img"
+      <div class="grid">
+        <v-card
+          :elevation="hover ? 12 : 2"
+          class="mx-auto my-2"
+          @click="$router.push({path:'/detail',param:{id:item.id}})"
+          width="95%"
         >
-          <v-card-title>
-            <v-avatar v-if="type === 0">
-              <img :src="'Platform'+item.avatar">
-            </v-avatar>
-            {{item.prjname}}
-          </v-card-title>
-        </v-img>
-        <v-card-subtitle>类别</v-card-subtitle>
-        <v-card-text class="text--primary">
-          <div v-if="type === 0">
-            <span
-              v-for="(tag ,i) in item.tag"
-              :key="i"
-            >{{utils.ctg[tag].name}} </span>
-          </div>
-          <div
-            v-else
-            class="d-flex flex-wrap"
+          <v-img
+            class="white--text align-end"
+            height="200"
+            :src="'Platform' + item.img"
           >
-            <span>{{utils.ctg[item.tag].name}}-{{item.subtag == null ? 0: utils.ctg[item.tag].subctg[item.subtag]}}</span>
-            <v-spacer />
-            <span style="color:red;font-size: 20px;">{{item.price}}</span>
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            text
-          >
-            查看详情
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+            <v-card-title>
+              <v-avatar v-if="type === 0">
+                <img :src="'Platform'+item.avatar" />
+              </v-avatar>
+              {{item.prjname?item.prjname:item.name}}
+            </v-card-title>
+          </v-img>
+          <v-card-subtitle>类别</v-card-subtitle>
+          <v-card-text class="text--primary">
+            <div v-if="type === 0">
+              <span
+                v-for="(tag ,i) in item.tag"
+                :key="i"
+              >{{utils.ctg[tag].name}}</span>
+            </div>
+            <div
+              v-else
+              class="d-flex flex-wrap"
+            >
+              <span>{{utils.ctg[item.tag].name}}{{item.subtag == 0 ? '': '-'+utils.ctg[item.tag].subctg[item.subtag - 1]}}</span>
+              <v-spacer />
+              <span style="color:red;font-size: 20px;">{{'￥'+item.price}}</span>
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              v-if="btnText"
+              color="primary"
+              @click="callback"
+              text
+            >{{btnText}}</v-btn>
+          </v-card-actions>
+        </v-card>
+      </div>
     </v-hover>
     <v-pagination
       v-if="!isActiveLoad"
       v-model="page"
       style="height: 84px"
-      :length="total/number"
+      :length="Math.ceil(total/number)"
       circle
     ></v-pagination>
   </div>
@@ -86,7 +88,9 @@ export default {
     number: Number, // 一次加载数目
     type: Number, // 卡片类型
     address: String, // 接口
-    extraParam: String // 额外参数
+    extraParam: String, // 额外参数
+    btnText: String, // 按钮文字
+    callback: Function// 按钮回调
   },
   data () {
     return {
@@ -153,3 +157,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.grid {
+  width: 25%;
+}
+
+@media screen and (max-width: 960px) {
+  .grid {
+    width: 50%;
+  }
+}
+</style>

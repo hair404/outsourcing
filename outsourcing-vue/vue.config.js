@@ -2,7 +2,7 @@ module.exports = {
   devServer: {
     // proxy: {
     //   '/Platform': {
-    //     target: 'http://192.168.137.111:8088',
+    //     target: 'http://192.168.1.185:8080',
     //     pathRewrite: {
     //       '^/Platform': ''
     //     },

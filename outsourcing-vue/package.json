@@ -38,7 +38,9 @@
       "plugin:vue/essential",
       "@vue/standard"
     ],
-    "rules": {},
+    "rules": {
+      "curly": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }

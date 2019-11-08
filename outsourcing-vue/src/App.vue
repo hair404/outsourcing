@@ -54,7 +54,6 @@ body {
 .wrapper {
   width: 60%;
   margin: 0 auto;
-  min-width: 400px;
 }
 
 @media screen and (max-width: 1200px) {

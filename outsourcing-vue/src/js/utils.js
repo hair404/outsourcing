@@ -4,7 +4,7 @@ const type = ['企业', '工作室', '管理员', '游客']
 
 const ctg = [
   {
-    name: '首页'
+    name: '全部'
   },
   {
     name: '网站开发',

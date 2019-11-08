@@ -5,6 +5,7 @@
       :nick="info.username"
       :img="info.img"
       :ctg="ctg"
+      @keyword="search"
     />
     <div class="d-block d-sm-none">
       <div style="height: 21px;width: 100%" />
@@ -17,6 +18,7 @@
       <router-view
         :info="info"
         :infoLoaded="infoLoaded"
+        :keyword="keyword"
       />
     </v-content>
   </v-app>
@@ -37,7 +39,8 @@ export default {
     return {
       info: {},
       infoLoaded: false,
-      ctg: utils.ctg
+      ctg: utils.ctg,
+      keyword: ''
     }
   },
   methods: {
@@ -45,10 +48,15 @@ export default {
       Axios
         .post('/Platform/info', 'type=basic')
         .then(response => {
-          this.infoLoaded = true
-          this.info = response.data
+          if (!(response.data === 'NotLogin')) {
+            this.infoLoaded = true
+            this.info = response.data
+          }
         })
         .catch(error => { console.log(error) })
+    },
+    search (keyword) {
+      this.keyword = keyword
     }
   },
   created () {

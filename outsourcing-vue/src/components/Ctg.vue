@@ -8,15 +8,18 @@
         <li
           v-for="(item,i) in ctg"
           :key="i"
-        ><a>{{item.name}}</a>
+        >
+          <router-link :to="{name:'search',params:{ctg: i}}">{{item.name}}</router-link>
           <ul
             class="selection card"
             style="width: 100px;position: absolute"
           >
             <li
-              v-for="subctg in item.subctg"
+              v-for="(subctg,j) in item.subctg"
               :key="subctg"
-            ><a>{{subctg}}</a></li>
+            >
+              <router-link :to="{name:'search',params:{ctg: i,subctg: j + 1}}">{{subctg}}</router-link>
+            </li>
           </ul>
         </li>
       </ul>

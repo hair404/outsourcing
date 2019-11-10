@@ -3,25 +3,49 @@
     class="mx-auto d-none d-md-block"
     min-width="200px"
   >
-    <v-skeleton-loader
+    <v-card
       v-if="!infoLoaded"
-      class="mx-auto d-none d-md-block"
-      width="29%"
-      min-width="200px"
-      height="400"
-      type="card"
-    ></v-skeleton-loader>
+      :height="height"
+      class="d-flex"
+    >
+      <div class="mx-auto my-auto">
+        <v-btn
+          outlined
+          rounded
+          color="primary"
+          class="d-block mb-10"
+          width="100"
+          @click="$router.push('/login')"
+        >登录</v-btn>
+        <v-btn
+          outlined
+          rounded
+          color="primary"
+          class="d-block"
+          width="100"
+          @click="$router.push('/register')"
+        >注册</v-btn>
+      </div>
+    </v-card>
     <v-card
       v-else
-      height="400"
+      :height="height"
     >
       <v-img
         class="white--text align-end"
-        height="200px"
-        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+        :height="height/2"
+        src="info.img"
       >
         <v-card-title>{{info.username}}</v-card-title>
       </v-img>
+      <v-rating
+        v-if="info.type == 1 && !isOthers"
+        v-model="info.rating"
+        color="orange"
+        background-color="orange"
+        readonly
+        half-increments
+      ></v-rating>
       <v-card-subtitle class="pb-0">身份</v-card-subtitle>
       <v-card-text class="text--primary">
         <div>{{utils.type[info.type]}}</div>
@@ -30,7 +54,7 @@
       <v-card-text class="text--primary">
         <div>{{info.email}}</div>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions v-if="!isOthers">
         <v-btn
           color="primary"
           text
@@ -54,7 +78,12 @@ import utils from '../js/utils'
 export default {
   props: {
     infoLoaded: Boolean,
-    info: {}
+    info: {},
+    height: Number,
+    isOthers: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {

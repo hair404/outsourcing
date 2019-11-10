@@ -24,7 +24,7 @@
         <v-card
           :elevation="hover ? 12 : 2"
           class="mx-auto my-2"
-          @click="$router.push({path:'/detail',param:{id:item.id}})"
+          @click="$router.push({name:'detail',params:{id:item.id}})"
           width="95%"
         >
           <v-img
@@ -36,16 +36,31 @@
               <v-avatar v-if="type === 0">
                 <img :src="'Platform'+item.avatar" />
               </v-avatar>
-              {{item.prjname?item.prjname:item.name}}
+              {{item.prjname?item.prjname:item.username}}
             </v-card-title>
           </v-img>
-          <v-card-subtitle>类别</v-card-subtitle>
           <v-card-text class="text--primary">
-            <div v-if="type === 0">
-              <span
-                v-for="(tag ,i) in item.tag"
-                :key="i"
-              >{{utils.ctg[tag].name}}</span>
+            <v-rating
+              v-if="item.credit"
+              v-model="item.credit"
+              color="orange"
+              background-color="orange"
+              readonly
+              half-increments
+            />
+            <v-card-subtitle>类别</v-card-subtitle>
+            <div
+              v-if="type === 0"
+              style="overflow-x: auto;"
+            >
+              <div style="display: inline-flex">
+                <v-chip
+                  outlined
+                  class="ma-1"
+                  v-for="(tag ,i) in item.tag"
+                  :key="i"
+                >{{utils.ctg[tag].name}}</v-chip>
+              </div>
             </div>
             <div
               v-else
@@ -85,6 +100,14 @@ export default {
   name: 'LoadCard',
   props: {
     isActiveLoad: Boolean, // 是否瀑布流式加载，否则分页式加载
+    isLoaded: {
+      type: Boolean,
+      default: false // 是否已经存在数据
+    },
+    cards: {
+      type: Array,
+      default: () => { return [] }
+    },
     number: Number, // 一次加载数目
     type: Number, // 卡片类型
     address: String, // 接口
@@ -96,8 +119,7 @@ export default {
     return {
       utils: utils,
       loaded: false,
-      index: 1,
-      cards: [],
+      index: 0,
       isDelay: false,
       total: 0,
       page: 1
@@ -127,20 +149,22 @@ export default {
     }
   },
   mounted () {
-    if (this.isActiveLoad) {
-      this.load(4 * 4)
-      window.addEventListener('scroll', () => {
-        if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
-          this.load(4 * 4)
-          this.isDelay = true
-          setTimeout(() => {
-            this.isDelay = false
-          }, 2000)
-        }
-      })
-    } else {
-      this.update()
-    }
+    if (!this.isLoaded)
+      if (this.isActiveLoad) {
+        this.load(4 * 4)
+        window.addEventListener('scroll', () => {
+          if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
+            this.load(4 * 4)
+            this.isDelay = true
+            setTimeout(() => {
+              this.isDelay = false
+            }, 2000)
+          }
+        })
+      } else
+        this.update()
+    else
+      this.loaded = true
   },
   watch: {
     extraParam: function () {

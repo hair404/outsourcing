@@ -31,7 +31,8 @@
       <MyInfo
         :infoLoaded="infoLoaded"
         :info="info"
-        style="width:29%"
+        :height="400"
+        style="width:29%;"
       />
     </div>
     <div style="height: 10px;" />

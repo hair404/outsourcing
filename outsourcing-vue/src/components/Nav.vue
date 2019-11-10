@@ -113,20 +113,26 @@
             :key="i"
             v-if="item.subctg == null"
           >
-            <v-list-item-title>{{item.name}}</v-list-item-title>
+            <v-list-item-title>
+              <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+            </v-list-item-title>
           </v-list-item>
           <v-list-group
             :key="i"
             v-else
           >
             <template v-slot:activator>
-              <v-list-item-title>{{item.name}}</v-list-item-title>
+              <v-list-item-title>
+                <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+              </v-list-item-title>
             </template>
             <v-list-item
-              v-for="(subctg,i) in item.subctg"
-              :key="i"
+              v-for="(subctg,j) in item.subctg"
+              :key="j"
             >
-              <v-list-item-title>{{subctg}}</v-list-item-title>
+              <v-list-item-title>
+                <router-link :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}">{{subctg}}</router-link>
+              </v-list-item-title>
             </v-list-item>
           </v-list-group>
         </template>

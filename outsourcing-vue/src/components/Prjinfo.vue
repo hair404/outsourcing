@@ -6,7 +6,13 @@
   >
     <v-list-item three-line>
       <v-list-item-content>
-        <v-list-item-title class="headline mb-1">项目信息</v-list-item-title>
+        <v-list-item-title class="headline mb-1">
+          <v-icon
+            color="grey"
+            class="mx-4 my-4"
+            @click="$router.back()"
+          >mdi-arrow-left</v-icon>项目信息
+        </v-list-item-title>
         <v-list-item-subtitle>项目名称:{{info.prjname}}</v-list-item-subtitle>
         <v-list-item-subtitle>公司名称:{{info.companyName}}</v-list-item-subtitle>
         <v-list-item-subtitle>发布时间:{{info.releaseTime}}</v-list-item-subtitle>

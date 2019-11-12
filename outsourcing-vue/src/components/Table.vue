@@ -4,19 +4,51 @@
       v-model="selected"
       :headers="headers"
       :items="data"
-      :items-per-page="5"
       item-key="name"
       class="elevation-1"
-      show-select
+      :show-select="!isCompany"
       disable-sort
-    ></v-data-table>
+      hide-default-footer
+    >
+      <template
+        v-if="isCompany"
+        v-slot:item.price="props"
+      >
+        <v-edit-dialog
+          :return-value.sync="props.item.price"
+          large
+          persistent
+        >
+          <v-btn
+            v-if="!props.item.price"
+            outlined
+            color="primary"
+          >设定进度款</v-btn>
+          <div v-else>{{props.item.price}}</div>
+          <template v-slot:input>
+            <v-text-field
+              v-model="props.item.price"
+              :rules="[v => typeof v =='number' && v > 0 || '必须超过0']"
+              label="Edit"
+              single-line
+              counter
+              autofocus
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+      </template>
+    </v-data-table>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    data: Array
+    data: Array,
+    isCompany: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {
@@ -27,10 +59,14 @@ export default {
         text: '进度详情', value: 'info'
       },
       {
-        text: '所需时间', value: 'time'
+        text: '所需时间(天)', value: 'time'
       }],
       selected: []
     }
+  },
+  created () {
+    if (this.isCompany)
+      this.headers.push({ text: '价格', value: 'price' })
   }
 }
 </script>

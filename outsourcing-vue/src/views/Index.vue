@@ -1,5 +1,19 @@
 <template>
   <v-app style="background: rgb(246, 246, 246)">
+
+    <v-snackbar
+      :color="snackbar.color"
+      v-model="snackbar.open"
+    >
+      {{ snackbar.text }}
+      <v-btn
+        text
+        @click="snackbar.open = false"
+      >
+        关闭
+      </v-btn>
+    </v-snackbar>
+
     <Nav
       :isLoged="infoLoaded"
       :nick="info.username"
@@ -19,6 +33,7 @@
         :info="info"
         :infoLoaded="infoLoaded"
         :keyword="keyword"
+        :snackbar="snackbar"
       />
     </v-content>
   </v-app>
@@ -40,7 +55,12 @@ export default {
       info: {},
       infoLoaded: false,
       ctg: utils.ctg,
-      keyword: ''
+      keyword: '',
+      snackbar: {
+        open: false,
+        color: 'primary',
+        text: '错误'
+      }
     }
   },
   methods: {

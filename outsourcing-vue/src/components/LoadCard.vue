@@ -24,7 +24,7 @@
         <v-card
           :elevation="hover ? 12 : 2"
           class="mx-auto my-2"
-          @click="$router.push({name:'detail',params:{id:item.id}})"
+          @click="$router.push(type === 0?{name:'display',params:{id:item.id}}:{name:'detail',params:{id:item.id}})"
           width="95%"
         >
           <v-img
@@ -75,7 +75,7 @@
             <v-btn
               v-if="btnText"
               color="primary"
-              @click="callback"
+              @click="callback(item.id)"
               text
             >{{btnText}}</v-btn>
           </v-card-actions>
@@ -86,7 +86,7 @@
       v-if="!isActiveLoad"
       v-model="page"
       style="height: 84px"
-      :length="Math.ceil(total/number)"
+      :length="Math.ceil(totalProps?totalProps:total/number)"
       circle
     ></v-pagination>
   </div>
@@ -104,11 +104,12 @@ export default {
       type: Boolean,
       default: false // 是否已经存在数据
     },
-    cards: {
+    cardsProp: {
       type: Array,
       default: () => { return [] }
     },
     number: Number, // 一次加载数目
+    totalProps: Number,
     type: Number, // 卡片类型
     address: String, // 接口
     extraParam: String, // 额外参数
@@ -117,6 +118,7 @@ export default {
   },
   data () {
     return {
+      cards: [],
       utils: utils,
       loaded: false,
       index: 0,
@@ -149,7 +151,7 @@ export default {
     }
   },
   mounted () {
-    if (!this.isLoaded)
+    if (this.address)
       if (this.isActiveLoad) {
         this.load(4 * 4)
         window.addEventListener('scroll', () => {
@@ -163,8 +165,10 @@ export default {
         })
       } else
         this.update()
-    else
+    else {
+      this.cards = this.cardsProp
       this.loaded = true
+    }
   },
   watch: {
     extraParam: function () {
@@ -174,6 +178,9 @@ export default {
         this.index = 0
         this.update()
       }
+    },
+    isLoaded: function () {
+      this.cards = this.cardsProp
     }
   },
   destroyed () {

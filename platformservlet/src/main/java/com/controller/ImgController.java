@@ -26,7 +26,8 @@ public class ImgController {
 	@Autowired
 	ImgDao imgDao;
 	
-	public static final String root_user = "F:/img/user_img";
+	public static final String root_user = "F:/img/user_img/img";
+	public static final String root_avatar = "F:/img/user_img/avatar";
 	public static final String root_prj = "F:/img/prj_img";
 
 	 
@@ -48,7 +49,7 @@ public class ImgController {
 				dest.getParentFile().mkdirs();
 			}
 			try {
-				String url = "http://localhost:8080/userimg/" + fileName;
+				String url = "/userimg/" + fileName;
 				file.transferTo(dest);
 				imgDao.insert(url, id);
 				return url;
@@ -64,6 +65,14 @@ public class ImgController {
 	public ResponseEntity<?> get_user_img(@PathVariable String filename) {
 		try {
 			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_user, filename).toString()));
+		} catch (Exception e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	@GetMapping(value = "/avatar/{filename:.+}",produces ="application/octet-stream;charset = utf-8")
+	public ResponseEntity<?> get_user_avatar(@PathVariable String filename) {
+		try {
+			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_avatar, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();
 		}

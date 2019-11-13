@@ -2,6 +2,7 @@ package com.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import com.model.Cancel_reason;
 import com.model.Complain_reason;
 
 @RestController
+@Transactional
 public class OperationController {
 	@Autowired
 	ProjectRepository projectRepository;
@@ -36,9 +38,10 @@ public class OperationController {
 			 HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Integer company_id = (Integer) session.getAttribute("id");
+		
 		if (action.equals("select")) {
            projectRepository.update_studioid(studioid, id);
-           
+           return "success";
 		}
 		else if (action.equals("cancel")) {
 			Cancel_reason r = new Cancel_reason();
@@ -93,7 +96,6 @@ public class OperationController {
 			projectRepository.update_studioPaidState(1, id);
 			return "success";
 			}
-		
 		return "false";
 	}
 		

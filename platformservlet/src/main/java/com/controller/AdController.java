@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dao.AdDao;
 import com.service.AdService;
 
 @RestController
 public class AdController {
+	@Autowired
+	AdDao adDao;
 	@Autowired
 	AdService adService;
 	
@@ -24,7 +28,7 @@ public class AdController {
 			@RequestParam("price") float price,
 			@RequestParam("img") String img
 		) {
-		adService.insert(dueTime, prjName, tag,subTag, price, ad_price, img);
+		adDao.insert(dueTime, prjName, tag,subTag, price, ad_price, img);
 		   
 		return "success";
 	}

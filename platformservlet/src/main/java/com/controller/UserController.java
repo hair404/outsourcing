@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.dao.AccountRepository;
 import com.dao.ProjectDao;
+import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.UserDao;
 import com.dao.UserRepository;
@@ -41,6 +43,10 @@ public class UserController {
 	private TagDao tagDao;
 	@Autowired
 	private ProjectDao projectDao;
+	@Autowired
+	private ProjectRepository projectRepository;
+	@Autowired
+	AccountRepository  accountRepository;
 
 	UserInfo user = new UserInfo();
 
@@ -54,8 +60,9 @@ public class UserController {
 			@RequestParam("password") String password, @RequestParam("email") String email,
 			@RequestParam("username") String username, @RequestParam("type") Integer type) {
 		if (!userService.ifExsit(tel)) {
-			userService.insertAccount(password, tel);
-			String uuid = UUID.randomUUID().toString();
+			userDao.insertAccount(password, tel);
+			Integer account_id = accountRepository.get_id(tel);
+			String solr_id = UUID.randomUUID().toString();
 			String entity = null;
 			if (type == 0)
 				entity = "company";
@@ -63,7 +70,7 @@ public class UserController {
 				entity = "studio";
 			else if (type == 2)
 				entity = "manager";
-			userService.insertInfo(name, tel, password, email, username, type, uuid, entity);
+		 userDao.insertInfo(solr_id, account_id, name, tel, email, username, type, entity);
 			return "success";
 		} else
 			return "fail";
@@ -179,7 +186,7 @@ public class UserController {
 	}
 
 	@PostMapping("display_info")
-	public String display(HttpServletRequest request) {
+	public String display(HttpServletRequest request,@RequestParam("id") String solr_id) {
 		HttpSession session = request.getSession();
 		Integer id = (Integer) session.getAttribute("id");
 		//Integer id=1;
@@ -188,8 +195,9 @@ public class UserController {
 			UserInfo user = userRepository.getInfoById(id);
 			JSONArray array = new JSONArray();
 			array.put(0);
-			array.put(projectDao.getCompletedProject(id));
-			json.put("id", user.getAccount_id());
+			JSONObject project  = new JSONObject(projectRepository.get_info_by_solr_id(solr_id));
+			array.put(project);
+			json.put("id", user.getSolr_id());
 			json.put("type", user.getType());
 			json.put("img", user.getImg());
 			json.put("username", user.getUsername());

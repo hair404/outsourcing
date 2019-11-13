@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,11 +20,17 @@ public class AdDao {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
-	public List<Ad_project> queryAd() {
+	public JSONArray queryAd() {
 		Sort sort = new Sort(Sort.Direction.DESC, "weight");
 		List<Ad_project> project = adPrjRepository.findAll(sort);
-		List<Ad_project> listAd = new ArrayList<>();
-		listAd.addAll(project);
+		JSONArray listAd = new JSONArray();
+		for(int i=0;i<project.size();i++) {
+			Ad_project ad = project.get(i);
+			JSONObject add = new JSONObject(ad);
+			add.put("id", ad.getPrj_id());
+			add.remove("prj_id");
+			listAd.put(add);
+		}
 		return listAd;
 	}
 	

@@ -162,25 +162,96 @@
       </div>
 
     </div> -->
-    <div class="d-flex flex-wrap">
-      <v-card
-        class="mx-auto my-2"
-        width="49%"
-        height="200"
-        min-width="360"
-      ></v-card>
-      <v-card
-        class="mx-auto my-2"
-        width="49%"
-        height="200"
-        min-width="360"
-      ></v-card>
-    </div>
+    <v-container>
+      <v-row v-resize="onResize">
+        <v-col :cols="cols">
+          <MyInfo
+            :infoLoaded="infoLoaded"
+            :info="info"
+          />
+        </v-col>
+        <v-col>
+          <v-card
+            class="mx-auto"
+            width="100%"
+            height="400"
+          ></v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col :cols="12">
+          <v-card
+            class="mx-auto my-2"
+            width="100%"
+            height="400"
+          >
+            <v-app-bar
+              absolute
+              color="primary"
+              dark
+            >
+              <v-toolbar-title>我的项目</v-toolbar-title>
+            </v-app-bar>
+            <v-tabs>
+              <v-tab>推荐工作室</v-tab>
+              <v-tab>推荐项目</v-tab>
+              <v-tab-item></v-tab-item>
+            </v-tabs>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-bottom-navigation
+      class="d-flex d-md-none"
+      color="primary"
+      :value="activeBtn"
+      shift
+      absolute
+      style="position: fixed;"
+    >
+      <v-btn>
+        <span>数据中心</span>
+        <v-icon>mdi-database</v-icon>
+      </v-btn>
+
+      <v-btn>
+        <span>我的项目</span>
+        <v-icon>mdi-progress-wrench</v-icon>
+      </v-btn>
+
+      <v-btn>
+        <span>我的收藏</span>
+        <v-icon>mdi-history</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
   </div>
 </template>
 
 <script>
-export default {
+import MyInfo from '../components/MyInfo'
 
+export default {
+  components: {
+    MyInfo
+  },
+  props: {
+    info: Object,
+    infoLoaded: Boolean
+  },
+  data () {
+    return {
+      cols: 3,
+      activeBtn: 1
+    }
+  },
+  methods: {
+    onResize () {
+      if (window.innerWidth < 800)
+        this.cols = 12
+      else
+        this.cols = 3
+    }
+  }
 }
 </script>

@@ -7,6 +7,7 @@
         tile
         color="primary"
         group
+        mandatory
       >
         <v-btn
           v-for="(item,i) in types"
@@ -14,7 +15,7 @@
           :value="i"
         >{{item}}</v-btn>
       </v-btn-toggle>
-      <br>
+      <br />
       <div
         class="label"
         style="float: left"
@@ -25,9 +26,10 @@
           tile
           color="primary"
           group
+          mandatory
         >
           <v-btn
-            v-for="(item,i) in utils.ctg.slice(1)"
+            v-for="(item,i) in utils.ctg"
             :key="i"
             :value="i"
           >{{item.name}}</v-btn>
@@ -39,18 +41,23 @@
         tile
         color="primary"
         group
+        mandatory
       >
         <v-btn
-          v-for="(item,i) in utils.getReal(utils.ctg[ctg + 1].subctg)"
-          :key="i"
-          :value="i"
+          key="0"
+          :value="0"
+        >全部</v-btn>
+        <v-btn
+          v-for="(item,i) in utils.getReal(utils.ctg[ctg ].subctg)"
+          :key="i + 1"
+          :value="i + 1"
         >{{item}}</v-btn>
       </v-btn-toggle>
     </v-card>
     <LoadCard
       :type="1 - type"
       address="search"
-      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg})"
+      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg, keyword})"
       :number="20"
       ref="LoadCard"
     />
@@ -65,14 +72,16 @@ export default {
   components: {
     LoadCard
   },
+  props: {
+    keyword: String
+  },
   data () {
     return {
       utils: utils,
       types: ['招标', '工作室'],
       type: utils.getReal(this.$route.params.type, 0),
       ctg: utils.getReal(this.$route.params.ctg, 0),
-      subctg: utils.getReal(this.$route.params.subctg, 0),
-      keyword: String
+      subctg: utils.getReal(this.$route.params.subctg, 0)
     }
   },
   watch: {

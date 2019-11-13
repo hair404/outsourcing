@@ -31,7 +31,7 @@ public class SearchController {
 
 	@PostMapping("search")
 	public String recommend(
-			// type=0/1&ctg=1&subctg=[0,1,2]&keyword=空或者XXX&number=X&first=X
+			// type=0/1&ctg=1&subctg=[0,1,2]&keyword=空或者XXX&number=X&first=
 			@RequestParam("type") Integer type, @RequestParam("ctg") Integer ctg,
 			@RequestParam("subctg") Integer subctg, @RequestParam("keyword") String keyword,
 			@RequestParam("number") Integer number, @RequestParam("first") Integer first)
@@ -44,21 +44,20 @@ public class SearchController {
 		if ("".equals(keyword))
 			query.set("q", "text:*");
 		else
-			query.set("q", "text:" + keyword);
-		
+			query.set("q", "text:" + keyword);		
 		query.setStart(first);
 		query.setRows(number);
 		query.set("df", "text");
-		if (type == 0) {
+		if (type == 1) {
 			if (ctg == 0 & subctg == 0)
 				query.setFilterQueries("entity:project");
 			else if (ctg == 0 & subctg != 0) {
 				query.addFilterQuery("entity:project");
-				query.addFilterQuery("sub_tag:" + subctg);
+				query.addFilterQuery("subtag:" + subctg);
 			} else {
 				query.addFilterQuery("entity:project");
 				query.addFilterQuery("tag:" + ctg);
-				query.addFilterQuery("sub_tag:" + subctg);
+				query.addFilterQuery("subtag:" + subctg);
 			}
 		} else {
 			query.setFilterQueries("entity:studio");

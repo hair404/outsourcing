@@ -90,7 +90,6 @@ public class UserController {
 			if (account.getTel().equals(tel) && account.getPassword().equals(password))
 				session.setMaxInactiveInterval(24 * 60 * 60);
 			session.setAttribute("tel", tel);
-			session.setAttribute("password", password);
 			session.setAttribute("id", account.getId());
 			session.setAttribute("type", type);
 			return "success";
@@ -110,8 +109,8 @@ public class UserController {
 	public String info(@RequestParam("type") String type, HttpServletRequest request,
 			HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		Integer id = (Integer) session.getAttribute("id");
-		if (session.getId() != null) {
+		if (session.getAttribute("id") != null) {
+			Integer id = (Integer) session.getAttribute("id");
 			String tel = (String) session.getAttribute("tel");
 			UserInfo user = (UserInfo) userRepository.getInfoByTel(tel);
 			ObjectMapper mapper = new ObjectMapper();
@@ -122,11 +121,13 @@ public class UserController {
 			Integer id_check = user.getAccount_id();
 			String info = user.getInfo();
 			String name = user.getName();
+			String avatar = user.getAvatar();
 			HashMap<String, Object> basic = new HashMap<>();
 			basic.put("username", username);
 			basic.put("email", email);
 			basic.put("img", img_url);
 			basic.put("type", user_type);
+			basic.put("avatar", avatar);
 			try {
 				if (type.equals("all")) {
 					if (id_check == id) {

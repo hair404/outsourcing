@@ -16,6 +16,7 @@
             <li
               v-for="(item,i) in menu"
               :key="i"
+              v-ripple
             >
               <router-link :to="{name:item.path,params:{type:i - 1}}">{{item.name}}</router-link>
             </li>
@@ -59,9 +60,11 @@
       <form
         id="search"
         class="_search"
+        @submit.prevent="search"
       >
         <input
           type="text"
+          v-model="keywords"
           placeholder="你想搜索"
         >
         <button
@@ -71,7 +74,7 @@
           <v-icon
             color="primary"
             style="line-height: 30px;cursor: pointer;"
-          >mdi-file-search</v-icon>
+          >mdi-magnify</v-icon>
         </button>
       </form>
     </v-parallax>
@@ -110,20 +113,26 @@
             :key="i"
             v-if="item.subctg == null"
           >
-            <v-list-item-title>{{item.name}}</v-list-item-title>
+            <v-list-item-title>
+              <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+            </v-list-item-title>
           </v-list-item>
           <v-list-group
             :key="i"
             v-else
           >
             <template v-slot:activator>
-              <v-list-item-title>{{item.name}}</v-list-item-title>
+              <v-list-item-title>
+                <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+              </v-list-item-title>
             </template>
             <v-list-item
-              v-for="(subctg,i) in item.subctg"
-              :key="i"
+              v-for="(subctg,j) in item.subctg"
+              :key="j"
             >
-              <v-list-item-title>{{subctg}}</v-list-item-title>
+              <v-list-item-title>
+                <router-link :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}">{{subctg}}</router-link>
+              </v-list-item-title>
             </v-list-item>
           </v-list-group>
         </template>
@@ -145,7 +154,18 @@ export default {
     return {
       drawer: null,
       menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
-      menuSelected: 0
+      menuSelected: 0,
+      keywords: ''
+    }
+  },
+  methods: {
+    search () {
+      if (this.$route.path === '/search') {
+        this.$emit('keyword', this.keywords)
+      } else {
+        this.$emit('keyword', this.keywords)
+        this.$router.push({ path: '/search' })
+      }
     }
   }
 }
@@ -213,9 +233,11 @@ export default {
 
 .account img {
   float: right;
-  max-width: 35px;
-  margin: 3.5px;
+  width: 30px;
+  height: 30px;
+  margin: 5px;
   border-radius: 50px;
+  object-fit: cover;
 }
 
 .message {
@@ -272,5 +294,9 @@ export default {
   position: relative;
   height: 170px;
   z-index: 9;
+}
+
+.nav {
+  line-height: 42px;
 }
 </style>

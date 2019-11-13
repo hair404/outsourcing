@@ -1,7 +1,20 @@
 <template>
   <div class="backimg">
+    <v-snackbar
+      color="error"
+      v-model="snackbar"
+    >
+      {{ text }}
+      <v-btn
+        text
+        color="red"
+        @click="snackbar = false"
+      >
+        关闭
+      </v-btn>
+    </v-snackbar>
 
-    <Head></Head>
+    <Head />
     <div class="hover">
       <div class="blur"></div>
       <div class="cover"></div>
@@ -27,31 +40,15 @@
             placeholder="密码"
             required
           />
-        </div>
-        <div>
-          <input
-            v-model="type"
-            type="radio"
-            name="type"
-            value="0"
-            checked
-          />发包公司
-          <input
-            v-model="type"
-            type="radio"
-            name="type"
-            value="1"
-          />工作室
-          <input
-            v-model="type"
-            type="radio"
-            name="type"
-            value="2"
-          />管理员
+          <select v-model="type">
+            <option value="0">发包公司</option>
+            <option value="1">工作室</option>
+            <option value="2">管理员</option>
+          </select>
         </div>
         <br />
         <div class="button">
-          <a style="width: 80%;height: 30px;text-decoration:none;color:black;cursor:pointer">登录</a>
+          <button>登录</button>
           <br />
           <br />
           <v-btn
@@ -78,27 +75,33 @@ export default {
   data () {
     return {
       username: '',
-      password: ''
+      password: '',
+      type: 0,
+      snackbar: false,
+      text: ''
     }
   },
   methods: {
     submit: function (event) {
       let data = new FormData()
-      data.append('username', this.username)
+      data.append('name', this.username)
       data.append('password', this.password)
+      data.append('type', this.type)
       axios
-        .post('/Platform/Login', data)
+        .post('/Platform/login', data)
         .then(response => {
-          if (response === 'success') {
-            this.$router.push({ path: '/index' })
+          if (response.data === 'success') {
+            this.$router.push({ path: '/home' })
+          } else {
+            this.text = '密码错误或者未注册'
+            this.snackbar = true
           }
         })
         .catch(function (error) {
           console.log(error)
+          this.text = '服务器错误'
+          this.snackbar = true
         })
-    },
-    check: function () {
-
     }
   }
 }
@@ -108,6 +111,8 @@ export default {
 .backimg {
   background-image: url("../assets/backimg.jpg");
   height: 100%;
+  width: 100%;
+  position: absolute;
   background-position: center;
   overflow: hidden;
 }
@@ -166,6 +171,7 @@ export default {
   height: 100%;
   width: 100%;
   z-index: -2;
+  background-image: url("../assets/backimg.jpg");
   filter: blur(4px);
   background-position: center;
 }
@@ -177,6 +183,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 300px;
   text-align: center;
+  font-size: 25px;
 }
 
 #login {
@@ -187,25 +194,28 @@ export default {
   text-align: center;
 }
 
-input {
+input,
+select {
   border: transparent;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 3px;
   transition: 200ms;
 }
 
-input:hover {
+input:hover,
+select:hover {
   background: white;
   box-shadow: grey 0px 1px 4px;
 }
 
 .content {
-  width: 80%;
   padding-left: 10%;
+  padding-right: 10%;
   padding-bottom: 20px;
   height: fit-content;
 }
 
+.content select,
 .content input {
   margin-top: 20px;
   display: block;

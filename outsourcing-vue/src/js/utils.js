@@ -4,7 +4,7 @@ const type = ['企业', '工作室', '管理员', '游客']
 
 const ctg = [
   {
-    name: '首页'
+    name: '全部'
   },
   {
     name: '网站开发',
@@ -46,53 +46,4 @@ export default {
   ctg,
   toFormData,
   getReal
-}
-
-function translate_state(a) {
-  switch (a) {
-    case 0:
-      return '匹配工作室'
-    case 1:
-      return '工作室工作'
-    case 2:
-      return '验收成果'
-  }
-}
-
-function translate_passed(a) {
-  switch (a) {
-    case 0:
-      return '未审核'
-    case 1:
-      return '已通过'
-    case 2:
-      return '未通过'
-  }
-}
-
-function translate_manager(type, state) {
-  switch (type) {
-    case 0:
-      switch (state) {
-        case 0:
-          return '正常'
-        case 1:
-          return '已撤回'
-      }
-    case 1:
-      switch (state) {
-        case 0:
-          return '正常'
-        case 1:
-          return '已撤回'
-      }
-
-    case 2:
-      switch (state) {
-        case 0:
-          return '已处理'
-        case 1:
-          return '待处理'
-      }
-  }
 }

@@ -1,6 +1,8 @@
 package com.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import javax.persistence.Id;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import lombok.Setter;
 @Table(name = "user")
 public class UserInfo {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id; //primary key
 	private String solr_id; // be used in solr
 	private Integer account_id; //foreign key
@@ -24,5 +27,6 @@ public class UserInfo {
 	private Integer type;
 	private String img;
 	private String avatar;
+	private Float credit;
 	private String entity;
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dao.AdProjectRepository;
 import com.dao.ProjectDao;
 import com.dao.UserRepository;
 import com.service.ProjectService;
@@ -28,13 +29,15 @@ public class ProjectController {
 	ProjectDao projectDao;
 	@Autowired
     UserRepository userRepository;
+	  @Autowired
+	    AdProjectRepository adpr;
 	
 	@PostMapping("project_info")
-	public String info(HttpServletRequest request, @RequestParam("id") Integer project_id){
+	public String info(HttpServletRequest request, @RequestParam("id") String solr_id){
 		HttpSession session = request.getSession();
 		Integer account_id = (Integer) session.getAttribute("id");
-		return projectService.get_info(project_id,account_id);
-		
+		//Integer account_id =4;
+		return projectService.get_info(solr_id, account_id);
 	}
 
 	@PostMapping("register_prj")

@@ -42,8 +42,6 @@ public class UserController {
 	@Autowired
 	private TagDao tagDao;
 	@Autowired
-	private ProjectDao projectDao;
-	@Autowired
 	private ProjectRepository projectRepository;
 	@Autowired
 	AccountRepository  accountRepository;
@@ -70,7 +68,7 @@ public class UserController {
 				entity = "studio";
 			else if (type == 2)
 				entity = "manager";
-		 userDao.insertInfo(solr_id, account_id, name, tel, email, username, type, entity);
+		 userService.insertInfo(solr_id, account_id, name, tel, email, username, type, entity);
 			return "success";
 		} else
 			return "fail";
@@ -196,7 +194,7 @@ public class UserController {
 			UserInfo user = userRepository.getInfoById(id);
 			JSONArray array = new JSONArray();
 			array.put(0);
-			JSONObject project  = new JSONObject(projectRepository.get_info_by_solr_id(solr_id));
+			JSONObject project  = new JSONObject(projectRepository.getInfoBySolrId(solr_id));
 			array.put(project);
 			json.put("id", user.getSolr_id());
 			json.put("type", user.getType());

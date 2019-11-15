@@ -27,5 +27,6 @@ public class Ad_project {
 	private float price;
 	private float ad_price;
 	private String img;
-	private String prj_id;
+	private String solr_id;
+	private Integer prj_id;
 }

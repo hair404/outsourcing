@@ -31,7 +31,6 @@ public class SearchController {
 
 	@PostMapping("search")
 	public String recommend(
-			// type=0/1&ctg=1&subctg=[0,1,2]&keyword=空或者XXX&number=X&first=
 			@RequestParam("type") Integer type, @RequestParam("ctg") Integer ctg,
 			@RequestParam("subctg") Integer subctg, @RequestParam("keyword") String keyword,
 			@RequestParam("number") Integer number, @RequestParam("first") Integer first)
@@ -48,16 +47,17 @@ public class SearchController {
 		query.setStart(first);
 		query.setRows(number);
 		query.set("df", "text");
-		if (type == 1) {
+		if (type == 1) {//project
 			if (ctg == 0 & subctg == 0)
 				query.setFilterQueries("entity:project");
-			else if (ctg == 0 & subctg != 0) {
+			else if (ctg != 0 & subctg == 0) {
 				query.addFilterQuery("entity:project");
-				query.addFilterQuery("subtag:" + subctg);
+				query.addFilterQuery("tag:" + ctg);
 			} else {
 				query.addFilterQuery("entity:project");
 				query.addFilterQuery("tag:" + ctg);
 				query.addFilterQuery("subtag:" + subctg);
+				query.addFilterQuery("state:1");
 			}
 		} else {
 			query.setFilterQueries("entity:studio");

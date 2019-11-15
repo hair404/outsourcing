@@ -26,5 +26,6 @@ public class Ad_studio {
 		private float ad_price;
 		private float weight;
 		private Integer account_id;
-	
+
+		private String  solr_id;
 }

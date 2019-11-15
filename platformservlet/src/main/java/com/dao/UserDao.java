@@ -45,10 +45,6 @@ public class UserDao {
 		jdbcTemplate.update(sql, password, tel);
 	}
 
-	public void insertInfo(String solr_id,Integer account_id, String name, String tel,  String email, String username, Integer type, String entity) {
-		String sqlCom = "insert into user(solr_id, account_id, name, tel, email, username, type, entity) values (?,?,?,?,?,?,?,?)";
-		jdbcTemplate.update(sqlCom,solr_id,account_id, name, tel, email, username, type,entity);	
-	}
 	
 //update
 	

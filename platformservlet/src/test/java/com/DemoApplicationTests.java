@@ -1,5 +1,6 @@
 package com;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Jdbc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -33,14 +35,16 @@ import com.dao.TagDao;
 import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.model.Account;
+import com.model.Child_form;
 import com.model.Project;
 import com.model.Tag;
 import com.model.UserInfo;
 import com.utils.JsonUtils;
+import com.utils.RedisUtils;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DemoApplicationTests {
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
+//public class DemoApplicationTests {
 
 //	@Autowired
 //	private JdbcTemplate jdbcTemplate;
@@ -127,16 +131,21 @@ public class DemoApplicationTests {
 //	public void ccc() {
 //		Account account = userRepository.getAccountById(1);
 //		System.out.println(account.getTel());
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	TagDao tagDao;
-	@Autowired
-	JdbcTemplate jdbcTemplate;
-	@Autowired
-	ProjectDao projectDao;
-	@Test
-//	public void getCompletedProject() {
+//	@Autowired
+//	UserRepository userRepository;
+//	@Autowired
+//	TagDao tagDao;
+//	@Autowired
+//	JdbcTemplate jdbcTemplate;
+//	@Autowired
+//	ProjectDao projectDao;
+//	@Autowired
+//	RedisUtils redis;
+//	@Autowired
+//    StringRedisTemplate t;
+////	
+//	@Test
+////	public void getCompletedProject() {
 //		String sql ="select * from project where state = 1 and (companyId= ? or studioId=?)";
 //		List<Project> projectList = (List<Project>) jdbcTemplate.query(sql, new RowMapper<Project>() {
 //			@Override
@@ -191,12 +200,25 @@ public class DemoApplicationTests {
 //		   System.out.println(array);
 //		  
 //	   }
-	public void uuid() {
-		UUID i = UUID.randomUUID();
-		System.out.println(i);
-		
-	}
-}
+//	public void uuid() {
+////		JSONObject j  = new JSONObject();
+////		j.put("f", "f");
+////		System.out.println(j.toString());
+////		j.put("f", "d");
+////		System.out.println(j.toString());
+////
+////		JSONArray a = new JSONArray();
+////		Form f = new Form();
+////    	f.setPrice(122);
+////    	 t.opsForHash().put("1", "1", f);
+////		UUID i = UUID.randomUUID();
+////		System.out.println(i);
+//////		
+////	   	 String b = "[{\"name\":\"dawd\"},{\"name\":\"dwaghw\"}]";
+////			JSONArray j = new JSONArray(b);
+////			System.out.println(j.getJSONObject(1).get("name"));
+//	}
+//}
 
 //	}
 

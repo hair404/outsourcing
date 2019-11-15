@@ -32,11 +32,11 @@ public class AdController {
 
 	@RequestMapping("recommend_project")
 	public String recommend_pro(@RequestParam("first") Integer first) {
-	return adService.recommend_ad_project(first-1);
+	return adService.recommend_ad_project(first);
 	}
 	@RequestMapping("recommend_studio")
 	public String recommend_stu(@RequestParam("first") Integer first) {
-	return adService.recommend_ad_studio(first-1);
+	return adService.recommend_ad_studio(first);
 	}
 		
 }

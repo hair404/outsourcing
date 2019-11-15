@@ -1,10 +1,25 @@
 <template>
   <v-app style="background: rgb(246, 246, 246)">
+
+    <v-snackbar
+      :color="snackbar.color"
+      v-model="snackbar.open"
+    >
+      {{ snackbar.text }}
+      <v-btn
+        text
+        @click="snackbar.open = false"
+      >
+        关闭
+      </v-btn>
+    </v-snackbar>
+
     <Nav
       :isLoged="infoLoaded"
       :nick="info.username"
       :img="info.img"
       :ctg="ctg"
+      @keyword="search"
     />
     <div class="d-block d-sm-none">
       <div style="height: 21px;width: 100%" />
@@ -17,6 +32,8 @@
       <router-view
         :info="info"
         :infoLoaded="infoLoaded"
+        :keyword="keyword"
+        :snackbar="snackbar"
       />
     </v-content>
   </v-app>
@@ -37,7 +54,13 @@ export default {
     return {
       info: {},
       infoLoaded: false,
-      ctg: utils.ctg
+      ctg: utils.ctg,
+      keyword: '',
+      snackbar: {
+        open: false,
+        color: 'primary',
+        text: '错误'
+      }
     }
   },
   methods: {
@@ -45,10 +68,15 @@ export default {
       Axios
         .post('/Platform/info', 'type=basic')
         .then(response => {
-          this.infoLoaded = true
-          this.info = response.data
+          if (!(response.data === 'NotLogin')) {
+            this.infoLoaded = true
+            this.info = response.data
+          }
         })
         .catch(error => { console.log(error) })
+    },
+    search (keyword) {
+      this.keyword = keyword
     }
   },
   created () {

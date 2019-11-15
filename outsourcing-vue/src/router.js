@@ -8,7 +8,7 @@ import Home from './views/Home.vue'
 import Center from './views/Center.vue'
 import Edit from './views/Edit.vue'
 import Search from './views/Search.vue'
-import Display from './views/Display.vue'
+import Show from './views/Show.vue'
 
 Vue.use(Router)
 
@@ -33,7 +33,7 @@ export default new Router({
         {
           path: '/display',
           name: 'display',
-          component: Display
+          component: Show
         },
         {
           path: '/edit',

@@ -34,7 +34,7 @@
       <v-img
         class="white--text align-end"
         :height="height/2"
-        src="info.img"
+        :src="'Platform/'+info.img"
       >
         <v-card-title>{{info.username}}</v-card-title>
       </v-img>
@@ -67,6 +67,13 @@
         >
           展示页面
         </v-btn>
+        <v-btn
+          color="red"
+          text
+          @click="logoff"
+        >
+          注销
+        </v-btn>
       </v-card-actions>
     </v-card>
   </div>
@@ -74,6 +81,7 @@
 
 <script>
 import utils from '../js/utils'
+import Axios from 'axios'
 
 export default {
   props: {
@@ -88,6 +96,13 @@ export default {
   data () {
     return {
       utils: utils
+    }
+  },
+  methods: {
+    logoff () {
+      Axios.post('/logoff').then(response => {
+        if (response.data === 'success') this.$router.push({ path: '/Login' })
+      }).catch(error => { console.log(error) })
     }
   }
 }

@@ -41,9 +41,18 @@ function getReal(a, d, callback) {
   return a
 }
 
+function getTextValue(a, b, callback) {
+  if (!b) b = []
+  a.forEach((item, i) => {
+    b.push(callback ? callback(item, i) : { text: item, value: i })
+  })
+  return b
+}
+
 export default {
   type,
   ctg,
   toFormData,
-  getReal
+  getReal,
+  getTextValue
 }

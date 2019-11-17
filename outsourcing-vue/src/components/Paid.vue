@@ -11,7 +11,7 @@
         style="color: red;padding: 20px"
         ref="text"
       >
-        <Countdown :deadline="prjinfo.deadline"></Countdown>
+        <Countdown :deadline="prjinfo.payDeadline"></Countdown>
       </v-card-title>
       <div style="padding:16px 0 5px 16px">请确认项目信息,确认无误后点击按钮支付押金和首付款,之后请耐心等待对方付款</div>
 
@@ -22,20 +22,20 @@
           text
           outlined
           @click="$emit('submit',info.type === 0?4:5,{},()=>{prjinfo.hasPaid = 1;prjinfo.isdeposit = 1})"
-        >支付押金</v-btn>
+        >支付押金(￥{{parseInt( prjinfo.price * 0.1)}})</v-btn>
         <v-icon
           v-else
           color="green"
         >mdi-check</v-icon>
         <v-btn
-          v-if="info.type === 0 && prjinfo.ispia === 1"
+          v-if="info.type === 0 && prjinfo.ispia === 0"
           color="primary"
           text
           outlined
           @click="$emit('submit',5,{},()=>{prjinfo.ispia = 1})"
-        >支付首付款</v-btn>
+        >支付首付歀({{parseInt( prjinfo.payinadvance)}})</v-btn>
         <v-icon
-          v-else
+          v-else-if="info.type === 0"
           color="green"
         >mdi-check</v-icon>
       </v-card-actions>

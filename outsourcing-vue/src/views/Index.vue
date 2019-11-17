@@ -22,25 +22,27 @@
       @keyword="search"
     />
     <div class="d-block d-sm-none">
-      <div style="height: 21px;width: 100%" />
+      <div style="height: 15px;width: 100%" />
     </div>
     <Ctg
       class="d-none d-sm-flex"
       :ctg="ctg"
     />
     <v-content>
-      <router-view
-        :info="info"
-        :infoLoaded="infoLoaded"
-        :keyword="keyword"
-        :snackbar="snackbar"
-      />
+      <keep-alive include="search,detail,show">
+        <router-view
+          :info="info"
+          :infoLoaded="infoLoaded"
+          :keyword="keyword"
+          :snackbar="snackbar"
+        />
+      </keep-alive>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import Nav from '../components/Nav'
 import Ctg from '../components/Ctg'
 import utils from '../js/utils'
@@ -65,7 +67,7 @@ export default {
   },
   methods: {
     loadinfo () {
-      Axios
+      axios
         .post('/Platform/info', 'type=basic')
         .then(response => {
           if (!(response.data === 'NotLogin')) {

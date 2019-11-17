@@ -1,5 +1,33 @@
 <template>
   <div>
+    <v-dialog v-model="dialog">
+      <v-card height="100px">
+        <v-card-title style="display: inline-block">消息</v-card-title>
+        <v-card-title style="display: inline-block;float:right">
+          <v-btn text>清除通知</v-btn>
+        </v-card-title>
+        <div
+          v-if="message.length === 0"
+          style="margin-left: 40%"
+          class="subtitle-1"
+        >无通知</div>
+        <v-list v-else>
+          <v-list-item-group color="primary">
+            <v-list-item
+              v-for="(item, i) in message"
+              :key="i"
+              @click="this.$router.push(item.url)"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
+    </v-dialog>
+
     <div class="head">
       <div style="overflow: hidden;width: 100%;height: 42px;position: absolute;z-index: -1">
         <img
@@ -28,29 +56,59 @@
           color="black"
           @click="drawer = !drawer"
         >mdi-menu</v-icon>
-        <div
-          v-if="!isLoged"
-          style="float: right;line-height: 42px;"
-          @click="$router.push({path:'/Login'})"
-        >游客</div>
-        <div
-          v-else
-          style="float: right;height: 42px;"
-        >
+        <div style="float: right;height: 42px;">
           <div
             class="nav d-none d-sm-flex"
             style="float: right;height: 42px;"
           >
-            <div class="account">
-              <div>{{nick}}</div>
-              <img :src="'/Platform'+img" />
+            <div
+              @click="!isLoged?$router.push({path:'/Login'}):$router.push({path:'/Center'})"
+              class="account"
+            >
+              <div>{{isLoged?nick:'游客'}}</div>
+              <img
+                v-if="isLoged"
+                :src="'/Platform'+img"
+              />
             </div>
           </div>
-          <div class="message">收藏</div>
-          <div class="message">消息</div>
+
+          <v-menu
+            open-on-hover
+            offset-y
+            nudge-left="50%"
+          >
+            <template v-slot:activator="{ on }">
+              <div
+                class="message"
+                v-on="on"
+                @click="if(window.innerWidth < 600) dialog = true"
+              >消息</div>
+            </template>
+            <v-list class="d-none d-sm-flex">
+              <v-subheader style="float:left">消息</v-subheader>
+              <v-subheader style="float:right">
+                <v-btn text>清除通知</v-btn>
+              </v-subheader>
+              <v-list-item-group color="primary">
+                <v-list-item
+                  v-for="(item, i) in message"
+                  :key="i"
+                  @click="this.router.push(item.url)"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-menu>
+
         </div>
       </div>
     </div>
+
     <v-parallax
       height="170"
       src="../assets/head_bkgrd.jpg"
@@ -83,7 +141,15 @@
       absolute
       temporary
     >
-      <v-list-item>
+      <v-list-item v-if="!isLoged">
+        <v-list-item-content>
+          <v-list-item-title @click="$router.push({path:'/Login'})">游客</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
+        @click="$router.push({path:'/Center'})"
+        v-else
+      >
         <v-list-item-avatar>
           <v-img :src="'/Platform'+img"></v-img>
         </v-list-item-avatar>
@@ -114,7 +180,10 @@
             v-if="item.subctg == null"
           >
             <v-list-item-title>
-              <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+              <router-link
+                @click.native="menuSelected = 1"
+                :to="{name:'search',params:{ctg: i + 1}}"
+              >{{item.name}}</router-link>
             </v-list-item-title>
           </v-list-item>
           <v-list-group
@@ -123,7 +192,10 @@
           >
             <template v-slot:activator>
               <v-list-item-title>
-                <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+                <router-link
+                  @click.native="menuSelected = 1"
+                  :to="{name:'search',params:{ctg: i + 1}}"
+                >{{item.name}}</router-link>
               </v-list-item-title>
             </template>
             <v-list-item
@@ -131,7 +203,10 @@
               :key="j"
             >
               <v-list-item-title>
-                <router-link :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}">{{subctg}}</router-link>
+                <router-link
+                  @click.native="menuSelected = 1"
+                  :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}"
+                >{{subctg}}</router-link>
               </v-list-item-title>
             </v-list-item>
           </v-list-group>
@@ -142,6 +217,7 @@
 </template>
 
 <script>
+import Axios from 'axios'
 export default {
   name: 'Nav',
   props: {
@@ -155,7 +231,10 @@ export default {
       drawer: null,
       menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
       menuSelected: 0,
-      keywords: ''
+      keywords: '',
+      dialog: false,
+      message: [],
+      window: window
     }
   },
   methods: {
@@ -167,6 +246,9 @@ export default {
         this.$router.push({ path: '/search' })
       }
     }
+  },
+  created () {
+    Axios.post('/Platform/notify').then(response => { this.message = response.data }).catch(error => { console.log(error) })
   }
 }
 </script>
@@ -245,6 +327,12 @@ export default {
   line-height: 42px;
   padding-left: 10px;
   padding-right: 10px;
+  transition: 300ms;
+}
+
+.message:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .info {

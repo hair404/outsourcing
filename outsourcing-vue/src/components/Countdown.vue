@@ -1,15 +1,16 @@
 <template>
-  <div>{{hours}}小时{{minutes}}分{{seconds}}秒</div>
+  <div>{{day}}天{{hours}}小时{{minutes}}分{{seconds}}秒</div>
 </template>
 
 <script>
 export default {
   props: {
-    deadline: Object
+    deadline: String
   },
   data () {
     return {
-      time: this.deadline.split(':'),
+      time: (Date.parse(this.deadline + ' 24:00:00') - Date.parse(new Date())) / 1000,
+      day: 0,
       hours: 0,
       minutes: 0,
       seconds: 0
@@ -41,10 +42,14 @@ export default {
   },
   mounted () {
     // 倒计时
+    this.day = parseInt(this.time / 60 / 60 / 24)
+    this.hours = parseInt((this.time / 60) % 24)
+    this.minutes = parseInt((this.time / 60) % 60)
+    this.seconds = parseInt((this.time / 60 / 24) % 60)
     this.timer()
-    this.hours = parseInt(this.time[0])
-    this.minutes = parseInt(this.time[1])
-    this.seconds = parseInt(this.time[2])
+    // this.hours = parseInt(this.time[0])
+    // this.minutes = parseInt(this.time[1])
+    // this.seconds = parseInt(this.time[2])
   },
   watch: {
     // 倒计时
@@ -63,18 +68,6 @@ export default {
       handler (newVal) {
         this.num(newVal)
       }
-    }
-  },
-  computed: {
-    // 倒计时
-    second: function () {
-      return this.num(this.time.s)
-    },
-    minute: function () {
-      return this.num(this.time.m)
-    },
-    hour: function () {
-      return this.num(this.time.h)
     }
   }
 }

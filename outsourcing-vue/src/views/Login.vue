@@ -19,10 +19,7 @@
       <div class="blur"></div>
       <div class="cover"></div>
       <h1 class="title">人力和项目服务平台</h1>
-      <form
-        id="login"
-        @submit.prevent="submit"
-      >
+      <form id="login">
         <div class="content">
           <input
             v-model="username"
@@ -45,19 +42,33 @@
             <option value="1">工作室</option>
             <option value="2">管理员</option>
           </select>
+          <div>
+            <input
+              v-model="code"
+              style="width: 60%;display: inline-block;float: left;margin-top: 0px"
+              name="code"
+              placeholder="验证码"
+              required
+            />
+            <v-img
+              width="100"
+              class="d-inline-block"
+              style="margin-left: 28px;float: right"
+              src="/Platform/code"
+            />
+          </div>
         </div>
         <br />
         <div class="button">
-          <button>登录</button>
-          <br />
-          <br />
           <v-btn
-            class="button1"
-            style="width: 80%;height: 30px;text-decoration:none;color:black"
-            @click="$router.push('/register')"
-          >
-            <span>注册</span>
-          </v-btn>
+            style="width: 80%;"
+            @click="submit"
+          >登录</v-btn>
+          <br />
+          <br />
+          <button @click="$router.push('/register')">
+            注册
+          </button>
         </div>
       </form>
     </div>
@@ -92,6 +103,16 @@ export default {
         .then(response => {
           if (response.data === 'success') {
             this.$router.push({ path: '/home' })
+            var OneSignal = window.OneSignal || []
+            OneSignal.getUserId(function (userId) {
+              axios.post('/Platform/token', userId)
+                .then(response => {
+                  if (response.data !== 'success') console.log('token上传失败')
+                })
+                .catch(error => {
+                  console.log(error)
+                })
+            })
           } else {
             this.text = '密码错误或者未注册'
             this.snackbar = true
@@ -109,7 +130,7 @@ export default {
 </script>
 <style scoped lang="scss">
 .backimg {
-  background-image: url("../assets/backimg.jpg");
+  background-image: url('../assets/backimg.jpg');
   height: 100%;
   width: 100%;
   position: absolute;
@@ -171,7 +192,7 @@ export default {
   height: 100%;
   width: 100%;
   z-index: -2;
-  background-image: url("../assets/backimg.jpg");
+  background-image: url('../assets/backimg.jpg');
   filter: blur(4px);
   background-position: center;
 }
@@ -179,7 +200,7 @@ export default {
 .title {
   position: absolute;
   left: 50%;
-  top: 20%;
+  top: 10%;
   transform: translate(-50%, -50%);
   width: 300px;
   text-align: center;
@@ -188,7 +209,7 @@ export default {
 
 #login {
   position: absolute;
-  top: 60%;
+  top: 55%;
   transform: translate(0, -50%);
   width: 100%;
   text-align: center;
@@ -216,7 +237,8 @@ select:hover {
 }
 
 .content select,
-.content input {
+.content input,
+.content > div {
   margin-top: 20px;
   display: block;
   width: 100%;

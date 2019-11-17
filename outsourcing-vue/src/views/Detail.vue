@@ -4,7 +4,24 @@
       v-model="dialog"
       max-width="400"
     >
-      <v-card v-if="state === 2">
+      <v-card v-if="state === 1">
+        <v-card-title>确认？</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="info.type === 0?action(0, { studioid: id }, () => { state = 2 }):action(0);dialog = false"
+          >确认</v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="dialog = false"
+          >取消</v-btn>
+        </v-card-actions>
+      </v-card>
+
+      <v-card v-if="state === 2 && (info.type == 1 && projectInfo.isform === 0)">
         <v-card-title>添加进度</v-card-title>
         <v-card-text>
           <v-form
@@ -31,6 +48,7 @@
             ></v-text-field>
           </v-form>
           <v-card-actions>
+            <v-spacer></v-spacer>
             <v-btn
               color="primary"
               text
@@ -40,28 +58,49 @@
         </v-card-text>
       </v-card>
 
-      <v-card v-if="state === 7">
-        <v-card-title>我要申诉</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="reason"
-            filled
-            label="原因"
-          />
-          <v-text-field
-            v-if="punishSelect === 0"
-            v-model="money"
-            :rules="v => v <= 100 && v > 0 || 必须小于100大于0"
-            type="Number"
-            label="我要求退回金额（需要赔偿金额的百分比）"
-            required
-          />%
-        </v-card-text>
+      <!-- <v-card v-if="state == 2">
+        <v-card-title>确认？</v-card-title>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
-            @click="action(info.type === 0?10:12,{reason:reason,money:money},()=>{projectInfo.state += 1})"
+            @click="action(3);dialog = false"
+          >确认</v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="dialog = false"
+          >取消</v-btn>
+        </v-card-actions>
+      </v-card> -->
+
+      <v-card v-if="state === 7">
+        <v-card-title>我要申诉</v-card-title>
+        <v-card-text>
+          <v-form ref="form">
+            <v-text-field
+              v-model="reason"
+              filled
+              label="原因"
+            />
+            <v-text-field
+              v-model="money"
+              :rules="[v => (v <= 100 && v > 0) || '必须小于100大于0']"
+              type="Number"
+              label="我要求退回金额（需要赔偿金额的百分比）"
+              required
+              style="display: inline-block;width :90%"
+            />
+            <div style="display: inline-block;width: 10%;text-align: center">%</div>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="$refs.form.validate()?action(info.type === 0?11:12,{reason:reason,money:money},()=>{state += 1}):''"
           >提交</v-btn>
         </v-card-actions>
       </v-card>
@@ -119,14 +158,15 @@
                   style="position: absolute;right: 20px"
                 >
                   <v-btn
-                    v-if="state === 1 && info.type === 1"
+                    v-if="state === 1 && info.type === 1 && !isEnter"
                     outlined
                     color="red"
                     style="margin-right: 10px"
-                    @click="action(0)"
+                    @click="dialog = true"
                   >我要竞标</v-btn>
 
-                  <template v-if="state === 2 && info.type === 1">
+                  <template v-if="state === 2 && info.type === 1 && projectInfo.isform === 0">
+                    <div class="d-inline mr-4">{{'剩余可以分配的时间：' + getLeftTime(projectInfo.deadline)}}</div>
                     <v-btn
                       outlined
                       color="error"
@@ -147,28 +187,46 @@
                 :style="!vertical &&state !== i + 1 ? 'display:none':''"
               >
                 <LoadCard
-                  v-if="state === 1"
+                  v-if="(i+1) === 1 && state === 1 && info.type === 0 && projectInfo.companyID === 'self'"
                   isActiveLoad
                   :isLoaded="infoLoaded"
                   :cardsProp="enroll"
                   :type="0"
-                  btnText="中标"
+                  :extraText="(price)=>{return '报价：' + price}"
+                  :btnText="projectInfo.companyID === 'self'?'中标':null"
                   :callback="win"
                 ></LoadCard>
 
-                <template v-if="state === 2">
-                  <div v-if="table">
+                <div
+                  v-if="(i+1) === 1 && state === 1 && isEnter"
+                  class="headline"
+                >您已经进入投标，请耐心等待结果</div>
+
+                <template v-if="(i+1) === 2 && state === 2">
+                  <div v-if="(info.type == 1 && projectInfo.isform === 0) || (info.type === 0 && projectInfo.issetprice === 0 && projectInfo.isform === 1) || (info.type === 1 && projectInfo.isform === 1 && projectInfo.issetprice === 1)">
                     <Table
                       ref="table"
                       :data="table"
                       :isCompany="info.type === 0?true : false"
+                      :isPriceCol="(info.type == 1 && projectInfo.isform === 0)"
+                      :headers="headers"
+                      itemkey="name"
                     ></Table>
                     <v-btn
+                      v-if="info.type === 1 && projectInfo.isform === 1 && projectInfo.issetprice === 1"
                       color="primary"
                       class="my-4"
                       outlined
-                      @click="action(1,{table:JSON.stringify(table)},()=>{projectInfo.wait = 1})"
+                      @click="action(4,{},()=>{state = 3})"
+                    >确认</v-btn>
+                    <v-btn
+                      v-else
+                      color="primary"
+                      class="my-4"
+                      outlined
+                      @click="action(1,{table:JSON.stringify(table)},()=>{info.type === 1?projectInfo.isform = 1:projectInfo.issetprice = 1})"
                     >提交</v-btn>
+
                   </div>
                   <v-card
                     v-else
@@ -178,9 +236,9 @@
                     outlined
                   >
                     <div
-                      v-if="info.type == 0 && projectInfo.wait"
+                      v-if="info.type == 0 && projectInfo.isform === 1"
                       style="padding:40px 0 5px 16px"
-                    >等待工作室确认进度表</div>
+                    >等待工作室确认进度款</div>
                     <div
                       v-else-if="info.type == 0"
                       style="padding:40px 0 5px 16px"
@@ -188,7 +246,7 @@
                     <div
                       v-if="info.type == 1"
                       style="padding:40px 0 5px 16px"
-                    >等待公司定进度款</div>
+                    >等待公司制定进度款</div>
                     <v-card-actions style="padding-top: 80px">
                       <v-btn
                         color="primary"
@@ -200,21 +258,21 @@
                         color="error"
                         text
                         outlined
-                        @click="action(3)"
+                        @click="dialog = true"
                       >要求取消项目</v-btn>
                     </v-card-actions>
                   </v-card>
                 </template>
 
                 <Paid
-                  v-if="state === 3"
+                  v-if="(i+1) === 3 && state === 3"
                   :info="info"
                   :prjinfo="projectInfo"
-                  :submit="action"
+                  @submit="action"
                 ></Paid>
 
                 <Processing
-                  v-if="state === 4"
+                  v-if="(i+1) === 4 && state === 4"
                   :data="table"
                   :type="info.type"
                   :id="projectInfo.id"
@@ -222,10 +280,11 @@
                   class="mx-auto my-1"
                   :style="processWidth"
                   @submit="action"
+                  :prjinfo="projectInfo"
                 ></Processing>
 
                 <Comment
-                  v-if="state === 5"
+                  v-if="(i+1) === 5 && state === 5"
                   :type="info.type"
                   :prjinfo="projectInfo"
                   @submit="action"
@@ -281,7 +340,7 @@
               style="text-align: center"
             >在<Countdown
                 class="headline"
-                :deadline="projectInfo.deadline"
+                :deadline="projectInfo.countdown"
               ></Countdown>之前可以申诉</v-card-subtitle>
             <v-btn
               outlined
@@ -309,7 +368,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import qs from 'qs'
 import utils from '../js/utils'
 import Prjinfo from '../components/Prjinfo'
@@ -322,6 +381,7 @@ import Comment from '../components/Comment'
 import Countdown from '../components/Countdown'
 
 export default {
+  name: 'detail',
   components: {
     Prjinfo,
     MyInfo,
@@ -347,7 +407,18 @@ export default {
       cols: 8, // 控制自适应
       state: 1, // 控制进度条
       dialog: false,
-      enroll: [],
+      enroll: Array,
+      isEnter: false,
+      id: 0,
+      headers: [{
+        text: '进度名', value: 'name'
+      },
+      {
+        text: '进度详情', value: 'info'
+      },
+      {
+        text: '所需时间(天)', value: 'time'
+      }],
       table: [],
       step: {
         name: '',
@@ -360,6 +431,28 @@ export default {
     }
   },
   methods: {
+    getinfo () {
+      axios.post('/Platform/project_info', 'id=' + this.$route.params.id)
+        .then(response => {
+          this.projectInfo = response.data
+          this.state = response.data.state
+          this.enroll = utils.getReal(response.data.enroll, [])
+          if (this.info.type === 1)
+            this.enroll.forEach(item => {
+              if (item.id === this.info.id)
+                this.isEnter = true
+            })
+          this.table = utils.getReal(response.data.table, [])
+          this.infoLoaded = true
+          if (response.data.companyID !== 'self')
+            axios.post('/Platform/display_info', 'id=' + response.data.companyID)
+              .then(response => {
+                this.displayInfo = response.data
+              })
+              .catch(error => { console.log(error) })
+        })
+        .catch(error => { console.log(error) })
+    },
     onResize () {
       if (window.innerWidth < 950) {
         this.cols = 12
@@ -371,9 +464,8 @@ export default {
         this.processWidth = 'width: 95%'
       }
     },
-    win (id) { this.action(0, { studioid: id }, () => { this.projectInfo.state = 2 }) },
+    win (id) { this.id = id; this.dialog = true },
     add () {
-      console.log(this.$refs.form.validate())
       if (this.$refs.form.validate() && this.step.time > 0) {
         var step = {}
         step.name = this.step.name
@@ -388,22 +480,35 @@ export default {
       }
     },
     deleteItem () {
-      const selected = this.$refs.table.selected
-      this.table.forEach((item, i) => {
-        selected.forEach(selectItem => {
-          if (item === selectItem)
-            this.table.splice(i, 1)
-        })
+      var selected = this.$refs.table[0].selected
+      this.table = this.table.filter(i => !selected.includes(i))
+    },
+    getLeftTime (deadline) {
+      if (deadline === undefined)
+        return 0
+      var day = (Date.parse(deadline + ' 24:00:00') - Date.parse(new Date())) / 1000 / 60 / 60 / 24
+      this.table.forEach(item => {
+        day -= item.time
       })
+      day = parseInt(day)
+      if (day === 0)
+        return '已全部分配'
+      return day + '天'
     },
     action (a, extra, callback) {
-      Axios.post(this.info.type === 0 ? 'company_action' : 'studio_action', qs.stringify(Object.assign({ id: this.projectInfo.id, action: a }, extra)))
+      axios.post(this.info.type === 0 ? '/Platform/company_action' : '/Platform/studio_action', qs.stringify(Object.assign({ id: this.projectInfo.id, action: a }, extra)))
         .then(response => {
-          if (this.response.data === 'success')
+          if (response.data === 'success')
             if (callback) {
               callback()
             } else;
-          else {
+          else if (response.data[0] === '<') {
+            var id = window.open('', '_blank', 'height=800,width=1000')
+            id.onload = function () {
+              id.document.body.innerHTML = response.data
+              id.document.forms[0].submit()
+            }
+          } else {
             this.snackbar.color = 'error'
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
@@ -417,21 +522,10 @@ export default {
     }
   },
   mounted () {
-    Axios.post('/Platform/project_info', 'id=' + 1)
-      .then(response => {
-        this.projectInfo = response.data
-        this.state = response.data.state
-        this.enroll = response.data.enroll
-        this.table = utils.getReal(response.data.table)
-        this.infoLoaded = true
-        if (response.data.companyID !== 'self')
-          Axios.post('display_info', 'id=' + response.data.companyID)
-            .then(response => {
-              this.displayInfo = response.data
-            })
-            .catch(error => { console.log(error) })
-      })
-      .catch(error => { console.log(error) })
+    this.getinfo()
+  },
+  activated () {
+    this.getinfo()
   }
 }
 </script>

@@ -1,6 +1,11 @@
 <template>
   <div class="wrapper">
     <v-card class="mx-auto my-2">
+      <v-icon
+        color="grey"
+        class="ml-4 my-4"
+        @click="$router.back()"
+      >mdi-arrow-left</v-icon>
       <v-img
         class="white--text align-end"
         height="200"
@@ -17,6 +22,7 @@
         <v-tab>他的信息</v-tab>
         <v-tab>已完成项目</v-tab>
         <v-tab v-if="displayinfo.bid">正在竞标的项目</v-tab>
+        <v-tab v-if="!displayinfo.bid">工作室成员</v-tab>
       </v-tabs>
     </v-card>
     <v-tabs-items v-model="tab">
@@ -47,7 +53,7 @@
           v-if="isloaded"
           :isLoaded="isloaded"
           :cardsProp="complete"
-          number="20"
+          number="10"
           type="1"
           :totalProps="completeNo"
         ></LoadCard>
@@ -57,10 +63,21 @@
         <LoadCard
           :isLoaded="isloaded"
           :cardsProp="bid"
-          number="20"
+          number="10"
           type="1"
           :totalProps="bidNo"
         ></LoadCard>
+      </v-tab-item>
+
+      <v-tab-item>
+        <Table
+          ref="table"
+          :data="member"
+          :headers="headers"
+          itemkey="id"
+          issort
+          isCompany
+        ></Table>
       </v-tab-item>
 
     </v-tabs-items>
@@ -68,10 +85,11 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import LoadCard from '../components/LoadCard'
 
 export default {
+  name: 'show',
   components: { LoadCard },
   data () {
     return {
@@ -81,12 +99,14 @@ export default {
       bid: [],
       bidNo: 0,
       isloaded: false,
-      tab: 0
+      tab: 0,
+      headers: [{ text: '名字', value: 'name' }, { text: '介绍', value: 'info' }, { text: '邮箱', value: 'email' }, { text: '电话', value: 'tel' }],
+      member: []
     }
   },
   methods: {
     loaddisplayinfo () {
-      Axios
+      axios
         .post('/Platform/display_info', 'id=' + this.$route.params.id)
         .then(response => {
           this.displayinfo = response.data
@@ -97,6 +117,10 @@ export default {
           this.isloaded = true
         })
         .catch(error => { console.log(error) })
+
+      axios.post('/Platform/member', 'id=' + this.$route.params.id).then(response => {
+        this.member = response.data
+      }).catch(error => { console.log(error) })
     }
   },
   created () {

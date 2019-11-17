@@ -1,60 +1,64 @@
 <template>
   <div>
-    <v-form class="wrapper mt-4 mb-4">
-      <v-text-field
-        name="username"
-        type="text"
-        label="公司名"
-        required
-        outlined
-      />
-      <v-text-field
-        name="name"
-        type="text"
-        label="真实名字"
-        required
-        outlined
-      />
-      <v-text-field
-        name="password"
-        type="password"
-        label="密码"
-        outlined
-      />
-      <div style="width: 800px;display: none;">
-        <select
-          id="select"
-          style="width: 100px;height: 50px;"
-          onchange=""
+    <v-form class="wrapper">
+      <template v-for="(item,i) in editinfo">
+        <v-text-field
+          v-if="i !== 2"
+          :key="i"
+          v-model="item.value"
+          type="text"
+          :label="item[Object.keys(item)[0]]"
+          required
+          filled
+        />
+        <div
+          :key="i"
+          style="height: 70px;overflow-x: auto;"
+          v-else-if="info.type === 1"
         >
-          <option value="0">请选择</option>
-        </select>
-      </div>
-      <v-text-field
-        name="email"
-        type="email"
-        label="邮箱"
-        required
-        outlined
-      />
-      <v-text-field
-        name="phone"
-        type="text"
-        label="电话"
-        required
-        outlined
-      />
-      <v-textarea
-        outlined
-        name="info"
-        label="介绍"
-      />
+          <div style="display: inline-flex">
+            <v-chip
+              v-for="(tag,i) in item.value"
+              class="ma-2"
+              ripple
+              close
+              outlined
+              :key="tag"
+              @click:close="item.value.splice(i, 1)"
+            >{{utils.ctg[tag + 1].name}}</v-chip>
+            <v-menu offset-y>
+              <template v-slot:activator="{ on }">
+                <v-chip
+                  class="ma-2"
+                  ripple
+                  outlined
+                  v-on="on"
+                >
+                  <v-icon>mdi-plus</v-icon>
+                </v-chip>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(item, i) in utils.ctg.slice(1)"
+                  :key="i"
+                  @click="editinfo[2].value.push(i)"
+                >
+                  <v-list-item-title>{{ item.name }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </div>
+      </template>
       <v-btn
         text
         color="warning"
         class="mr-4"
       >重置</v-btn>
-      <v-btn color="primary">
+      <v-btn
+        @click="upload"
+        color="primary"
+      >
         保存
       </v-btn>
     </v-form>
@@ -62,7 +66,54 @@
 </template>
 
 <script>
+import utils from '../js/utils'
+import Axios from 'axios'
+import qs from 'qs'
+
 export default {
-  name: 'Info'
+  name: 'Info',
+  props: {
+    info: Object,
+    myinfo: Object,
+    snackbar: Object
+  },
+  data () {
+    return {
+      utils: utils,
+      editinfo: [
+        { username: this.info.type === 0 ? '公司名' : '工作室名称', value: this.myinfo.username },
+        { name: '真实名字', value: this.myinfo.name },
+        { tag: '标签', value: this.myinfo.tag },
+        { email: '电子邮件', value: this.myinfo.email },
+        { tel: '电话', value: this.myinfo.tel },
+        { info: '介绍', value: this.myinfo.info }
+      ]
+    }
+  },
+  methods: {
+    upload () {
+      var temp = {}
+      this.editinfo.forEach(item => {
+        temp[Object.keys(item)[0]] = item.value
+      })
+      if (this.info.type === 1)
+        temp['tag'] = JSON.stringify(this.editinfo[2].value)
+      else
+        temp['tag'] = undefined
+      Axios.post('/Platform/edit', qs.stringify(temp))
+        .then(response => {
+          if (response.data === 'success') {
+            this.snackbar.color = 'green'
+            this.snackbar.text = '修改成功'
+            this.snackbar.open = true
+          }
+        }).catch(error => {
+          console.log(error)
+          this.snackbar.color = 'error'
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
+        })
+    }
+  }
 }
 </script>

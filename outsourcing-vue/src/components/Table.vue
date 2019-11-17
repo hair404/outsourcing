@@ -4,11 +4,12 @@
       v-model="selected"
       :headers="headers"
       :items="data"
-      item-key="name"
+      :item-key="itemkey"
       class="elevation-1"
       :show-select="!isCompany"
-      disable-sort
+      :disable-sort="!issort"
       hide-default-footer
+      :items-per-page="100"
     >
       <template
         v-if="isCompany"
@@ -48,25 +49,23 @@ export default {
     isCompany: {
       type: Boolean,
       default: false
+    },
+    isPriceCol: Boolean,
+    headers: Array,
+    itemkey: String,
+    issort: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
-      headers: [{
-        text: '进度名', value: 'name'
-      },
-      {
-        text: '进度详情', value: 'info'
-      },
-      {
-        text: '所需时间(天)', value: 'time'
-      }],
       selected: []
     }
   },
   created () {
-    if (this.isCompany)
-      this.headers.push({ text: '价格', value: 'price' })
+    if (this.isPriceCol === true)
+      this.headers.push({ text: '进度款', value: 'price' })
   }
 }
 </script>

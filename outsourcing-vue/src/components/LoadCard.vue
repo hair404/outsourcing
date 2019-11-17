@@ -24,7 +24,7 @@
         <v-card
           :elevation="hover ? 12 : 2"
           class="mx-auto my-2"
-          @click="$router.push(type === 0?{name:'display',params:{id:item.id}}:{name:'detail',params:{id:item.id}})"
+          @click="$router.push(type === 0?{name:'display',params:{id:item.id}}:{name:'detail',params:{id:item.solr_id}})"
           width="95%"
         >
           <v-img
@@ -72,10 +72,12 @@
             </div>
           </v-card-text>
           <v-card-actions>
+            <div v-if="extraText">{{extraText(item.quote)}}</div>
+            <v-spacer></v-spacer>
             <v-btn
               v-if="btnText"
               color="primary"
-              @click="callback(item.id)"
+              @click.stop="callback(item.id)"
               text
             >{{btnText}}</v-btn>
           </v-card-actions>
@@ -93,7 +95,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import utils from '../js/utils'
 
 export default {
@@ -113,6 +115,7 @@ export default {
     type: Number, // 卡片类型
     address: String, // 接口
     extraParam: String, // 额外参数
+    extraText: Function,
     btnText: String, // 按钮文字
     callback: Function// 按钮回调
   },
@@ -129,17 +132,29 @@ export default {
   },
   methods: {
     load (number) {
-      Axios
-        .post('/Platform/' + this.address, 'first=' + this.index + '&end=' + (this.index + number - 1) + utils.getReal(this.extraParam, '', a => { return '&' + a }))
-        .then(response => {
-          this.loaded = true
-          this.cards.push.apply(this.cards, response.data)
-          this.index += number
-        })
-        .catch(error => { console.log(error) })
+      if (this.isActiveLoad)
+        axios
+          .post('/Platform/' + this.address, 'first=' + this.index + '&end=' + (this.index + number - 1) + utils.getReal(this.extraParam, '', a => { return '&' + a }))
+          .then(response => {
+            this.loaded = true
+            this.cards.push.apply(this.cards, response.data)
+            this.index += number
+          })
+          .catch(error => { console.log(error) })
+      else
+        window.removeEventListener('scroll', this.init)
+    },
+    init () {
+      if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
+        this.load(4 * 4)
+        this.isDelay = true
+        setTimeout(() => {
+          this.isDelay = false
+        }, 2000)
+      }
     },
     update () {
-      Axios
+      axios
         .post('/Platform/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
         .then(response => {
           this.loaded = true
@@ -154,15 +169,7 @@ export default {
     if (this.address)
       if (this.isActiveLoad) {
         this.load(4 * 4)
-        window.addEventListener('scroll', () => {
-          if (!this.isDelay && (document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop) + window.innerHeight >= (document.body.scrollHeight - 100)) {
-            this.load(4 * 4)
-            this.isDelay = true
-            setTimeout(() => {
-              this.isDelay = false
-            }, 2000)
-          }
-        })
+        window.addEventListener('scroll', this.init)
       } else
         this.update()
     else {
@@ -184,7 +191,10 @@ export default {
     }
   },
   destroyed () {
-    window.removeEventListener('scroll', this.load)
+    window.removeEventListener('scroll', this.init)
+  },
+  deactivated () {
+    window.removeEventListener('scroll', this.init)
   }
 }
 </script>

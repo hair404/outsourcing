@@ -7,11 +7,11 @@
 <style lang="scss">
 @font-face {
   font-family: NewYahei;
-  src: url("./assets/font/myh.ttf");
+  src: url('./assets/font/myh.ttf');
 }
 
 #app {
-  font-family: "NewYahei", Helvetica, Arial, sans-serif;
+  font-family: 'NewYahei', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -52,7 +52,7 @@ body {
 }
 
 .wrapper {
-  width: 60%;
+  width: 70%;
   margin: 0 auto;
 }
 

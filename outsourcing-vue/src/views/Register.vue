@@ -115,7 +115,21 @@ export default {
       data.append('type', this.type)
       axios
         .post('/Platform/register', data)
-        .then(response => (this.$router.push({ path: './home' })))
+        .then(response => {
+          if (response.data === 'success') {
+            this.$router.push({ path: './home' })
+            var OneSignal = window.OneSignal || []
+            OneSignal.getUserId(function (userId) {
+              axios.post('/Platform/token', userId)
+                .then(response => {
+                  if (response.data !== 'success') console.log('token上传失败')
+                })
+                .catch(error => {
+                  console.log(error)
+                })
+            })
+          }
+        })
         .catch(function (error) {
           console.log(error)
           this.text = '服务器错误'
@@ -139,7 +153,7 @@ export default {
 }
 
 .body {
-  background-image: url("../assets/backimg.jpg");
+  background-image: url('../assets/backimg.jpg');
   height: 100%;
   width: 100%;
   position: absolute;
@@ -194,7 +208,7 @@ a {
   height: 100%;
   width: 100%;
   z-index: -2;
-  background-image: url("../assets/backimg.jpg");
+  background-image: url('../assets/backimg.jpg');
   filter: blur(4px);
   background-position: center;
 }

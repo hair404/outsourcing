@@ -8,6 +8,9 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 
+/**
+ * 手机短信操作的相关类
+ */
 public class MessageTools {
 
     private static String ACCESS_ID = "LTAI4FpwjngawSEnW7fe5NxX";

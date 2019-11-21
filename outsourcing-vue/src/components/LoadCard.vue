@@ -36,18 +36,31 @@
               <v-avatar v-if="type === 0">
                 <img :src="'Platform'+item.avatar" />
               </v-avatar>
-              {{item.prjname?item.prjname:item.username}}
+              <div style="overflow-x: auto;">
+                <div style="display: inline-flex">
+                  <div
+                    class="title"
+                    style="white-space: nowrap"
+                  >{{item.prjname?item.prjname:item.username}}</div>
+                </div>
+              </div>
             </v-card-title>
           </v-img>
           <v-card-text class="text--primary">
-            <v-rating
+            <div
               v-if="item.credit"
-              v-model="item.credit"
-              color="orange"
-              background-color="orange"
-              readonly
-              half-increments
-            />
+              style="overflow-x: auto;"
+            >
+              <div style="display: inline-flex">
+                <v-rating
+                  v-model="item.credit"
+                  color="orange"
+                  background-color="orange"
+                  readonly
+                  half-increments
+                />
+              </div>
+            </div>
             <v-card-subtitle>类别</v-card-subtitle>
             <div
               v-if="type === 0"
@@ -64,15 +77,19 @@
             </div>
             <div
               v-else
-              class="d-flex flex-wrap"
+              class="d-flex"
             >
-              <span>{{utils.ctg[item.tag].name}}{{item.subtag == 0 ? '': '-'+utils.ctg[item.tag].subctg[item.subtag - 1]}}</span>
+              <div style="overflow-x: auto;height: 30px">
+                <div style="display: inline-flex">
+                  <div style="white-space: nowrap">{{utils.ctg[item.tag].name}}{{item.subtag == 0 ? '': '-'+utils.ctg[item.tag].subctg[item.subtag - 1]}}</div>
+                </div>
+              </div>
               <v-spacer />
               <span style="color:red;font-size: 20px;">{{'￥'+item.price}}</span>
             </div>
           </v-card-text>
           <v-card-actions>
-            <div v-if="extraText">{{extraText(item.quote)}}</div>
+            <div v-if="extraText">{{extraText(item)}}</div>
             <v-spacer></v-spacer>
             <v-btn
               v-if="btnText"
@@ -88,7 +105,7 @@
       v-if="!isActiveLoad"
       v-model="page"
       style="height: 84px"
-      :length="Math.ceil(totalProps?totalProps:total/number)"
+      :length="total !== 0?Math.ceil(totalProps?totalProps:total/number):1"
       circle
     ></v-pagination>
   </div>
@@ -157,10 +174,10 @@ export default {
       axios
         .post('/Platform/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
         .then(response => {
-          this.loaded = true
           this.total = response.data[0]
           this.cards = response.data.slice(1)
           this.index += this.number
+          this.loaded = true
         })
         .catch(error => { console.log(error) })
     }
@@ -188,6 +205,9 @@ export default {
     },
     isLoaded: function () {
       this.cards = this.cardsProp
+    },
+    page: function () {
+      this.update()
     }
   },
   destroyed () {

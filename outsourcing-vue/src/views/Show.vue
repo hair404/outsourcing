@@ -53,7 +53,7 @@
           v-if="isloaded"
           :isLoaded="isloaded"
           :cardsProp="complete"
-          number="10"
+          number="12"
           type="1"
           :totalProps="completeNo"
         ></LoadCard>
@@ -63,7 +63,7 @@
         <LoadCard
           :isLoaded="isloaded"
           :cardsProp="bid"
-          number="10"
+          number="12"
           type="1"
           :totalProps="bidNo"
         ></LoadCard>

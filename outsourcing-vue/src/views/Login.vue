@@ -40,7 +40,6 @@
           <select v-model="type">
             <option value="0">发包公司</option>
             <option value="1">工作室</option>
-            <option value="2">管理员</option>
           </select>
           <div>
             <input
@@ -87,6 +86,7 @@ export default {
     return {
       username: '',
       password: '',
+      code: '',
       type: 0,
       snackbar: false,
       text: ''
@@ -98,6 +98,7 @@ export default {
       data.append('name', this.username)
       data.append('password', this.password)
       data.append('type', this.type)
+      data.append('code', this.code)
       axios
         .post('/Platform/login', data)
         .then(response => {
@@ -119,9 +120,9 @@ export default {
           }
         })
         .catch(function (error) {
-          console.log(error)
           this.text = '服务器错误'
           this.snackbar = true
+          console.log(error)
         })
     }
   }

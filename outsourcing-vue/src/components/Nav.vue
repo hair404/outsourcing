@@ -28,7 +28,91 @@
       </v-card>
     </v-dialog>
 
-    <div class="head">
+    <v-app-bar
+      class="d-block d-md-none"
+      color="primary"
+      fixed
+      dark
+      shrink-on-scroll
+      prominent
+      src="https://picsum.photos/1920/1080?random"
+      fade-img-on-scroll
+    >
+      <template v-slot:img="{ props }">
+        <v-img
+          v-bind="props"
+          gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
+        ></v-img>
+      </template>
+
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title class="title">外包服务平台</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn
+        v-if="!searchBar"
+        icon
+        @click="searchBar = true"
+      >
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+      <v-form @submit.prevent="search">
+        <v-text-field
+          v-if="searchBar"
+          height="30px"
+          type="text"
+          v-model="keywords"
+          label="你想搜索"
+          filled
+        ></v-text-field>
+      </v-form>
+      <v-btn
+        v-if="searchBar"
+        icon
+        @click="searchBar = false"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+      <v-menu
+        open-on-hover
+        offset-y
+        nudge-left="50%"
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            v-on="on"
+            icon
+            @click="if(window.innerWidth < 600) dialog = true"
+          >
+            <v-icon>mdi-bell</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="d-none d-sm-flex">
+          <v-subheader style="float:left">消息</v-subheader>
+          <v-subheader style="float:right">
+            <v-btn text>清除通知</v-btn>
+          </v-subheader>
+          <v-list-item-group color="primary">
+            <v-list-item
+              v-for="(item, i) in message"
+              :key="i"
+              @click="this.router.push(item.url)"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+
+    <div
+      class="d-block d-md-none"
+      style="width: 100%;height: 128px"
+    ></div>
+
+    <div class="head d-none d-md-block">
       <div style="overflow: hidden;width: 100%;height: 42px;position: absolute;z-index: -1">
         <img
           src="../assets/head.jpg"
@@ -110,9 +194,10 @@
     </div>
 
     <v-parallax
+      class="d-none d-md-block"
       height="170"
       src="../assets/head_bkgrd.jpg"
-      style="margin-top:-42px"
+      style="margin-top: -50px"
     >
       <div class="logo"><img src="../assets/logo2.png"></div>
       <form
@@ -138,7 +223,7 @@
     </v-parallax>
     <v-navigation-drawer
       v-model="drawer"
-      absolute
+      fixed
       temporary
     >
       <v-list-item v-if="!isLoged">
@@ -229,6 +314,7 @@ export default {
   data () {
     return {
       drawer: null,
+      searchBar: false,
       menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
       menuSelected: 0,
       keywords: '',

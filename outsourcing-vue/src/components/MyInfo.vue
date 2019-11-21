@@ -58,6 +58,7 @@
         <v-btn
           color="primary"
           text
+          @click="$router.push('/center')"
         >
           个人中心
         </v-btn>
@@ -101,7 +102,10 @@ export default {
   methods: {
     logoff () {
       Axios.post('/logoff').then(response => {
-        if (response.data === 'success') this.$router.push({ path: '/Login' })
+        if (response.data === 'success') {
+          this.info.type = null
+          this.$router.push({ path: '/Login' })
+        }
       }).catch(error => { console.log(error) })
     }
   }

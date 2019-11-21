@@ -58,7 +58,7 @@
         </v-card-text>
       </v-card>
 
-      <!-- <v-card v-if="state == 2">
+      <v-card v-if="state == 2 && (info.type == 0) && (projectInfo.isform === 0) && (projectInfo.issetprice === 0)">
         <v-card-title>确认？</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -73,7 +73,7 @@
             @click="dialog = false"
           >取消</v-btn>
         </v-card-actions>
-      </v-card> -->
+      </v-card>
 
       <v-card v-if="state === 7">
         <v-card-title>我要申诉</v-card-title>
@@ -192,7 +192,7 @@
                   :isLoaded="infoLoaded"
                   :cardsProp="enroll"
                   :type="0"
-                  :extraText="(price)=>{return '报价：' + price}"
+                  :extraText="(item)=>{return '报价：' + item.quote}"
                   :btnText="projectInfo.companyID === 'self'?'中标':null"
                   :callback="win"
                 ></LoadCard>

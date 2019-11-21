@@ -17,7 +17,7 @@
     <Nav
       :isLoged="infoLoaded"
       :nick="info.username"
-      :img="info.img"
+      :img="info.avatar"
       :ctg="ctg"
       @keyword="search"
     />
@@ -82,6 +82,7 @@ export default {
     }
   },
   created () {
+    utils.refreshCtg()
     this.loadinfo()
   }
 }

@@ -9,6 +9,7 @@ import Center from './views/Center.vue'
 import Edit from './views/Edit.vue'
 import Search from './views/Search.vue'
 import Show from './views/Show.vue'
+import Manage from './views/Manage.vue'
 
 Vue.use(Router)
 
@@ -49,6 +50,11 @@ export default new Router({
           path: '/detail',
           name: 'detail',
           component: Detail
+        },
+        {
+          path: '/manage',
+          name: 'manage',
+          component: Manage
         }
       ]
     },

@@ -67,7 +67,7 @@
               <v-text-field
                 v-model="mem.email"
                 label="成员邮箱"
-                type="number"
+                type="email"
                 :rules="[v => !!v || '必需项',]"
                 required
               ></v-text-field>
@@ -164,7 +164,7 @@
               ></v-select>
               <v-file-input
                 label="上传头图"
-                v-model="prj.img"
+                v-model="prj.file"
                 accept="image/*"
                 filled
               ></v-file-input>
@@ -274,7 +274,7 @@
         </v-col>
 
         <v-col
-          :cols="state === 1?9:''"
+          :cols="(state === 1 && cardClass)?9:''"
           style="height: 800px"
           :class="state === 0? 'py-0':''"
         >
@@ -285,7 +285,7 @@
             >
               <v-parallax
                 height="200"
-                :src="'Platform'+myinfo.img"
+                :src="myinfo.img?'Platform'+myinfo.img:''"
               >
 
                 <v-icon
@@ -304,7 +304,7 @@
                 <v-img
                   @mouseenter="overlay = true"
                   @mouseleave="overlay = false"
-                  :src="'/Platform' + myinfo.avatar"
+                  :src="myinfo.avatar?'/Platform' + myinfo.avatar:''"
                 >
                   <v-overlay
                     :value="overlay"
@@ -354,27 +354,29 @@
 
               <v-divider class="mx-4"></v-divider>
 
-              <v-card-title>我的成员</v-card-title>
+              <template v-if="info.type === 1">
+                <v-card-title>我的成员</v-card-title>
 
-              <v-card-text>
-                <v-list>
-                  <v-list-item-group
-                    color="primary"
-                    style="height: 220px;overflow-y: auto"
-                  >
-                    <v-list-item
-                      v-for="(item, i) in member"
-                      :key="i"
-                      @click="this.$router.push(item.url)"
+                <v-card-text>
+                  <v-list>
+                    <v-list-item-group
+                      color="primary"
+                      style="height: 220px;overflow-y: auto"
                     >
-                      <v-list-item-content>
-                        <v-list-item-title>{{ item.name }}</v-list-item-title>
-                        <v-list-item-subtitle>{{ item.info }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list-item-group>
-                </v-list>
-              </v-card-text>
+                      <v-list-item
+                        v-for="(item, i) in member"
+                        :key="i"
+                        @click="this.$router.push(item.url)"
+                      >
+                        <v-list-item-content>
+                          <v-list-item-title>{{ item.name }}</v-list-item-title>
+                          <v-list-item-subtitle>{{ item.info }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-item-group>
+                  </v-list>
+                </v-card-text>
+              </template>
 
               <v-card-actions>
                 <v-btn
@@ -395,7 +397,7 @@
                 <v-btn
                   color="error accent-4"
                   text
-                  @click="logoff"
+                  @click="logoff()"
                 >
                   注销
                 </v-btn>
@@ -416,7 +418,7 @@
               ></v-select>
               <v-btn
                 v-if="info.type === 0"
-                class="mr-8 ml-8 d-inline-block mt-2"
+                class="mr-8 ml-8 d-none mt-2 d-md-inline-block"
                 color="primary"
                 @click="(dialog.open = true) && (dialog.state = 4)"
                 outlined
@@ -427,10 +429,27 @@
               :type="1"
               address="my_prj"
               :extraParam="utils.toFormData({'state':proSelect})"
+              :extraText="(item)=>{return proState[item.state]}"
               :number="16"
               :btnText="info.type === 0?'上首页':undefined"
               :callback="()=>{dialog.open = true; dialog.state = 5}"
             ></LoadCard>
+            <v-fab-transition>
+              <v-btn
+                v-if="info.type === 0"
+                class="d-block d-md-none"
+                style="bottom: 100px"
+                color="pink"
+                dark
+                fixed
+                bottom
+                right
+                fab
+                @click="(dialog.open = true) && (dialog.state = 4)"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </v-fab-transition>
           </template>
 
           <template v-if="state === 2">
@@ -467,12 +486,6 @@
           <template v-if="state === 4">
             <v-btn
               outlined
-              color="error"
-              style="margin-right: 10px"
-              @click="deleteItem()"
-            >删除所选</v-btn>
-            <v-btn
-              outlined
               color="primary"
               @click.stop="(dialog.state = 1) && (dialog.open = true)"
             >添加</v-btn>
@@ -482,6 +495,8 @@
               :headers="headers"
               itemkey="id"
               issort
+              :callback="item=>deleteItem(item)"
+              callbackIcon="mdi-trash-can-outline"
             ></Table>
           </template>
         </v-col>
@@ -511,6 +526,7 @@
 
 <script>
 import Axios from 'axios'
+import qs from 'qs'
 import utils from '../js/utils'
 import Table from '../components/Table'
 import LoadCard from '../components/LoadCard'
@@ -549,7 +565,7 @@ export default {
       message: [],
       member: [],
       mem: { name: '', info: '', tel: '', email: '' },
-      prj: { prjname: '', tag: 0, subtag: 0, img: null, info: '', deadline: new Date().toISOString().substr(0, 10), price: '', pia: '' },
+      prj: { prjname: '', tag: 0, subtag: 0, file: null, info: '', deadline: new Date().toISOString().substr(0, 10), price: '', pia: '' },
       ctgValue: [],
       headers: [{ text: '名字', value: 'name' }, { text: '介绍', value: 'info' }, { text: '邮箱', value: 'email' }, { text: '电话', value: 'tel' }],
       price: 0
@@ -569,11 +585,18 @@ export default {
         mem.name = this.mem.name
         mem.info = this.mem.info
         mem.tel = this.mem.tel
-        mem.email = this.email
-        Axios.post('/Platform/addMember', 'mem=' + JSON.stringify(mem))
+        mem.email = this.mem.email
+        Axios.post('/Platform/addMember', qs.stringify(mem))
           .then(response => {
-            if (response.data === 'success')
-              this.table.push(mem)
+            if (response.data === 'success') {
+              this.member.push(mem)
+              this.dialog.open = false
+              this.mem.name = ''
+              this.mem.info = ''
+              this.mem.tel = ''
+              this.mem.email = ''
+              this.$refs.form.resetValidation()
+            }
           })
           .catch(error => {
             console.log(error)
@@ -581,23 +604,15 @@ export default {
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
           })
-        this.dialog = false
-        this.mem.name = ''
-        this.mem.info = ''
-        this.mem.tel = ''
-        this.mem.email = ''
-        this.$refs.form.resetValidation()
       }
     },
-    deleteItem () {
-      var selected = this.$refs.table.selected
-      var id = []
-      selected.forEach(item => {
-        id.push(item.id)
-      })
-      Axios.post('delMember', 'id=' + JSON.stringify(id))
+    deleteItem (item) {
+      Axios.post('/Platform/delMember', 'id=' + JSON.stringify(item.id))
         .then(response => {
-          this.table = this.table.filter(i => !selected.includes(i))
+          this.member.forEach((it, i) => {
+            if (it.id === item.id)
+              this.member.splice(i, 1)
+          })
         })
         .catch(error => {
           console.log(error)
@@ -609,14 +624,14 @@ export default {
     upload (a) {
       if (a === 2) {
         let fd = new FormData()
-        this.prj.forEach((item, i) => {
-          fd.append(Object.keys(this.prj)[i], item)
+        Object.keys(this.prj).forEach((item, i) => {
+          fd.append(item, this.prj[Object.keys(this.prj)[i]])
         })
-        Axios.post('register_prj', fd)
+        Axios.post('/Platform/register_prj', fd)
           .then(response => {
             if (response.data === 'success') {
               this.snackbar.color = 'green'
-              this.snackbar.text = '成功'
+              this.snackbar.text = '发布成功'
               this.snackbar.open = true
             }
           })
@@ -626,25 +641,25 @@ export default {
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
           })
-        return
+      } else {
+        let fd = new FormData()
+        fd.append('file', a === 0 ? this.file : this.avatar)
+        Axios.post(a === 0 ? '/Platform/uploadimg' : '/Platform/upload_avatar', fd)
+          .then(response => {
+            if (response.data) {
+              this.myinfo.avatar = response.data
+            }
+          })
+          .catch(error => {
+            console.log(error)
+            this.snackbar.color = 'error'
+            this.snackbar.text = '服务器错误'
+            this.snackbar.open = true
+          })
       }
-      let fd = new FormData()
-      fd.append('img', a === 0 ? this.file : this.avatar)
-      Axios.post(a === 0 ? '/Platform/uploadimg' : '/Platform/upload_avatar', fd)
-        .then(response => {
-          if (response.data) {
-            this.myinfo.img = response.data
-          }
-        })
-        .catch(error => {
-          console.log(error)
-          this.snackbar.color = 'error'
-          this.snackbar.text = '服务器错误'
-          this.snackbar.open = true
-        })
     },
     pay () {
-      Axios.post(this.info.type === 0 ? 'ad_register_prj' : 'ad_register_stu', 'ad_price=' + this.price)
+      Axios.post(this.info.type === 0 ? '/Platform/ad_register_prj' : '/Platform/ad_register_stu', 'ad_price=' + this.price)
         .then(response => {
           if (response.data) {
             var id = window.open('', '_blank', 'height=800,width=1000')
@@ -662,8 +677,11 @@ export default {
         })
     },
     logoff () {
-      Axios.post('/logoff').then(response => {
-        if (response.data === 'success') this.$router.push({ path: '/Login' })
+      Axios.post('/Platform/logoff').then(response => {
+        if (response.data === 'success') {
+          this.info.type = null
+          this.$router.push({ path: '/Login' })
+        }
       }).catch(error => { console.log(error) })
     }
   },
@@ -674,14 +692,10 @@ export default {
 
     Axios.post('/Platform/center').then(response => {
       this.myinfo = response.data
-      if (response.data.isVaild === 1) {
+      if (response.data.isValid === 0) {
         this.dialog.open = true
         this.dialog.state = 0
       }
-    }).catch(error => { console.log(error) })
-
-    Axios.post('/Platform/member', 'id=' + this.info.id).then(response => {
-      this.member = response.data
     }).catch(error => { console.log(error) })
 
     Axios.post('/Platform/notify').then(response => {
@@ -701,6 +715,9 @@ export default {
       if (loaded === true)
         if (this.info.type === 1) {
           this.tabs.push({ name: '我的成员', icon: 'mdi-account-group' })
+          Axios.post('/Platform/member', 'id=').then(response => {
+            this.member = response.data
+          }).catch(error => { console.log(error) })
         }
     }
   }

@@ -1,5 +1,40 @@
 <template>
   <div>
+    <v-dialog
+      width="400"
+      v-model="dialog"
+    >
+      <v-card>
+        <v-card-title>修改密码</v-card-title>
+        <v-card-text>
+          <v-form ref="form">
+            <v-text-field
+              v-model="password"
+              label="输入密码"
+              type="password"
+              :rules="[v => !!v || '必需项',]"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="repassword"
+              label="重复密码"
+              type="password"
+              :rules="[v => v===password || '密码不一致',]"
+              required
+            ></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="change()"
+          >提交</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-form class="wrapper">
       <template v-for="(item,i) in editinfo">
         <v-text-field
@@ -52,9 +87,10 @@
       </template>
       <v-btn
         text
-        color="warning"
+        color="red"
         class="mr-4"
-      >重置</v-btn>
+        @click="dialog = true"
+      >修改密码</v-btn>
       <v-btn
         @click="upload"
         color="primary"
@@ -87,7 +123,10 @@ export default {
         { email: '电子邮件', value: this.myinfo.email },
         { tel: '电话', value: this.myinfo.tel },
         { info: '介绍', value: this.myinfo.info }
-      ]
+      ],
+      password: '',
+      repassword: '',
+      dialog: false
     }
   },
   methods: {
@@ -113,6 +152,22 @@ export default {
           this.snackbar.text = '服务器错误'
           this.snackbar.open = true
         })
+    },
+    change () {
+      if (this.$refs.form.validate())
+        Axios.post('/Platform/changepassword', 'password=' + this.password)
+          .then(response => {
+            if (response.data === 'success') {
+              this.snackbar.color = 'green'
+              this.snackbar.text = '修改成功'
+              this.snackbar.open = true
+            }
+          }).catch(error => {
+            console.log(error)
+            this.snackbar.color = 'error'
+            this.snackbar.text = '服务器错误'
+            this.snackbar.open = true
+          })
     }
   }
 }

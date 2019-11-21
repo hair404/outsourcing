@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import com.model.UserInfo;
+import com.model.User;
 
 @Repository
 public class UserDao {
@@ -22,12 +22,12 @@ public class UserDao {
 //select	
 	
 
-	public List<UserInfo> getInfoByTag(Integer tag) {
+	public List<User> getInfoByTag(Integer tag) {
 		String sql = "select * from user";
-		List<UserInfo> userList = (List<UserInfo>) jdbcTemplate.query(sql, new RowMapper<UserInfo>() {
+		List<User> userList = (List<User>) jdbcTemplate.query(sql, new RowMapper<User>() {
 			@Override
-			public UserInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-				UserInfo user = new UserInfo();
+			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+				User user = new User();
 				user.setAccount_id(rs.getInt("id"));
 				user.setUsername(rs.getString("username"));
 				user.setTel(rs.getString("tel"));

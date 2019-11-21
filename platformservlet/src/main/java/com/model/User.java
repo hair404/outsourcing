@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "user")
-public class UserInfo {
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id; //primary key
@@ -29,4 +29,5 @@ public class UserInfo {
 	private String avatar;
 	private Float credit;
 	private String entity;
+	private Integer isValid;
 }

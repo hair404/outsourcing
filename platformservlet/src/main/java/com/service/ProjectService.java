@@ -11,13 +11,18 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.dao.AdProjectRepository;
 import com.dao.BidRepository;
-import com.dao.File_project_repository;
+import com.dao.File_projectRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.CancelReasonRepository;
@@ -27,13 +32,13 @@ import com.model.Bid;
 import com.model.Child_form;
 import com.model.File_project;
 import com.model.Project;
-import com.model.UserInfo;
+import com.model.User;
 import com.utils.JsonUtils;
 
 @Service
 public class ProjectService {
 	@Autowired
-	File_project_repository fpj;
+	File_projectRepository fpj;
 	@Autowired
 	BidRepository bidRepository;
 	@Autowired
@@ -47,7 +52,7 @@ public class ProjectService {
 	@Autowired
 	TagDao tagDao;
 	@Autowired
-	File_project_repository fpr;
+	File_projectRepository fpr;
 
 	// a project information(the bid system)
 	public String get_info(String solr_id, Integer user_id) {
@@ -64,9 +69,10 @@ public class ProjectService {
 			List<Bid> rs = bidRepository.get_info(project_id);
 			for (int i = 0; i < rs.size(); i++) {
 				Bid bid = rs.get(i);
-				UserInfo userInfo = userRepository.getInfoById(bid.getStudio_id());
+				User userInfo = userRepository.getInfoById(bid.getStudio_id());
 				JSONObject user_info = new JSONObject(userInfo);
 				user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
+				user_info.put("quote", bid.getQuote());
 				enroll.add(user_info);
 				project_info.put("enroll", enroll);
 			}
@@ -80,14 +86,14 @@ public class ProjectService {
 					project_info.put("table", j);
 				}
 			}
-				if (user_id.equals(project.getStudioID())) {
-					if (project.getIsform()==1 && project.getIssetprice()==1) {
-						List<Child_form> child = child_formRepository.getChildForm(project_id);
-						JSONArray j = JSONArray.parseArray(JsonUtils.objectToJson(child));
-						project_info.put("table", j);
-					}
+			if (user_id.equals(project.getStudioID())) {
+				if (project.getIsform() == 1 && project.getIssetprice() == 1) {
+					List<Child_form> child = child_formRepository.getChildForm(project_id);
+					JSONArray j = JSONArray.parseArray(JsonUtils.objectToJson(child));
+					project_info.put("table", j);
 				}
-			
+			}
+
 		} else if (project.getState() == 3) {
 			Calendar calendar = new GregorianCalendar();
 			Date date = project.getStartTime();
@@ -104,7 +110,7 @@ public class ProjectService {
 				project_info.put("payDeadline", project.getPayDeadline());
 			if (child.getState() == 2) {
 				project_info.put("path", fpr.get_file(project_id, project.getCurrent()));
-			}	
+			}
 			project_info.put("table", JSONArray.parseArray(JsonUtils.objectToJson(child_form)));
 		} else
 			return project_info.toString();
@@ -132,4 +138,72 @@ public class ProjectService {
 		}
 	}
 
+	public JSONArray myPrj(Integer id, Integer first, Integer state) {
+		JSONArray array = new JSONArray();
+		Integer size = projectRepository.getProjectById(state, id).size();
+		Integer page = (first - 1) / 16;
+		for (int i = 0; i <= page; i++) {
+			final Pageable pageable = PageRequest.of(page, 16);
+			List<Project> pro = projectRepository.getProjectById(state, id, pageable);
+			array.add(size);
+			array.addAll(pro);
+		}
+		return array;
+	}
+
+	public JSONArray myPrjWithoutState(Integer id, Integer first) {
+		JSONArray array = new JSONArray();
+		Integer size = projectRepository.findByCompanyIDOrStudioID(id).size();
+		Integer page = (first - 1) / 16;
+		for (int i = 0; i <= page; i++) {
+			final Pageable pageable = PageRequest.of(page, 16);
+			List<Project> pro = projectRepository.findByCompanyIDOrStudioID(id, pageable);
+			array.add(size);
+			array.addAll(pro);
+		}
+		return array;
+	}
+
+	public JSONArray displayPrj(Integer id, Integer first) {
+		JSONArray array = new JSONArray();
+		Integer size = projectRepository.findByCompanyIDOrStudioID(id).size();
+		Integer page = (first - 1) / 12;
+		for (int i = 0; i <= page; i++) {
+			final Pageable pageable = PageRequest.of(page, 12);
+			List<Project> pro = projectRepository.findByCompanyIDOrStudioID(id, pageable);
+			array.add(size);
+			array.addAll(pro);
+		}
+		return array;
+	}
+
+	public void insertPrj(String company_name, String name, Integer tag, Integer subtag, String img,
+			java.sql.Date releaseTime, String info, java.sql.Date deadline, float price, Integer companyId,
+			String solr_id, String entity, Integer pia) {
+		Project project = new Project();
+		project.setCompanyID(companyId);
+		project.setCompanyName(company_name);
+		project.setReleaseTime(releaseTime);
+		project.setPrjname(name);
+		project.setDeadline(deadline);
+		project.setSolr_id(solr_id);
+		project.setEntity(entity);
+		project.setPayinadvance(pia);
+		project.setTag(tag);
+		project.setSubtag(subtag);
+		project.setImg(img);
+		project.setStudioID(0);
+		project.setInfo(info);
+		project.setState(1);
+		project.setPrice(price);
+		project.setHasPaid(0);
+		project.setIfAd(0);
+		project.setIspia(0);
+		project.setIssetprice(0);
+		project.setIsconfirm(0);
+		project.setIsdeposit(0);
+		project.setIsform(0);
+		
+		projectRepository.save(project);
+	}
 }

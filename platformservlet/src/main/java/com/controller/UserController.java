@@ -1,33 +1,40 @@
 package com.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dao.AccountRepository;
-import com.dao.ProjectDao;
+import com.dao.AdminRepository;
+import com.dao.MemberRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
+import com.dao.TagRepository;
 import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.model.Account;
-import com.model.UserInfo;
+import com.model.Admin;
+import com.model.Project;
+import com.model.User;
+import com.service.ProjectService;
 import com.service.TagService;
 import com.service.UserService;
-
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
+import com.utils.UuidUtils;
 
 @RestController
 public class UserController {
@@ -44,23 +51,31 @@ public class UserController {
 	@Autowired
 	private ProjectRepository projectRepository;
 	@Autowired
-	AccountRepository  accountRepository;
+	AccountRepository accountRepository;
+	@Autowired
+	MemberRepository memberRepository;
+	@Autowired
+	private TagRepository tagR;
+	@Autowired
+	ProjectService ps;
+	@Autowired
+	AdminRepository ar;
 
-	UserInfo user = new UserInfo();
+	User user = new User();
 
 	@RequestMapping("index")
 	public String index() {
 		return "success";
 	}
 
-	@PostMapping(value = "register")
+	@PostMapping("register")
 	public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
 			@RequestParam("password") String password, @RequestParam("email") String email,
 			@RequestParam("username") String username, @RequestParam("type") Integer type) {
 		if (!userService.ifExsit(tel)) {
 			userDao.insertAccount(password, tel);
 			Integer account_id = accountRepository.get_id(tel);
-			String solr_id = UUID.randomUUID().toString();
+			String solr_id = UuidUtils.generateShortUuid();
 			String entity = null;
 			if (type == 0)
 				entity = "company";
@@ -68,30 +83,44 @@ public class UserController {
 				entity = "studio";
 			else if (type == 2)
 				entity = "manager";
-		 userService.insertInfo(solr_id, account_id, name, tel, email, username, type, entity);
+			userService.insertInfo(solr_id, account_id, name, tel, email, username, type, entity);
 			return "success";
 		} else
 			return "fail";
 	}
 
 	@RequestMapping("list")
-	public java.util.List<UserInfo> list() {
+	public java.util.List<User> list() {
 		return userRepository.findAll();
 	}
 
 	@PostMapping(value = "login")
 	public String login(@RequestParam("name") String tel, @RequestParam("password") String password,
-			@RequestParam("type") Integer type, HttpServletRequest request, HttpServletResponse response) {
+			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type, HttpServletRequest request,
+			HttpServletResponse response) {
 		try {
 			HttpSession session = request.getSession();
-			Account account = userRepository.getAccountByTel(tel);
-			if (account.getTel().equals(tel) && account.getPassword().equals(password))
-				session.setMaxInactiveInterval(24 * 60 * 60);
-			session.setAttribute("tel", tel);
-			session.setAttribute("id", account.getId());
-			session.setAttribute("type", type);
-			return "success";
+
+			if (type == 0 || type == 1) {
+				Account account = userRepository.getAccountByTel(tel);
+				if (account.getPassword().equals(password) && (userService.checkCode(code))) {
+					session.setMaxInactiveInterval(24 * 60 * 60);
+					session.setAttribute("id", account.getId());
+					session.setAttribute("tel", account.getTel());
+					session.setAttribute("type", type);
+					return "success";
+				}
+			} else {
+				Admin admin = ar.findByAccount(tel);
+				if (admin.getPassword().equals(password)) {
+					session.setMaxInactiveInterval(24 * 60 * 60);
+					session.setAttribute("id", admin.getId());
+					session.setAttribute("type", type);
+					return "success";
+				}
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return "fail";
 	}
@@ -104,13 +133,12 @@ public class UserController {
 	}
 
 	@RequestMapping("info")
-	public String info(@RequestParam("type") String type, HttpServletRequest request,
-			HttpServletResponse response) {
+	public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		if (session.getAttribute("id") != null) {
 			Integer id = (Integer) session.getAttribute("id");
 			String tel = (String) session.getAttribute("tel");
-			UserInfo user = (UserInfo) userRepository.getInfoByTel(tel);
+			User user = (User) userRepository.getInfoByTel(tel);
 			ObjectMapper mapper = new ObjectMapper();
 			String username = user.getUsername();
 			String email = user.getEmail();
@@ -151,7 +179,7 @@ public class UserController {
 	}
 
 	@PostMapping("edit")
-	public String edit(@RequestParam("name") String name, @RequestParam("tag") String tag,
+	public String edit(@RequestParam("name") String name, @RequestParam(name = "tag", required = false) String tag,
 			@RequestParam("password") String password, @RequestParam("email") String email,
 			@RequestParam("username") String username, @RequestParam("phone") String tel,
 			@RequestParam("info") String info, HttpServletRequest request) {
@@ -166,46 +194,62 @@ public class UserController {
 	}
 
 	@PostMapping("center")
-	public String center(HttpServletRequest request) {
+	public JSONObject center(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Integer id = (Integer) session.getAttribute("id");
 		JSONObject json = new JSONObject();
+
 		if (id != null) {
-			UserInfo user = userRepository.getInfoById(id);
-			JSONArray tag = tagDao.QueryTag(id);
+			User user = userRepository.getInfoById(id);
 			json.put("img", user.getImg());
 			json.put("username", user.getUsername());
 			json.put("name", user.getName());
-			json.put("tag", tag);
+
+			if (!userService.isCompany(id))
+				json.put("tag", tagDao.QueryTag(id));
+
+			json.put("avatar", user.getAvatar());
 			json.put("email", user.getEmail());
-			json.put("phone", user.getTel());
+			json.put("tel", user.getTel());
 			json.put("info", user.getInfo());
+			json.put("isValid", user.getIsValid());
 		}
-		return json.toString();
+		return json;
 	}
 
 	@PostMapping("display_info")
-	public String display(HttpServletRequest request,@RequestParam("id") String solr_id) {
-		HttpSession session = request.getSession();
-		Integer id = (Integer) session.getAttribute("id");
-		//Integer id=1;
+	public JSONObject display(HttpServletRequest request, @RequestParam("id") Integer id,
+			@RequestParam("first") Integer first) {
 		JSONObject json = new JSONObject();
-		if (id != null) {
-			UserInfo user = userRepository.getInfoById(id);
-			JSONArray array = new JSONArray();
-			array.put(0);
-			JSONObject project  = new JSONObject(projectRepository.getInfoBySolrId(solr_id));
-			array.put(project);
-			json.put("id", user.getSolr_id());
-			json.put("type", user.getType());
-			json.put("img", user.getImg());
-			json.put("username", user.getUsername());
-			json.put("email", user.getEmail());
-			json.put("phone", user.getTel());
-			json.put("info", user.getInfo());
-			json.put("complete", array);
-		}
-		System.out.println(json);
-		return json.toString();
-		}
+		json = JSONObject.parseObject(JSON.toJSONString(userRepository.getInfoById(id)));
+		if (userService.isCompany(id))
+			json.put("bid", projectRepository.findByStateAndCompanyID(2, id));
+		json.put("complete", ps.displayPrj(id, first));
+		return json;
+	}
+
+	@PostMapping("addMember")
+	public String addMember(HttpServletRequest request, @RequestParam("email") String email,
+			@RequestParam("name") String name, @RequestParam("tel") String tel, @RequestParam("info") String info) {
+		HttpSession session = request.getSession();
+		Integer studio_id = (Integer) session.getAttribute("id");
+		userService.addMember(name, tel, email, info, studio_id);
+		return "success";
+	}
+
+	@PostMapping("delMember")
+	public String delMember(@RequestParam("id") JSONArray id) {
+		for (int i = 0; i < id.size(); i++)
+			memberRepository.deleteById(id.getInteger(i));
+		return "success";
+	}
+
+	@PostMapping("member")
+	public JSONArray member(HttpServletRequest request, @RequestParam("id") Integer id) {
+		HttpSession session = request.getSession();
+		if (id == null)
+			id = (Integer) session.getAttribute("id");
+		JSONArray array = JSONArray.parseArray(JSON.toJSONString(memberRepository.findByStudioid(id)));
+		return array;
+	}
 }

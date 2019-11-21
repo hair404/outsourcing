@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dao.File_project_repository;
+import com.dao.File_projectRepository;
 import com.service.ProjectService;
 
 @RestController
 public class FileController {
 	@Autowired
-	File_project_repository fpj;
+	File_projectRepository fpj;
 	@Autowired
 	ResourceLoader resourceLoader;
 	@Autowired

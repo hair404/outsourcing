@@ -29,4 +29,5 @@ public class Ad_project {
 	private String img;
 	private String solr_id;
 	private Integer prj_id;
+	private Integer state;
 }

@@ -18,4 +18,5 @@ public class Bid {
   private Integer studio_id;
   private Integer state;
   private Integer company_id;
+  private Integer quote;
   }

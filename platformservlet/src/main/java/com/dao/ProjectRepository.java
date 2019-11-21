@@ -1,7 +1,9 @@
 package com.dao;
 
 import java.util.Date;
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,11 +25,25 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 	
 	@Query("select u.companyID from com.model.Project u where u.id =:id")
 	public Integer get_companyid(@Param("id")Integer id);
-		
+	
+	@Query("select u from com.model.Project u where u.state=?1 and (u.companyID=?2 or u.studioID=?2)")
+	public List<Project> getProjectById(Integer state,Integer id);
+	
+	@Query("select u from com.model.Project u where u.state=?1 and (u.companyID=?2 or u.studioID=?2)")
+	public List<Project> getProjectById(Integer state,Integer id,Pageable pageable);
+	
+	@Query("select u from com.model.Project u where u.state=?1 and u.companyID=?2")
+	public List<Project> findByStateAndCompanyID(Integer state,Integer companyID);
+	
+	@Query("select u from com.model.Project u where u.companyID=?1 or u.studioID=?1")
+	public List<Project> findByCompanyIDOrStudioID(Integer id,Pageable pageable);
+	
+	@Query("select u from com.model.Project u where u.companyID=?1 or u.studioID=?1")
+	public List<Project> findByCompanyIDOrStudioID(Integer id);
+	
 	@Modifying   
 	@Query("update com.model.Project u set u.studioID=?1 where u.id=?2")    
 	void update_studioid(Integer studioid,Integer id);
-	
 	
 	@Modifying   
 	@Query("update com.model.Project u set u.state=?1 where u.id=?2")    

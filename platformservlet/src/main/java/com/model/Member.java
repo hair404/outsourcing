@@ -1,6 +1,5 @@
 package com.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,12 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "tag")
-public class Tag {
+@Table(name = "member")
+public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column(name = "user_id")
-	private Integer userId;
-	private Integer tag;
+    private String name;
+    private String tel;
+    private String email;
+    private String info;
+    private Integer studioid;
 }

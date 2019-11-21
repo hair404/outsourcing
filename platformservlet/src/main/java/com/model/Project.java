@@ -2,6 +2,7 @@ package com.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,7 +36,7 @@ public class Project {
 	private Integer hasPaid;
 	private Integer ispia;
 	private Integer isdeposit;
-	private Float payinadvance;
+	private Integer payinadvance;
 	private Integer isform;
 	private Integer issetprice;
 	private Integer totalPart;

@@ -154,6 +154,13 @@
 			<version>4.8.10.ALL</version>
 		</dependency>
 
+		<!--Aliyun短信服务-->
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

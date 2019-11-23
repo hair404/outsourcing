@@ -15,8 +15,10 @@ import com.dao.AdProjectRepository;
 import com.dao.AdStudioRepository;
 import com.dao.CtgRepository;
 import com.dao.FundRepository;
+import com.dao.RefundRepository;
 import com.dao.UserRepository;
 import com.service.AdService;
+import com.utils.JsonUtils;
 
 @RestController
 
@@ -37,23 +39,29 @@ public class ManagerController {
 	ActivityRepository acr;
 	@Autowired
 	FundRepository fr;
+	@Autowired
+	RefundRepository rfr;
+	@Autowired
+	JsonUtils js;
 
 	@PostMapping("manager")
 	public JSONArray manager(@RequestParam("state") Integer state,
 			@RequestParam(name = "type", required = false) Integer type,
 			@RequestParam(name = "text", required = false) String text) {
+		if (text != null)
+			text = '%' + text + '%';
 		if (state == 0) {
 			if (type == 0) {
 				if (text != null)
-					return JSONArray.parseArray(JSON.toJSONString(ur.findByUsernameLike('%' + text + '%')));
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByUsernameLike(text)));
 				return JSONArray.parseArray(JSON.toJSONString(ur.findAll()));
 			} else if (type == 1) {
 				if (text != null)
-					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(0, '%' + text + '%')));
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(0, text)));
 				return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(0)));
 			} else if (type == 2) {
 				if (text != null)
-					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(1, '%' + text + '%')));
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(1, text)));
 				return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(1)));
 			}
 		} else if (state == 1) {
@@ -69,22 +77,27 @@ public class ManagerController {
 				return adService.adS();
 			}
 		} else if (state == 2) {
+			if (text != null)
+				return JSONArray.parseArray(JSON.toJSONString(fr.findByPrjnameLike(text)));
 			return JSONArray.parseArray(JSON.toJSONString(fr.findAll()));
 		} else if (state == 3) {
 			return JSONArray.parseArray(JSON.toJSONString(acr.findAll()));
 		} else if (state == 4) {
-
 		} else if (state == 5) {
-			if(type == 0) {
-				
+			if (type == 0) {
+				if (text != null)
+					return js.listToJA(rfr.findByTypeAndNameLike(type, text));
+				return js.listToJA(rfr.findAll());
+			} else if (type == 1) {
+				if (text != null)
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(1, text)));
+				return JSONArray.parseArray(JSON.toJSONString(rfr.findByType(type)));
+			} else if (type == 2) {
+				if (text != null)
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(2, text)));
+				return JSONArray.parseArray(JSON.toJSONString(rfr.findByType(type)));
 			}
-		else if(type == 1) {
-            	
-            }
-            else if(type == 2) {
 		}
-		
-	}
 		return null;
 	}
 
@@ -111,6 +124,7 @@ public class ManagerController {
 					asr.updateState(1, solr_id);
 			}
 		} else if (state == 2) {
+
 		} else if (state == 3) {
 			acr.deleteById((long) id);
 		} else if (state == 4) {

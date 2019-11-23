@@ -8,8 +8,9 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.1.7.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.example</groupId>
+
+</parent>
+<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>demo</name>
@@ -153,9 +154,8 @@
 			<artifactId>alipay-sdk-java</artifactId>
 			<version>4.8.10.ALL</version>
 		</dependency>
-
-
-        <!--Aliyun短信服务-->
+		
+		 <!--Aliyun短信服务-->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
@@ -169,21 +169,24 @@
             <version>1.4.1</version>
             <scope>provided</scope><!--这里你视项目情况而定-->
         </dependency>
+		
+
 	</dependencies>
 
 	<build>
-		
+	<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
+			</plugin>
+		</plugins>
 		<resources>
-
 			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
-
 		</resources>
-
 	</build>
-
-
-    
-
 </project>

@@ -12,11 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Code extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private Random ran = new Random();
-	private static String code = "";
+	public  String code = "";
 
 	// 写一个方法随机生成一种颜色
 	private Color getRandomColor() {
@@ -31,11 +34,7 @@ public class Code extends HttpServlet {
 	private void buildCode(char c) {
 		code += c;
 	}
-
-	public static void setCode() {
-		code = "";
-	}
-
+	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int width = 100, height = 50;
 		// 参数：宽，高，图片模式
@@ -73,12 +72,8 @@ public class Code extends HttpServlet {
 		ImageIO.write(img, "jpg", response.getOutputStream());
 	}
 
-	public static String getCode() {
+	public  String getCode() {
 		return code;
-	}
-
-	public static void setCode(String code) {
-		Code.code = code;
 	}
 
 }

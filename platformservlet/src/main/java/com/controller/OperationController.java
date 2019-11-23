@@ -115,10 +115,10 @@ public class OperationController {
 							+ "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
 		} else if (action == 7) {
               Refund r = new Refund();
-              r.setCompany_id(company_id);
-              r.setProject_id(id);
+              r.setFromid(company_id);
+              r.setPrjid(id);
               r.setReason(reason);
-              r.setStudio_id(studioid);
+              r.setToid(studioid);
               r.setType(0);
               r.setMoney(money);
               r.setState(0);
@@ -145,10 +145,10 @@ public class OperationController {
 			projectRepository.updateCompanyRate(companyRate, company_id);
 		} else if (action == 11) {
 			Refund r = new Refund();
-            r.setCompany_id(company_id);
-            r.setProject_id(id);
+            r.setFromid(company_id);
+            r.setPrjid(id);
             r.setReason(reason);
-            r.setStudio_id(project.getStudioID());
+            r.setToid(project.getStudioID());
             r.setType(1);
             r.setMoney(money);
             r.setState(0);
@@ -233,10 +233,10 @@ public class OperationController {
 			return "success";
 		} else if (action == 8) {
 			Refund r = new Refund();
-            r.setCompany_id(company_id);
-            r.setProject_id(id);
+            r.setToid(company_id);
+            r.setPrjid(id);
             r.setReason(reason);
-            r.setStudio_id(studio_id);
+            r.setFromid(studio_id);
             r.setType(0);
             r.setMoney(money);
             r.setState(0);
@@ -276,10 +276,10 @@ public class OperationController {
 		}
 		else if(action == 12) {
 		    Refund r = new Refund();
-            r.setCompany_id(company_id);
-            r.setProject_id(id);
+            r.setToid(company_id);
+            r.setPrjid(id);
             r.setReason(reason);
-            r.setStudio_id(studio_id);
+            r.setFromid(studio_id);
             r.setType(1);
             r.setMoney(money);
             r.setState(0);

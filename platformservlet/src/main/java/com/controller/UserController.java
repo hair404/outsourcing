@@ -34,6 +34,7 @@ import com.model.User;
 import com.service.ProjectService;
 import com.service.TagService;
 import com.service.UserService;
+import com.utils.Code;
 import com.utils.UuidUtils;
 
 @RestController
@@ -60,13 +61,11 @@ public class UserController {
 	ProjectService ps;
 	@Autowired
 	AdminRepository ar;
+	@Autowired
+	Code co;
 
 	User user = new User();
 
-	@RequestMapping("index")
-	public String index() {
-		return "success";
-	}
 
 	@PostMapping("register")
 	public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
@@ -99,11 +98,12 @@ public class UserController {
 			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type, HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
+			
 			HttpSession session = request.getSession();
-
+            session.setAttribute("code", co.getCode());
 			if (type == 0 || type == 1) {
 				Account account = userRepository.getAccountByTel(tel);
-				if (account.getPassword().equals(password) && (userService.checkCode(code))) {
+				if (account.getPassword().equals(password) && userService.checkCode(code, request)) {
 					session.setMaxInactiveInterval(24 * 60 * 60);
 					session.setAttribute("id", account.getId());
 					session.setAttribute("tel", account.getTel());
@@ -129,6 +129,14 @@ public class UserController {
 	public String loginOff(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		session.invalidate();
+		return "success";
+	}
+	
+	@PostMapping("changepassword")
+	public String login(@RequestParam("password") String password,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Integer id = (Integer) session.getAttribute("id");
+		accountRepository.changePassword(password, id);
 		return "success";
 	}
 

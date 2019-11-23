@@ -1,5 +1,7 @@
 package com.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	MemberRepository mr;
+
 
 	public boolean ifExsit(String tel) {
 		try {
@@ -51,18 +54,12 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public Boolean checkCode(String code) {
-		String check = code.toUpperCase();
-		if (check.equals(Code.getCode())) {
-			System.out.println(Code.getCode());
-			System.out.println(check);
-			Code.setCode();
+	public Boolean checkCode(String code,HttpServletRequest request) {
+		String check = code.toUpperCase();  
+		if (check.equals(request.getSession().getAttribute("code")))
 			return true;
-		}
-		else {
-			Code.setCode();
+		else 
 			return false;
-		}
 	}
 	
 	public void addMember(String name,String tel,String email, String info,Integer studio_id) {

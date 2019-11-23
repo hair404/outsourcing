@@ -43,28 +43,48 @@ public class ManagerController {
 			@RequestParam(name = "type", required = false) Integer type,
 			@RequestParam(name = "text", required = false) String text) {
 		if (state == 0) {
-          if(type==0)
-        	 return JSONArray.parseArray(JSON.toJSONString(ur.findAll()));
-          if(type==1)
-        	 return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(0)));
-          if(type==2)
-        	 return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(1)));  
-		}
-		if (state == 1) {
+			if (type == 0) {
+				if (text != null)
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByUsernameLike('%' + text + '%')));
+				return JSONArray.parseArray(JSON.toJSONString(ur.findAll()));
+			} else if (type == 1) {
+				if (text != null)
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(0, '%' + text + '%')));
+				return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(0)));
+			} else if (type == 2) {
+				if (text != null)
+					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(1, '%' + text + '%')));
+				return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(1)));
+			}
+		} else if (state == 1) {
+			if (type == null)
+				return adService.ad();
+			else if (type == 0) {
+				if (text != null)
+					return adService.adP(text);
+				return adService.adP();
+			} else if (type == 1) {
+				if (text != null)
+					return adService.adS(text);
+				return adService.adS();
+			}
+		} else if (state == 2) {
+			return JSONArray.parseArray(JSON.toJSONString(fr.findAll()));
+		} else if (state == 3) {
+			return JSONArray.parseArray(JSON.toJSONString(acr.findAll()));
+		} else if (state == 4) {
 
+		} else if (state == 5) {
+			if(type == 0) {
+				
+			}
+		else if(type == 1) {
+            	
+            }
+            else if(type == 2) {
 		}
-		if (state == 2) {
-			 return JSONArray.parseArray(JSON.toJSONString(fr.findAll()));  
-		}
-		if (state == 3) {
-              return JSONArray.parseArray(JSON.toJSONString(acr.findAll())); 
-		}
-		if (state == 4) {
-
-		}
-		if (state == 5) {
-
-		}
+		
+	}
 		return null;
 	}
 

@@ -28,6 +28,14 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 	@Query("select u from com.model.User u where u.type =?1")
 	public List<User> getInfoByType(Integer type);
 	
+	@Query("select u.username from com.model.User u where u.account_id =?1")
+	 String  findUsernameById(Integer id);
+
+    public List<User> findByUsernameLike(String username);
+    
+
+    public List<User> findByTypeAndUsernameLike(Integer type, String username);
+
 	@Transactional
 	@Modifying   
 	@Query("update com.model.User u set u.avatar=?1 where u.id=?2")    

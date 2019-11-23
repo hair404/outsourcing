@@ -26,6 +26,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 	@Query("select u.companyID from com.model.Project u where u.id =:id")
 	public Integer get_companyid(@Param("id")Integer id);
 	
+	@Query("select u.companyName from com.model.Project u where u.id =:id")
+	public String findCompanyNameById(Integer id);
+	
 	@Query("select u from com.model.Project u where u.state=?1 and (u.companyID=?2 or u.studioID=?2)")
 	public List<Project> getProjectById(Integer state,Integer id);
 	

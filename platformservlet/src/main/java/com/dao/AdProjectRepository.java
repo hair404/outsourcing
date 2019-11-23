@@ -1,5 +1,7 @@
 package com.dao;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,5 @@ public interface AdProjectRepository extends JpaRepository<Ad_project,Long> {
 	@Query("update com.model.Ad_project u set u.state=?1 where u.solr_id=?2")    
 	void updateState(Integer state,String solr_id);
 	
+	 public List<Ad_project> findByPrjnameLike(String name);
 }

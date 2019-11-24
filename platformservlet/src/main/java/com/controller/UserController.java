@@ -2,6 +2,7 @@ package com.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyuncs.exceptions.ClientException;
 import com.dao.AccountRepository;
 import com.dao.AdminRepository;
 import com.dao.MemberRepository;
@@ -35,6 +37,7 @@ import com.service.ProjectService;
 import com.service.TagService;
 import com.service.UserService;
 import com.utils.Code;
+import com.utils.MessageTools;
 import com.utils.UuidUtils;
 
 @RestController
@@ -66,7 +69,6 @@ public class UserController {
 
 	User user = new User();
 
-
 	@PostMapping("register")
 	public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
 			@RequestParam("password") String password, @RequestParam("email") String email,
@@ -95,15 +97,15 @@ public class UserController {
 
 	@PostMapping(value = "login")
 	public String login(@RequestParam("name") String tel, @RequestParam("password") String password,
-			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type, HttpServletRequest request,
-			HttpServletResponse response) {
+			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
+			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			
+
 			HttpSession session = request.getSession();
-            session.setAttribute("code", co.getCode());
+			String sessionCode = (String) session.getAttribute("code");
 			if (type == 0 || type == 1) {
 				Account account = userRepository.getAccountByTel(tel);
-				if (account.getPassword().equals(password) && userService.checkCode(code, request)) {
+				if (account.getPassword().equals(password) && userService.checkCode(code,sessionCode)) {
 					session.setMaxInactiveInterval(24 * 60 * 60);
 					session.setAttribute("id", account.getId());
 					session.setAttribute("tel", account.getTel());
@@ -131,12 +133,15 @@ public class UserController {
 		session.invalidate();
 		return "success";
 	}
+
+	
+	
 	
 	@PostMapping("changepassword")
-	public String login(@RequestParam("password") String password,HttpServletRequest request) {
+	public String login(@RequestParam("password") String password, HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		Integer id = (Integer) session.getAttribute("id");
-		accountRepository.changePassword(password, id);
+		String tel = (String) session.getAttribute("tel");
+		accountRepository.changePassword(password, tel);
 		return "success";
 	}
 

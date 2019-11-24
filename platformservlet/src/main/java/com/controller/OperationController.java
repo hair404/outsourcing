@@ -271,7 +271,7 @@ public class OperationController {
 			Notification.send();
 			return "success";
 		} else if (action == 11) {
-			projectRepository.updateStudioRate(studioRate, company_id);
+			projectRepository.updateStudioRate(studioRate, id);
 			return "success";
 		}
 		else if(action == 12) {

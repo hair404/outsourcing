@@ -54,9 +54,8 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public Boolean checkCode(String code,HttpServletRequest request) {
-		String check = code.toUpperCase();  
-		if (check.equals(request.getSession().getAttribute("code")))
+	public Boolean checkCode(String code,String sessionCode) {
+		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode))
 			return true;
 		else 
 			return false;
@@ -71,5 +70,4 @@ public class UserService {
 		member.setStudioid(studio_id);
 		mr.save(member);
 	}
-	
 }

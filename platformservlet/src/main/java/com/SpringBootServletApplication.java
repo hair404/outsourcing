@@ -14,11 +14,7 @@ import com.utils.Code;
 @SpringBootApplication
 public class SpringBootServletApplication {
 
-	@Bean
-	public ServletRegistrationBean<Code> servletRegistrationBean() {
-	    return new ServletRegistrationBean<Code>(new Code(), "/code");
-	  }
-	
+
 	@Bean
 	public ConfigurableServletWebServerFactory webServerFactory() {
 	    TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();

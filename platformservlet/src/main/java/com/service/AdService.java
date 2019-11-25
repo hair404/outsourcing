@@ -62,7 +62,7 @@ public class AdService {
 		ap.setImg(prj.getImg());
 		ap.setWeight(weight(ad_price));
 		ap.setPrj_id(prj_id);
-		ap.setSolr_id(prj.getSolr_id());
+		ap.setSolrid(prj.getSolr_id());
 		ap.setState(0);
 		apr.save(ap);
 	}
@@ -83,7 +83,7 @@ public class AdService {
 		as.setTel(ui.getTel());
 		as.setImg(ui.getImg());
 		as.setUsername(ui.getUsername());
-		as.setSolr_id(ui.getSolr_id());
+		as.setSolrid(ui.getSolr_id());
 		as.setCredit(ui.getCredit());
 		as.setState(0);
 		asr.save(as);
@@ -109,7 +109,7 @@ public class AdService {
 			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolr_id());
+			ad.put("solr_id", project.getSolrid());
 			ad.put("state", project.getState());
 			array.add(ad);
 		}
@@ -121,7 +121,7 @@ public class AdService {
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
 			ad.put("type", 1);
 			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolr_id());
+			ad.put("solr_id", studio.getSolrid());
 			ad.put("state", studio.getState());
 			array.add(ad);
 		}
@@ -139,7 +139,7 @@ public class AdService {
 			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolr_id());
+			ad.put("solr_id", project.getSolrid());
 			ad.put("state", project.getState());
 			array.add(ad);
 		}
@@ -157,7 +157,7 @@ public class AdService {
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
 			ad.put("type", 1);
 			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolr_id());
+			ad.put("solr_id", studio.getSolrid());
 			ad.put("state", studio.getState());
 			array.add(ad);
 		}
@@ -175,7 +175,7 @@ public class AdService {
 			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolr_id());
+			ad.put("solr_id", project.getSolrid());
 			ad.put("state", project.getState());
 			array.add(ad);
 		}
@@ -193,7 +193,7 @@ public class AdService {
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
 			ad.put("type", 1);
 			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolr_id());
+			ad.put("solr_id", studio.getSolrid());
 			ad.put("state", studio.getState());
 			array.add(ad);
 		}

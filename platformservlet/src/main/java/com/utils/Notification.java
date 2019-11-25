@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class Notification {
-	public static void send() {
+	public static void send(String players_id,String headings,String contents) {
 		try {
 			   String jsonResponse;	   
 			   URL url = new URL("https://onesignal.com/api/v1/notifications");
@@ -21,9 +21,9 @@ public class Notification {
 
 			   String strJsonBody = "{"
 			                      +   "\"app_id\": \"c386c41e-fba0-4c27-b561-10d8a6d9b13c\","
-			                      +   "\"included_segments\": [\"Active Users\"],"
-			                      +   "\"headings\": {\"en\": \"进度表\"},"
-			                      +   "\"contents\": {\"en\": \"尽快完成\"}"
+			                      +   "\"include_player_ids\": [\""+players_id+"\"],"
+			                      +   "\"headings\": {\"en\": \""+headings+"\"},"
+			                      +   "\"contents\": {\"en\": \""+contents+"\"}"
 			                      + "}";
 			         
 			   

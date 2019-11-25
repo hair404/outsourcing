@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alipay.api.domain.AccountRecord;
 import com.dao.AccountRepository;
 import com.dao.ActivityRepository;
 import com.dao.AdProjectRepository;
@@ -17,6 +16,7 @@ import com.dao.CtgRepository;
 import com.dao.FundRepository;
 import com.dao.RefundRepository;
 import com.dao.UserRepository;
+import com.model.Ctg;
 import com.service.AdService;
 import com.utils.JsonUtils;
 
@@ -47,7 +47,8 @@ public class ManagerController {
 	@PostMapping("manager")
 	public JSONArray manager(@RequestParam("state") Integer state,
 			@RequestParam(name = "type", required = false) Integer type,
-			@RequestParam(name = "text", required = false) String text) {
+			@RequestParam(name = "text", required = false) String text,
+			@RequestParam(name = "isVerified",required = false) Integer isVerified) {
 		if (text != null)
 			text = '%' + text + '%';
 		if (state == 0) {
@@ -86,8 +87,8 @@ public class ManagerController {
 		} else if (state == 5) {
 			if (type == 0) {
 				if (text != null)
-					return js.listToJA(rfr.findByTypeAndNameLike(type, text));
-				return js.listToJA(rfr.findAll());
+					return JSONArray.parseArray(JSON.toJSONString(rfr.findByTypeAndNameLike(type, text)));
+				return JSONArray.parseArray(JSON.toJSONString(rfr.findAll()));
 			} else if (type == 1) {
 				if (text != null)
 					return JSONArray.parseArray(JSON.toJSONString(ur.findByTypeAndUsernameLike(1, text)));
@@ -102,8 +103,8 @@ public class ManagerController {
 	}
 
 	@PostMapping("getCtg")
-	public JSONArray getCtg() {
-		return JSONArray.parseArray(JSON.toJSONString(cr.getOne((long) 1)));
+	public String getCtg() {
+		return cr.getOne((long)1).getCtg();
 	}
 
 	@PostMapping("manager_action")

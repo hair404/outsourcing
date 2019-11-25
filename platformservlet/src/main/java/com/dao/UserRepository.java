@@ -33,6 +33,7 @@ public interface UserRepository extends JpaRepository<User,Integer>{
 
     public List<User> findByUsernameLike(String username);
     
+    public float findCreditById(Integer id);    
 
     public List<User> findByTypeAndUsernameLike(Integer type, String username);
 

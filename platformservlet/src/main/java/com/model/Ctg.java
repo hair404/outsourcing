@@ -16,6 +16,6 @@ import lombok.Setter;
 public class Ctg {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 	private String ctg;
 }

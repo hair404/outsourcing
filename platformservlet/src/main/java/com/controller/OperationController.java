@@ -33,6 +33,7 @@ import com.model.Cancel_reason;
 import com.model.Complain_reason;
 import com.model.Project;
 import com.model.Refund;
+import com.model.Token;
 import com.service.AliPayService;
 import com.service.ProjectService;
 import com.utils.Notification;
@@ -55,7 +56,10 @@ public class OperationController {
 	ProjectService ser;
 	@Autowired
 	RefundRepository rr;
-
+   @Autowired
+   TokenController tc;
+   @Autowired
+   Token token;
 	@PostMapping("company_action")
 	public String company_action(@RequestParam("id") Integer id, @RequestParam("action") Integer action,
 			@RequestParam(value = "studioid", required = false) Integer studioid,
@@ -65,6 +69,8 @@ public class OperationController {
 			@RequestParam(value = "measure", required = false) Integer measure,
 			@RequestParam(value = "money", required = false) Float money,
 			@RequestParam(value = "companyRate", required = false) Float companyRate,
+			@RequestParam(value = "headings", required = false) String headings,
+			@RequestParam(value = "contents", required = false) String contents,
 			@RequestParam(value = "isfirst", required = false) Integer isfirst, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Integer company_id = (Integer) session.getAttribute("id");
@@ -84,7 +90,7 @@ public class OperationController {
 			projectRepository.updateIssetprice(1, id);
 			return "success";
 		} else if (action == 2) {
-			Notification.send();
+			Notification.send(token.getToken(),headings, contents);
 			return "success";
 		} else if (action == 3) {
 			projectRepository.update_state(7, id);
@@ -167,6 +173,8 @@ public class OperationController {
 			@RequestParam(value = "measure", required = false) Integer measure,
 			@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam(value = "money", required = false) Float money,
+			@RequestParam(value = "headings", required = false) String headings,
+			@RequestParam(value = "contents", required = false) String contents,
 			@RequestParam(value = "table", required = false) String table, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		Project project = projectRepository.get_info(id);
@@ -197,7 +205,7 @@ public class OperationController {
 			}
 			return "success";
 		} else if (action == 2) {
-			Notification.send();
+			Notification.send(token.getToken(), headings,contents);
 			return "success";
 		} else if (action == 3) {
 			projectRepository.update_state(7, id);
@@ -268,7 +276,7 @@ public class OperationController {
 			}
 			return "success";
 		} else if (action == 10) {
-			Notification.send();
+			Notification.send(token.getToken(), headings, contents);
 			return "success";
 		} else if (action == 11) {
 			projectRepository.updateStudioRate(studioRate, id);

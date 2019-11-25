@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Code {
 	private Random ran = new Random();
-	public String code = "";
+	String code ="";
 
 	
 	private Color getRandomColor() {
@@ -21,6 +21,7 @@ public class Code {
 		return new Color(red, green, blue);
 	}
 
+	
 	public BufferedImage buildCode() {
 		int width = 100, height = 50;
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -45,6 +46,9 @@ public class Code {
 		return img;
 	}
 	public String getCode() {
-		return code;
+		return code.toString();
+	}
+	public void setCode() {
+		code = "";
 	}
 }

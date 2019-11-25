@@ -1,18 +1,14 @@
 package com.service;
 
-import javax.servlet.http.HttpServletRequest;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.dao.MemberRepository;
-import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.model.Member;
 import com.model.User;
-import com.utils.Code;
 
-import net.bytebuddy.asm.MemberRemoval;
 
 @Service
 public class UserService {	
@@ -20,8 +16,9 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	MemberRepository mr;
+	
 
-
+	
 	public boolean ifExsit(String tel) {
 		try {
 			if (userRepository.getAccountByTel(tel).getTel().equals(tel))
@@ -55,7 +52,7 @@ public class UserService {
 	}
 
 	public Boolean checkCode(String code,String sessionCode) {
-		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode))
+		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode)) 	
 			return true;
 		else 
 			return false;

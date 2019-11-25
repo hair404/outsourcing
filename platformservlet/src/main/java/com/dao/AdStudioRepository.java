@@ -9,8 +9,10 @@ import com.model.Ad_studio;
 
 public interface AdStudioRepository extends JpaRepository<Ad_studio,Long> {
 	@Modifying   
-	@Query("update com.model.Ad_studio u set u.state=?1 where u.solr_id=?2")    
-	void updateState(Integer state,String solr_id);
+	@Query("update com.model.Ad_studio u set u.state=?1 where u.solrid=?2")    
+	void updateState(Integer state,String solrid);
 
 	 public List<Ad_studio> findByUsernameLike(String name);
+
+	float findWeightBySolrid(String solrid);
 }

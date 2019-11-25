@@ -46,5 +46,6 @@ public class VerifyCodeController {
 		HttpSession session  = request.getSession();
 		 ImageIO.write(code.buildCode(), "jpg", response.getOutputStream());
 		  session.setAttribute("code", code.getCode());
+		  code.setCode();
 	}
 }

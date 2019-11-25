@@ -2,6 +2,7 @@ package com.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,7 +28,8 @@ public class Ad_project {
 	private float price;
 	private float ad_price;
 	private String img;
-	private String solr_id;
+	@Column(name="solr_id")
+	private String solrid;
 	private Integer prj_id;
 	private Integer state;
 }

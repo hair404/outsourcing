@@ -100,7 +100,6 @@ public class UserController {
 			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
-
 			HttpSession session = request.getSession();
 			String sessionCode = (String) session.getAttribute("code");
 			if (type == 0 || type == 1) {

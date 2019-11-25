@@ -1,16 +1,14 @@
 package com.service;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.dao.MemberRepository;
-import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.model.Member;
 import com.model.User;
-import com.utils.Code;
 
-import net.bytebuddy.asm.MemberRemoval;
 
 @Service
 public class UserService {	
@@ -18,7 +16,9 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	MemberRepository mr;
+	
 
+	
 	public boolean ifExsit(String tel) {
 		try {
 			if (userRepository.getAccountByTel(tel).getTel().equals(tel))
@@ -51,18 +51,11 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public Boolean checkCode(String code) {
-		String check = code.toUpperCase();
-		if (check.equals(Code.getCode())) {
-			System.out.println(Code.getCode());
-			System.out.println(check);
-			Code.setCode();
+	public Boolean checkCode(String code,String sessionCode) {
+		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode)) 	
 			return true;
-		}
-		else {
-			Code.setCode();
+		else 
 			return false;
-		}
 	}
 	
 	public void addMember(String name,String tel,String email, String info,Integer studio_id) {
@@ -74,5 +67,4 @@ public class UserService {
 		member.setStudioid(studio_id);
 		mr.save(member);
 	}
-	
 }

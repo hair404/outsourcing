@@ -1,5 +1,6 @@
 package com;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,9 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.aliyuncs.exceptions.ClientException;
+import com.utils.EmailTools;
+import com.utils.MessageTools;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,17 +35,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.dao.ProjectDao;
-import com.dao.TagDao;
-import com.dao.UserDao;
-import com.dao.UserRepository;
-import com.model.Account;
-import com.model.Child_form;
-import com.model.Project;
-import com.model.Tag;
-import com.model.User;
-import com.utils.JsonUtils;
-import com.utils.RedisUtils;
+
+
+
+public class DemoApplicationTests {
+
+    public static void main(String[] args){
+        try {
+            EmailTools.sendEmail("848815969@qq.com","人力外包服务中心-验证邮件","您好，感谢您注册我们公司！这边是您的验证码：123456");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+}
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest

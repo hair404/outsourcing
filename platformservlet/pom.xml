@@ -7,12 +7,16 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.1.7.RELEASE</version>
+		
 		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.example</groupId>
+
+</parent>
+<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>demo</name>
+	
+    <packaging>war</packaging><!--<packaging>jar</packaging>-->
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -42,6 +46,12 @@
 			<artifactId>lucene-highlighter</artifactId>
 			<version>4.7.2</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
 
 		<dependency>
@@ -153,29 +163,39 @@
 			<artifactId>alipay-sdk-java</artifactId>
 			<version>4.8.10.ALL</version>
 		</dependency>
+		
+		 <!--Aliyun短信服务-->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+		<!--邮箱服务器支持-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.1</version>
+            <scope>provided</scope><!--这里你视项目情况而定-->
+        </dependency>
+		
 
 	</dependencies>
 
 	<build>
-		<plugins>
+	<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<includeSystemScope>true</includeSystemScope>
-					<jvmArguments>-Xdebug
-						-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</jvmArguments>
 				</configuration>
 			</plugin>
 		</plugins>
 		<resources>
-
 			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
-
 		</resources>
-
 	</build>
-
 </project>

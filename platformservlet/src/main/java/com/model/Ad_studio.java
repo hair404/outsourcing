@@ -1,5 +1,6 @@
 package com.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,6 +27,7 @@ public class Ad_studio {
 	private float weight;
 	private Integer account_id;
 	private Float credit;
-	private String solr_id;
+	@Column(name = "solr_id")
+	private String solrid;
 	private Integer state;
 }

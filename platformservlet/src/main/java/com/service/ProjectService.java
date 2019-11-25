@@ -67,15 +67,19 @@ public class ProjectService {
 		if (project.getState() == 1) {
 			JSONArray enroll = new JSONArray();
 			List<Bid> rs = bidRepository.get_info(project_id);
-			for (int i = 0; i < rs.size(); i++) {
-				Bid bid = rs.get(i);
-				User userInfo = userRepository.getInfoById(bid.getStudio_id());
-				JSONObject user_info = new JSONObject(userInfo);
-				user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
-				user_info.put("quote", bid.getQuote());
-				enroll.add(user_info);
-				project_info.put("enroll", enroll);
-			}
+			if (!rs.isEmpty()) {
+				System.out.println(rs.toString());
+				for (int i = 0; i < rs.size(); i++) {
+					Bid bid = rs.get(i);
+					User userInfo = userRepository.getInfoById(bid.getStudio_id());
+					JSONObject user_info = new JSONObject(userInfo);
+					user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
+					user_info.put("quote", bid.getQuote());
+					enroll.add(user_info);
+					project_info.put("enroll", enroll);
+				}
+			} else
+				project_info.put("enroll",new JSONArray());
 		}
 
 		else if (project.getState() == 2) {
@@ -203,7 +207,7 @@ public class ProjectService {
 		project.setIsconfirm(0);
 		project.setIsdeposit(0);
 		project.setIsform(0);
-		
+
 		projectRepository.save(project);
 	}
 }

@@ -18,7 +18,11 @@ public class Fund {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private Float money;
-	private String usage;
+	private Integer usage;
 	private String from;
 	private String to;
+	private Integer fromid;
+	private Integer toid;
+	private Integer prjid;
+	private String prjname;
 }

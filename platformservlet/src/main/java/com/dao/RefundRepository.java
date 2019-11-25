@@ -9,6 +9,10 @@ import com.model.Refund;
 import com.model.User;
 
 public interface RefundRepository extends JpaRepository<Refund, Long> {
-	@Query("select u from com.model.Refund u where u.type =?1")
-	public List<User> getInfoByType(Integer type);
+
+	public List<User> findByType(Integer type);
+	
+	public List<User> findByTypeAndNameLike(Integer type,String name);
+	
+	
 }

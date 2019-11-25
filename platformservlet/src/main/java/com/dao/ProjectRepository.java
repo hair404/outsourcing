@@ -97,7 +97,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 	@Modifying   
 	@Query("update com.model.Project u set u.countdown=?1 where u.id=?2")    
 	void updateCountdown(Date date,Integer id);
-	
+
 //	@Modifying   
 //	@Query("update com.model.Project u set u.studiohasPaid=?1, where u.id=?2")    
 //	void update_studioPaidState(Integer state,Integer id);

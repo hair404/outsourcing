@@ -13,10 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +27,9 @@ import com.dao.CancelReasonRepository;
 import com.dao.Child_formRepository;
 import com.dao.ComplainReasonRepository;
 import com.model.Bid;
-import com.model.Cancel_reason;
-import com.model.Complain_reason;
 import com.model.Project;
 import com.model.Refund;
-import com.service.AliPayService;
+import com.service.PayService;
 import com.service.ProjectService;
 import com.utils.Notification;
 import com.model.Child_form;
@@ -55,6 +51,8 @@ public class OperationController {
 	ProjectService ser;
 	@Autowired
 	RefundRepository rr;
+	@Autowired
+	PayService payService;
 
 	@PostMapping("company_action")
 	public String company_action(@RequestParam("id") Integer id, @RequestParam("action") Integer action,
@@ -90,25 +88,25 @@ public class OperationController {
 			projectRepository.update_state(7, id);
 			return "success";
 		} else if (action == 4) {
-			projectRepository.updateIsdeposit(1, id);
-			return AliPayService.Pay("", "",
-					"{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
-							+ "\"total_amount\":88.88," + "\"subject\":\"part_remuneration\","
-							+ "\"body\":\"Iphone6 16G\","
-							+ "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
-							+ "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
+//			projectRepository.updateIsdeposit(1, id);
+//			return payService.pay("", "",
+//					"{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
+//							+ "\"total_amount\":88.88," + "\"subject\":\"part_remuneration\","
+//							+ "\"body\":\"Iphone6 16G\","
+//							+ "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
+//							+ "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
 
 		} else if (action == 5) {
 
 			projectRepository.updateIspia(1, id);
-			return AliPayService.Pay("", "",
+			return PayService.Pay("", "",
 					"{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
 							+ "\"total_amount\":88.88," + "\"subject\":\"首付款\"," + "\"body\":\"Iphone6 16G\","
 							+ "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
 							+ "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
 		} else if (action == 6) {
 			projectRepository.updateIspia(1, id);
-			return AliPayService.Pay("", "",
+			return PayService.Pay("", "",
 					"{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
 							+ "\"total_amount\":88.88," + "\"subject\":\"进度款\"," + "\"body\":\"Iphone6 16G\","
 							+ "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
@@ -125,7 +123,7 @@ public class OperationController {
               rr.save(r);
 		} else if (action == 8) {
 			child.updateState(9, id, stepid);
-			if ((project.getTotalPart()-1)!=stepid) { 
+			if ((project.getTotalPart()-1)!=stepid) {
 				child.updateState(1, id, stepid+1);
 				projectRepository.updateCurrent(stepid+1, id);
 			}
@@ -217,13 +215,13 @@ public class OperationController {
 			return "success";
 		} else if (action == 5) {
 			projectRepository.updateHasPaid(1, id);
-			return AliPayService.Pay("", "",
+			return PayService.Pay("", "",
 					"{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
 							+ "\"total_amount\":88.88," + "\"subject\":\"押金\"," + "\"body\":\"Iphone6 16G\","
 							+ "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
 							+ "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
 
-			
+
 		} else if (action == 6) {
 			//ser.upload(file, id, step_id);
 			child.updateState(2, id, project.getCurrent());
@@ -259,11 +257,11 @@ public class OperationController {
 				try {
 					calendar.setTime(ff.parse(f.format(date.getTime())));
 				} catch (ParseException e1) {
-				
+
 					e1.printStackTrace();
 				}
 				calendar.add(Calendar.DATE, 1);
-				date = calendar.getTime();				
+				date = calendar.getTime();
 				projectRepository.updateCountdown(date, id);
 			}
 			return "success";

@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,6 +54,9 @@ public class ProjectService {
 	TagDao tagDao;
 	@Autowired
 	File_projectRepository fpr;
+	
+	@Value("${url}")
+	private static String url;
 
 	// a project information(the bid system)
 	public String get_info(String solr_id, Integer user_id) {
@@ -123,7 +127,7 @@ public class ProjectService {
 
 	public void upload(MultipartFile file, int prj_id, int step_id) {
 		String fileName = file.getOriginalFilename();
-		String filePath = "F://file//" + prj_id + "/" + step_id + "/";
+		String filePath = url+"//file//" + prj_id + "/" + step_id + "/";
 		File dest = new File(filePath + fileName);
 		if (!dest.getParentFile().exists()) {
 			dest.getParentFile().mkdirs();

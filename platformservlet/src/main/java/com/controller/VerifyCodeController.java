@@ -20,8 +20,7 @@ import com.utils.MessageTools;
 
 @RestController
 public class VerifyCodeController {
-	@Autowired
-	Code code;
+	
 
 	@PostMapping("getverifycode")
 	public void getVerifyCode( HttpServletRequest request,@RequestParam("tel") String phoneNumber) throws ClientException {
@@ -43,9 +42,9 @@ public class VerifyCodeController {
 	
 	@GetMapping("code")
 	public void code(HttpServletResponse response,HttpServletRequest request) throws IOException {
-		HttpSession session  = request.getSession();
-		 ImageIO.write(code.buildCode(), "jpg", response.getOutputStream());
+		HttpSession session  = request.getSession(true);
+		Code code = new Code();
+ 		 ImageIO.write(code.buildCode(), "jpg", response.getOutputStream());
 		  session.setAttribute("code", code.getCode());
-		  code.setCode();
 	}
 }

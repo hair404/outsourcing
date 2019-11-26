@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,8 @@ public class ProjectController {
 	@Autowired
 	ProjectRepository projectRepository;
 
+	
+	private static String url="/usr/local/tomcat/work/Catalina/localhost/Platform/";
 	@PostMapping("project_info")
 	public String info(HttpServletRequest request, @RequestParam("id") String solr_id) {
 		HttpSession session = request.getSession();
@@ -61,7 +64,7 @@ public class ProjectController {
 			if (id != null) {
 				String fileName = file.getOriginalFilename();
 				String suffixName = fileName.substring(fileName.lastIndexOf("."));
-				String filePath = "F:/img/prj_img/";
+				String filePath =url+ "/img/prj_img/";
 				fileName = solr_id + suffixName;
 				File dest = new File(filePath + fileName);
 				String company_name  = "";

@@ -100,7 +100,7 @@ public class UserController {
 			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			HttpSession session = request.getSession();
+			HttpSession session = request.getSession(true);
 			String sessionCode = (String) session.getAttribute("code");
 			if (type == 0 || type == 1) {
 				Account account = userRepository.getAccountByTel(tel);
@@ -147,8 +147,10 @@ public class UserController {
 	@RequestMapping("info")
 	public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		if (session.getAttribute("id") != null) {
-			Integer id = (Integer) session.getAttribute("id");
+		Integer id = (Integer) session.getAttribute("id");
+		Integer userType = (Integer) session.getAttribute("type");
+		if ( id!= null) {
+			if(userType==0&&userType==1) {
 			String tel = (String) session.getAttribute("tel");
 			User user = (User) userRepository.getInfoByTel(tel);
 			ObjectMapper mapper = new ObjectMapper();
@@ -186,7 +188,10 @@ public class UserController {
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
+		} else {
+			return JSON.toJSONString(ar.findById(id));
 		}
+			}
 		return "NotLogin";
 	}
 

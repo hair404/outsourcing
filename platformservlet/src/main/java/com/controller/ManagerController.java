@@ -66,9 +66,8 @@ public class ManagerController {
 				return JSONArray.parseArray(JSON.toJSONString(ur.getInfoByType(1)));
 			}
 		} else if (state == 1) {
-			if (type == null)
-				return adService.ad();
-			else if (type == 0) {
+		
+			 if (type == 0) {
 				if (text != null)
 					return adService.adP(text);
 				return adService.adP();

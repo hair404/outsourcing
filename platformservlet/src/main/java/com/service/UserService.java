@@ -1,18 +1,12 @@
 package com.service;
 
-import com.dao.ProjectRepository;
-import com.type.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.dao.MemberRepository;
-import com.dao.UserDao;
 import com.dao.UserRepository;
 import com.model.Member;
 import com.model.User;
-import com.utils.Code;
 
-import net.bytebuddy.asm.MemberRemoval;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,21 +14,22 @@ import java.util.Map;
 @Service
 public class UserService {
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     MemberRepository mr;
 
-    public boolean ifExsit(String tel) {
-        try {
-            if (userRepository.getAccountByTel(tel).getTel().equals(tel))
-                return true;
-        } catch (Exception e) {
-            System.out.println("无数据");
-        }
-        return false;
-    }
+	
+	public boolean ifExsit(String tel) {
+		try {
+			if (userRepository.getAccountByTel(tel).getTel().equals(tel))
+				return true;
+		} catch (Exception e) {
+			System.out.println("无数据");
+		}
+		return false;
+	}
 
     public boolean isCompany(Integer id) {
         if (userRepository.getInfoById(id).getType() == 0)
@@ -56,29 +51,6 @@ public class UserService {
         user.setType(type);
         user.setEntity(entity);
         userRepository.save(user);
-    }
-
-    public Boolean checkCode(String code) {
-        String check = code.toUpperCase();
-        if (check.equals(Code.getCode())) {
-            System.out.println(Code.getCode());
-            System.out.println(check);
-            Code.setCode();
-            return true;
-        } else {
-            Code.setCode();
-            return false;
-        }
-    }
-
-    public void addMember(String name, String tel, String email, String info, Integer studio_id) {
-        Member member = new Member();
-        member.setName(name);
-        member.setTel(tel);
-        member.setEmail(email);
-        member.setInfo(info);
-        member.setStudioid(studio_id);
-        mr.save(member);
     }
 
     /**
@@ -110,4 +82,20 @@ public class UserService {
         return scores;
     }
 
+	public Boolean checkCode(String code,String sessionCode) {
+		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode)) 	
+			return true;
+		else 
+			return false;
+	}
+	
+	public void addMember(String name,String tel,String email, String info,Integer studio_id) {
+		Member member  =  new Member();
+		member.setName(name);
+		member.setTel(tel);
+		member.setEmail(email);
+		member.setInfo(info);
+		member.setStudioid(studio_id);
+		mr.save(member);
+	}
 }

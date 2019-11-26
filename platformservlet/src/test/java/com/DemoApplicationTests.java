@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Jdbc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
@@ -33,23 +34,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.dao.ProjectDao;
-import com.dao.TagDao;
-import com.dao.UserDao;
-import com.dao.UserRepository;
-import com.model.Account;
-import com.model.Child_form;
-import com.model.Project;
-import com.model.Tag;
-import com.model.User;
-import com.utils.JsonUtils;
-import com.utils.RedisUtils;
+
 
 
 public class DemoApplicationTests {
 
-    public static void main(String[] args) throws ClientException, InterruptedException {
-        System.out.println(new OrderInfo().toJson());
+    public static void main(String[] args){
+//        try {
+//            EmailTools.sendEmail("848815969@qq.com","人力外包服务中心-验证邮件","您好，感谢您注册我们公司！这边是您的验证码：123456");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+////        }
+//    	@Value("${url}")  String url;
+//    	System.out.println(url);
     }
 }
 

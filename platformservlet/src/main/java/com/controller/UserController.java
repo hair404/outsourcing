@@ -2,6 +2,7 @@ package com.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyuncs.exceptions.ClientException;
 import com.dao.AccountRepository;
 import com.dao.AdminRepository;
 import com.dao.MemberRepository;
@@ -34,6 +36,8 @@ import com.model.User;
 import com.service.ProjectService;
 import com.service.TagService;
 import com.service.UserService;
+import com.utils.Code;
+import com.utils.MessageTools;
 import com.utils.UuidUtils;
 
 @RestController
@@ -60,13 +64,10 @@ public class UserController {
 	ProjectService ps;
 	@Autowired
 	AdminRepository ar;
+	@Autowired
+	Code co;
 
 	User user = new User();
-
-	@RequestMapping("index")
-	public String index() {
-		return "success";
-	}
 
 	@PostMapping("register")
 	public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
@@ -96,14 +97,14 @@ public class UserController {
 
 	@PostMapping(value = "login")
 	public String login(@RequestParam("name") String tel, @RequestParam("password") String password,
-			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type, HttpServletRequest request,
-			HttpServletResponse response) {
+			@RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
+			HttpServletRequest request, HttpServletResponse response) {
 		try {
-			HttpSession session = request.getSession();
-
+			HttpSession session = request.getSession(true);
+			String sessionCode = (String) session.getAttribute("code");
 			if (type == 0 || type == 1) {
 				Account account = userRepository.getAccountByTel(tel);
-				if (account.getPassword().equals(password) && (userService.checkCode(code))) {
+				if (account.getPassword().equals(password) && userService.checkCode(code,sessionCode)) {
 					session.setMaxInactiveInterval(24 * 60 * 60);
 					session.setAttribute("id", account.getId());
 					session.setAttribute("tel", account.getTel());
@@ -132,11 +133,24 @@ public class UserController {
 		return "success";
 	}
 
+	
+	
+	
+	@PostMapping("changepassword")
+	public String login(@RequestParam("password") String password, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String tel = (String) session.getAttribute("tel");
+		accountRepository.changePassword(password, tel);
+		return "success";
+	}
+
 	@RequestMapping("info")
 	public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		if (session.getAttribute("id") != null) {
-			Integer id = (Integer) session.getAttribute("id");
+		Integer id = (Integer) session.getAttribute("id");
+		Integer userType = (Integer) session.getAttribute("type");
+		if ( id!= null) {
+			if(userType==0&&userType==1) {
 			String tel = (String) session.getAttribute("tel");
 			User user = (User) userRepository.getInfoByTel(tel);
 			ObjectMapper mapper = new ObjectMapper();
@@ -174,7 +188,10 @@ public class UserController {
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
+		} else {
+			return JSON.toJSONString(ar.findById(id));
 		}
+			}
 		return "NotLogin";
 	}
 

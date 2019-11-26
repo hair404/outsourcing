@@ -6,4 +6,5 @@ import com.model.Admin;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 	 Admin findByAccount(String account);
+	 Admin findById(Integer id);
 }

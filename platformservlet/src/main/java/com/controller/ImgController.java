@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +29,10 @@ public class ImgController {
 	@Autowired
 	UserRepository userRepository;
 
-	public static final String root_user = "F:/img/user_img/img";
-	public static final String root_avatar = "F:/img/user_img/avatar";
-	public static final String root_prj = "F:/img/prj_img";
+	public static final String root_user = "img/user_img/img";
+	public static final String root_avatar = "img/user_img/avatar";
+	public static final String root_prj = "img/prj_img";
+	private static String url="/usr/local/tomcat/work/Catalina/localhost/Platform/";
 
 	@PostMapping("uploadimg")
 	public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
@@ -42,7 +44,7 @@ public class ImgController {
 		if (id != null) {
 			String fileName = file.getOriginalFilename();
 			String suffixName = fileName.substring(fileName.lastIndexOf("."));
-			String filePath = "F:/img/user_img/img/";
+			String filePath = url+"img/user_img/img/";
 			fileName = UuidUtils.generateShortUuid() + suffixName;
 			File dest = new File(filePath + fileName);
 			if (!dest.getParentFile().exists()) {
@@ -69,7 +71,7 @@ public class ImgController {
 		if (id != null) {
 			String fileName = file.getOriginalFilename();
 			String suffixName = fileName.substring(fileName.lastIndexOf("."));
-			String filePath = "F:/img/user_img/avatar/";
+			String filePath = url+"img/user_img/avatar/";
 			fileName = UuidUtils.generateShortUuid()+ suffixName;
 			File dest = new File(filePath + fileName);
 			if (!dest.getParentFile().exists()) {
@@ -91,7 +93,7 @@ public class ImgController {
 	@GetMapping(value = "/userimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
 	public ResponseEntity<?> get_user_img(@PathVariable String filename) {
 		try {
-			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_user, filename).toString()));
+			return ResponseEntity.ok(resourceLoader.getResource(url + Paths.get(root_user, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -100,7 +102,7 @@ public class ImgController {
 	@GetMapping(value = "/avatar/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
 	public ResponseEntity<?> get_user_avatar(@PathVariable String filename) {
 		try {
-			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_avatar, filename).toString()));
+			return ResponseEntity.ok(resourceLoader.getResource(url + Paths.get(root_avatar, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -109,7 +111,7 @@ public class ImgController {
 	@GetMapping(value = "/prjimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
 	public ResponseEntity<?> get_prj_img(@PathVariable String filename) {
 		try {
-			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_prj, filename).toString()));
+			return ResponseEntity.ok(resourceLoader.getResource(url + Paths.get(root_prj, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();
 		}

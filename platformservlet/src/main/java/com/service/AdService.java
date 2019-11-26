@@ -1,11 +1,16 @@
 package com.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dao.AdProjectRepository;
 import com.dao.AdStudioRepository;
 import com.dao.ProjectRepository;
@@ -57,7 +62,7 @@ public class AdService {
 		ap.setImg(prj.getImg());
 		ap.setWeight(weight(ad_price));
 		ap.setPrj_id(prj_id);
-		ap.setSolr_id(prj.getSolr_id());
+		ap.setSolrid(prj.getSolr_id());
 		ap.setState(0);
 		apr.save(ap);
 	}
@@ -78,7 +83,7 @@ public class AdService {
 		as.setTel(ui.getTel());
 		as.setImg(ui.getImg());
 		as.setUsername(ui.getUsername());
-		as.setSolr_id(ui.getSolr_id());
+		as.setSolrid(ui.getSolr_id());
 		as.setCredit(ui.getCredit());
 		as.setState(0);
 		asr.save(as);
@@ -91,4 +96,107 @@ public class AdService {
 			return false;
 	}
 
+	public JSONArray ad() {
+
+		JSONArray array = new JSONArray();
+		List<Ad_project> p = apr.findAll();
+		List<Ad_studio> s = asr.findAll();
+		for (int i = 0; i < p.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_project project = p.get(i);
+			ad.put("id", project.getId());
+			ad.put("name", project.getPrjname());
+			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("type", 0);
+			ad.put("money", project.getAd_price());
+			ad.put("solr_id", project.getSolrid());
+			ad.put("state", project.getState());
+			array.add(ad);
+		}
+		for (int i = 0; i < s.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_studio studio = s.get(i);
+			ad.put("id", studio.getId());
+			ad.put("name", studio.getUsername());
+			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
+			ad.put("type", 1);
+			ad.put("money", studio.getAd_price());
+			ad.put("solr_id", studio.getSolrid());
+			ad.put("state", studio.getState());
+			array.add(ad);
+		}
+		return array;
+	}
+
+	public JSONArray adP() {
+		JSONArray array = new JSONArray();
+		List<Ad_project> p = apr.findAll();
+		for (int i = 0; i < p.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_project project = p.get(i);
+			ad.put("id", project.getId());
+			ad.put("name", project.getPrjname());
+			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("type", 0);
+			ad.put("money", project.getAd_price());
+			ad.put("solr_id", project.getSolrid());
+			ad.put("state", project.getState());
+			array.add(ad);
+		}
+		return array;
+	}
+
+	public JSONArray adS() {
+		JSONArray array = new JSONArray();
+		List<Ad_studio> s = asr.findAll();
+		for (int i = 0; i < s.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_studio studio = s.get(i);
+			ad.put("id", studio.getId());
+			ad.put("name", studio.getUsername());
+			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
+			ad.put("type", 1);
+			ad.put("money", studio.getAd_price());
+			ad.put("solr_id", studio.getSolrid());
+			ad.put("state", studio.getState());
+			array.add(ad);
+		}
+		return array;
+	}
+	public JSONArray adP(String text) {
+		text = '%'+text+'%';
+		JSONArray array = new JSONArray();
+		List<Ad_project> p = apr.findByPrjnameLike(text);
+		for (int i = 0; i < p.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_project project = p.get(i);
+			ad.put("id", project.getId());
+			ad.put("name", project.getPrjname());
+			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("type", 0);
+			ad.put("money", project.getAd_price());
+			ad.put("solr_id", project.getSolrid());
+			ad.put("state", project.getState());
+			array.add(ad);
+		}
+		return array;
+	}
+	public JSONArray adS(String text) {
+		text = '%'+text +'%';
+		JSONArray array = new JSONArray();
+		List<Ad_studio> s = asr.findByUsernameLike(text);
+		for (int i = 0; i < s.size(); i++) {
+			JSONObject ad = new JSONObject();
+			Ad_studio studio = s.get(i);
+			ad.put("id", studio.getId());
+			ad.put("name", studio.getUsername());
+			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
+			ad.put("type", 1);
+			ad.put("money", studio.getAd_price());
+			ad.put("solr_id", studio.getSolrid());
+			ad.put("state", studio.getState());
+			array.add(ad);
+		}
+		return array;
+	}
 }

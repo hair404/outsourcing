@@ -1,5 +1,7 @@
 package com.service;
 
+import com.dao.ProjectRepository;
+import com.type.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.dao.MemberRepository;

@@ -48,6 +48,11 @@ public class PayService {
         return AlipayTools.pay(orderInfo, url + "/alipay/callback");
     }
 
+    /**
+     * 更新支付状态
+     * @param orderId 订单号
+     * @param state 状态
+     */
     public void updatePayState(String orderId, PayState state) {
         Optional<Payment> op = paymentRepository.findByOrOrderId(orderId);
         if (op.isPresent()) {

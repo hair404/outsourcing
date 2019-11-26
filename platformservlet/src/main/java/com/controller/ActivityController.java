@@ -38,6 +38,7 @@ public class ActivityController {
 	@GetMapping(value = "/activity_img/{filename:.+}",produces ="application/octet-stream;charset = utf-8")
 	public ResponseEntity<?> get_activity_img(@PathVariable String filename) {
 		try {
+
 			return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(root_ac, filename).toString()));
 		} catch (Exception e) {
 			return ResponseEntity.notFound().build();

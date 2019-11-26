@@ -27,7 +27,7 @@ import com.dao.ProjectRepository;
 import com.dao.RefundRepository;
 import com.dao.BidRepository;
 import com.dao.CancelReasonRepository;
-import com.dao.Child_formRepository;
+import com.dao.ChildFormRepository;
 import com.dao.ComplainReasonRepository;
 import com.service.ProjectService;
 import com.utils.Notification;
@@ -42,11 +42,11 @@ public class OperationController {
     @Autowired
     ComplainReasonRepository complainr;
     @Autowired
-    Child_formRepository child;
+    ChildFormRepository child;
     @Autowired
     BidRepository bidRepository;
     @Autowired
-    ProjectService ser;
+    ProjectService projectService;
     @Autowired
     RefundRepository rr;
     @Autowired
@@ -78,7 +78,7 @@ public class OperationController {
             projectRepository.update_state(2, id);
             return "success";
         } else if (action == 1) {
-            List<Child_form> l = com.alibaba.fastjson.JSONArray.parseArray(table, Child_form.class);
+            List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);
             for (int i = 0; i < l.size(); i++) {
                 JSONObject json_form = new JSONObject(l.get(i));
                 child.updatePrice((Float) json_form.get("price"), id, i);
@@ -92,22 +92,12 @@ public class OperationController {
             projectRepository.update_state(7, id);
             return "success";
         } else if (action == 4) {
-            payService.payDeposit(id, project.getPrice() * 0.1);
+            return payService.payDepositToStudio(id, project.getPrice() * 0.1);
         } else if (action == 5) {
-//
-//            projectRepository.updateIspia(1, id);
-//            return AliPayService.Pay("", "",
-//                    "{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
-//                            + "\"total_amount\":88.88," + "\"subject\":\"首付款\"," + "\"body\":\"Iphone6 16G\","
-//                            + "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
-//                            + "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
+            return payService.payInAdvanced(id, project.getPayinadvance());
         } else if (action == 6) {
-//            projectRepository.updateIspia(1, id);
-//            return AliPayService.Pay("", "",
-//                    "{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
-//                            + "\"total_amount\":88.88," + "\"subject\":\"进度款\"," + "\"body\":\"Iphone6 16G\","
-//                            + "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
-//                            + "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
+            ChildForm cf = projectService.getPart(project.getId(), project.getCurrent());
+            return payService.payPart(cf.getId(), cf.getPrice());
         } else if (action == 7) {
             Refund r = new Refund();
             r.setFromid(company_id);
@@ -178,10 +168,10 @@ public class OperationController {
             bid.setStudio_id(studio_id);
             bid.setCompany_id(company_id);
         } else if (action == 1) {
-            List<Child_form> l = com.alibaba.fastjson.JSONArray.parseArray(table, Child_form.class);
+            List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);
             for (int i = 0; i < l.size(); i++) {
                 JSONObject json_form = new JSONObject(l.get(i));
-                Child_form c = new Child_form();
+                ChildForm c = new ChildForm();
                 c.setName((String) json_form.get("name"));
                 c.setTime((Integer) json_form.get("time"));
                 c.setPart(i);
@@ -213,14 +203,7 @@ public class OperationController {
             child.updateState(1, id, 1);
             return "success";
         } else if (action == 5) {
-            projectRepository.updateHasPaid(1, id);
-//            return AliPayService.Pay("", "",
-//                    "{" + "\"out_trade_no\":\"20150320010101001\"," + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\","
-//                            + "\"total_amount\":88.88," + "\"subject\":\"押金\"," + "\"body\":\"Iphone6 16G\","
-//                            + "\"passback_params\":\"merchantBizType%3d3C%26merchantBizNo%3d2016010101111\","
-//                            + "\"extend_params\":{" + "\"sys_service_provider_id\":\"2088511833207846\"" + "}" + "}");
-
-
+            return payService.payDepositToCompany(project.getId(),project.getPrice() * 0.1);
         } else if (action == 6) {
             //ser.upload(file, id, step_id);
             child.updateState(2, id, project.getCurrent());

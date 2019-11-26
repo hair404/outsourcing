@@ -13,7 +13,7 @@ public class AlipayTools {
     private final static String alipayPublicCertPath = new File("payment/alipayCertPublicKey_RSA2.crt").getAbsolutePath();
     private final static String rootCertPath = new File("payment/alipayRootCert.crt").getAbsolutePath();
 
-    public static String pay(OrderInfo orderInfo, String notifyURL) {
+    public static String pay(OrderInfo orderInfo, String notifyURL, String returnURL) {
         CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
         certAlipayRequest.setServerUrl("https://openapi.alipaydev.com/gateway.do");
         certAlipayRequest.setAppId("2016101700705840");
@@ -31,6 +31,7 @@ public class AlipayTools {
 
             AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();// 创建API对应的request
             alipayRequest.setNotifyUrl(notifyURL);// 在公共参数中设置回跳和通知地址
+            alipayRequest.setReturnUrl(returnURL);
             alipayRequest.setBizContent(orderInfo.toJson());// 填充业务参数
             String form = "";
             try {

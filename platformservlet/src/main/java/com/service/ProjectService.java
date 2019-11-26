@@ -6,29 +6,24 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.type.UserType;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.dao.AdProjectRepository;
 import com.dao.BidRepository;
 import com.dao.File_projectRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.CancelReasonRepository;
-import com.dao.Child_formRepository;
+import com.dao.ChildFormRepository;
 import com.dao.UserRepository;
 import com.model.Bid;
-import com.model.Child_form;
+import com.model.ChildForm;
 import com.model.File_project;
 import com.model.Project;
 import com.model.User;
@@ -47,7 +42,7 @@ public class ProjectService {
     @Autowired
     CancelReasonRepository reasonRepository;
     @Autowired
-    Child_formRepository child_formRepository;
+    ChildFormRepository child_formRepository;
     @Autowired
     TagDao tagDao;
     @Autowired
@@ -92,8 +87,8 @@ public class ProjectService {
             project_info.put("payDeadline", f.format(date));
         } else if (project.getState() == 4) {
 
-            List<Child_form> child_form = child_formRepository.getChildForm(project_id);
-            Child_form child = child_form.get(project.getCurrent());
+            List<ChildForm> child_form = child_formRepository.getChildForm(project_id);
+            ChildForm child = child_form.get(project.getCurrent());
             if (child.getState() == 4 || child.getState() == 7)
                 project_info.put("payDeadline", project.getPayDeadline());
             if (child.getState() == 2) {
@@ -195,5 +190,22 @@ public class ProjectService {
             array.addAll(pro);
         }
         return array;
+    }
+
+    /**
+     * 返回步骤
+     *
+     * @param projectId 项目ID
+     * @param part      步骤
+     * @return 步骤
+     */
+    public ChildForm getPart(int projectId, int part) {
+        List<ChildForm> forms = child_formRepository.getChildForm(projectId);
+        for (ChildForm form : forms) {
+            if (form.getPart() == part) {
+                return form;
+            }
+        }
+        return null;
     }
 }

@@ -32,9 +32,9 @@ public class Project {
 	private Integer companyID;
 	private String companyName;
 	private Integer studioID;
-	private Integer hasPaid;
+	private Integer hasPaid; //工作室是否支付押金
 	private Integer ispia;
-	private Integer isdeposit;
+	private Integer isdeposit; //企业是否支付押金
 	private Integer payinadvance;
 	private Integer isform;
 	private Integer issetprice;

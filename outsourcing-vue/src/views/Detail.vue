@@ -589,10 +589,8 @@ export default {
             } else;
           else if (response.data[0] === '<') {
             var id = window.open('', '_blank', 'height=800,width=1000')
-            id.onload = function () {
-              id.document.body.innerHTML = response.data
-              id.document.forms[0].submit()
-            }
+            id.document.body.innerHTML = response.data
+            id.document.forms[0].submit()
           } else {
             this.snackbar.color = 'error'
             this.snackbar.text = '服务器错误'

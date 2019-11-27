@@ -113,7 +113,7 @@ export default {
             })
           } else {
             console.log(this)
-            this.snackbar.text = '密码错误或者未注册'
+            this.snackbar.text = '验证码错误或者密码错误'
             this.snackbar.open = true
           }
         })

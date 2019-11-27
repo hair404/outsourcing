@@ -38,7 +38,7 @@
           text
           outlined
           @click="$emit('submit',5,{},()=>{prjinfo.ispia = 1})"
-        >支付首付歀({{parseInt( prjinfo.payinadvance)}})</v-btn>
+        >支付首付歀(￥{{parseInt(prjinfo.payinadvance)}})</v-btn>
       </v-card-actions>
     </v-card>
   </div>

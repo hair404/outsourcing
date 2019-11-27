@@ -7,6 +7,7 @@
     <v-dialog
       max-width="400"
       v-model="dialog.open"
+      :persistent="response.data.isValid === 0"
     >
       <template v-if="dialog.state === 0">
         <v-card>

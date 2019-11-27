@@ -53,6 +53,8 @@ public class UserService {
         user.setTel(tel);
         user.setType(type);
         user.setEntity(entity);
+        user.setIsValid(0);
+        user.setStudent(false);
         userRepository.save(user);
     }
 

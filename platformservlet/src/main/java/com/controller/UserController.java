@@ -104,6 +104,9 @@ public class UserController {
             String sessionCode = (String) session.getAttribute("code");
             if (type == 0 || type == 1) {
                 Account account = userRepository.getAccountByTel(tel);
+                if (account == null){
+                    return "fail";
+                }
                 if (account.getPassword().equals(password) && userService.checkCode(code, sessionCode)) {
                     session.setMaxInactiveInterval(24 * 60 * 60);
                     session.setAttribute("id", account.getId());
@@ -158,6 +161,11 @@ public class UserController {
                 String username = user.getUsername();
                 String email = user.getEmail();
                 String img_url = user.getImg();
+
+                if (img_url == null){
+                    img_url = "/userimg/default.jpg";
+                }
+
                 Integer user_type = user.getType();
                 Integer id_check = user.getAccount_id();
                 String info = user.getInfo();

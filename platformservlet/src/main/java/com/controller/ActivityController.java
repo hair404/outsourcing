@@ -23,8 +23,7 @@ import com.utils.JsonUtils;
 
 @RestController
 public class ActivityController {
-    @Autowired
-    ResourceLoader resourceLoader;
+
     @Autowired
     ActivityService as;
     @Autowired

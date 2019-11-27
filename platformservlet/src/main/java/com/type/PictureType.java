@@ -35,10 +35,10 @@ public enum PictureType {
 
     public File getSaveFolder() {
         File file;
-        if (baseFolder.isEmpty()) {
-            file = new File(baseFolder, path);
-        } else {
+        if (baseFolder == null || baseFolder.isEmpty()) {
             file = new File(path);
+        } else {
+            file = new File(baseFolder,path);
         }
         if (!file.exists()) {
             file.mkdirs();

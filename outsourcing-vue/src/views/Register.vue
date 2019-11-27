@@ -159,7 +159,7 @@ export default {
     },
     send () {
       axios
-        .post(this.utils.baseURL + '/getverifycode' + '&tel=' + this.phone)
+        .post(this.utils.baseURL + '/getverifycode' + '?tel=' + this.phone)
         .then(response => {
           if (response.data === 'success') {
             this.snackbar.text = '发送成功!'

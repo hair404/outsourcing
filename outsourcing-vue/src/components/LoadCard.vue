@@ -26,15 +26,16 @@
           class="mx-auto my-2"
           @click="$router.push(type === 0?{name:'display',params:{id:item.id}}:{name:'detail',params:{id:item.solr_id}})"
           width="95%"
+          min-height="200"
         >
           <v-img
             class="white--text align-end"
-            height="200"
-            :src="'Platform' + item.img"
+            height="170"
+            :src="utils.baseURL + item.img"
           >
             <v-card-title>
               <v-avatar v-if="type === 0">
-                <img :src="'Platform'+item.avatar" />
+                <img :src="utils.baseURL+item.avatar" />
               </v-avatar>
               <div style="overflow-x: auto;">
                 <div style="display: inline-flex">
@@ -58,10 +59,11 @@
                   background-color="orange"
                   readonly
                   half-increments
+                  dense
                 />
               </div>
             </div>
-            <v-card-subtitle>类别</v-card-subtitle>
+            <v-card-subtitle class="pa-0">类别</v-card-subtitle>
             <div
               v-if="type === 0"
               style="overflow-x: auto;"
@@ -88,7 +90,7 @@
               <span style="color:red;font-size: 20px;">{{'￥'+item.price}}</span>
             </div>
           </v-card-text>
-          <v-card-actions>
+          <v-card-actions v-if="extraText && btnText">
             <div v-if="extraText">{{extraText(item)}}</div>
             <v-spacer></v-spacer>
             <v-btn
@@ -151,7 +153,7 @@ export default {
     load (number) {
       if (this.isActiveLoad)
         axios
-          .post('/Platform/' + this.address, 'first=' + this.index + '&end=' + (this.index + number - 1) + utils.getReal(this.extraParam, '', a => { return '&' + a }))
+          .post(this.utils.baseURL + '/' + this.address, 'first=' + this.index + '&end=' + (this.index + number - 1) + utils.getReal(this.extraParam, '', a => { return '&' + a }))
           .then(response => {
             this.loaded = true
             this.cards.push.apply(this.cards, response.data)
@@ -172,7 +174,7 @@ export default {
     },
     update () {
       axios
-        .post('/Platform/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
+        .post(this.utils.baseURL + '/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
         .then(response => {
           this.total = response.data[0]
           this.cards = response.data.slice(1)

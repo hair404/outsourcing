@@ -10,7 +10,7 @@
       :disable-sort="!issort"
       :hide-default-footer="itemperPage === 100?true:false"
       :items-per-page="itemperPage"
-      @click:row="rowCallback?rowCallback:null"
+      @click:row="(item)=>{rowCallback?rowCallback(item):null}"
     >
       <template
         v-if="isCompany"
@@ -42,24 +42,31 @@
 
       <template v-slot:item.action="{ item }">
         <template v-if="callback && isCallback(item)">
-          <v-icon
+          <v-btn
             v-if="typeof callback === 'function'"
+            fab
+            small
+            color="primary"
+          >
+            <v-icon @click.stop="callback(item)">
+              {{callbackIcon}}
+            </v-icon>
+          </v-btn>
+          <v-btn
+            fab
             small
             class="mr-2"
-            @click="callback(item)"
-          >
-            {{callbackIcon}}
-          </v-icon>
-          <v-icon
+            color="primary"
             v-else
-            v-for="(call, i) in callback"
-            :key="i"
-            small
-            class="mr-2"
-            @click="call(item)"
           >
-            {{callbackIcon[i]}}
-          </v-icon>
+            <v-icon
+              v-for="(call, i) in callback"
+              :key="i"
+              @click.stop="call(item)"
+            >
+              {{callbackIcon[i]}}
+            </v-icon>
+          </v-btn>
         </template>
       </template>
     </v-data-table>
@@ -98,13 +105,20 @@ export default {
       selected: []
     }
   },
-  created () {
-    if (!this.headers.contain({ text: '进度款', value: 'price' }) && this.isPriceCol === true)
-      this.headers.push({ text: '进度款', value: 'price' })
+  methods: {
+    update () {
+      if (!this.headers.contain({ text: '进度款', value: 'price' }) && this.isPriceCol === true)
+        this.headers.push({ text: '进度款', value: 'price' })
 
-    console.log(this.callback)
-    if ((!this.headers.contain({ text: '操作', value: 'action' })) && this.callback)
-      this.headers.push({ text: '操作', value: 'action' })
+      if ((!this.headers.contain({ text: '操作', value: 'action' })) && this.callback)
+        this.headers.push({ text: '操作', value: 'action' })
+    }
+  },
+  created () {
+    this.update()
+  },
+  beforeUpdate () {
+    this.update()
   }
 }
 </script>

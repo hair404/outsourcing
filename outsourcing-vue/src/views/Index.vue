@@ -20,6 +20,7 @@
       :img="info.avatar"
       :ctg="ctg"
       @keyword="search"
+      :isBack="isBack"
     />
     <div class="d-block d-sm-none">
       <div style="height: 15px;width: 100%" />
@@ -34,6 +35,9 @@
           :info="info"
           :infoLoaded="infoLoaded"
           :keyword="keyword"
+          :type="typeEmit"
+          :ctg="ctgEmit"
+          :subctg="subctgEmit"
           :snackbar="snackbar"
         />
       </keep-alive>
@@ -56,7 +60,11 @@ export default {
     return {
       info: {},
       infoLoaded: false,
+      isBack: false,
       ctg: utils.ctg,
+      typeEmit: 0,
+      ctgEmit: 0,
+      subctgEmit: 0,
       keyword: '',
       snackbar: {
         open: false,
@@ -68,7 +76,7 @@ export default {
   methods: {
     loadinfo () {
       axios
-        .post('/Platform/info', 'type=basic')
+        .post(this.utils.baseURL + '/info', 'type=basic')
         .then(response => {
           if (!(response.data === 'NotLogin')) {
             this.infoLoaded = true
@@ -77,13 +85,30 @@ export default {
         })
         .catch(error => { console.log(error) })
     },
-    search (keyword) {
-      this.keyword = keyword
+    search (a) {
+      if (typeof a === 'number')
+        this.typeEmit = a
+      else {
+        this.keyword = a[0]
+        this.typeEmit = 0
+        this.ctgEmit = a[1]
+        this.subctgEmit = a[2]
+      }
     }
   },
   created () {
     utils.refreshCtg()
     this.loadinfo()
+    if (this.$route.params.keyword)
+      this.keyword = this.$route.params.keyword
+  },
+  watch: {
+    $route: function (newV) {
+      if (newV.path === '/detail')
+        this.isBack = true
+      else
+        this.isBack = false
+    }
   }
 }
 </script>

@@ -35,7 +35,7 @@
       dark
       shrink-on-scroll
       prominent
-      src="https://picsum.photos/1920/1080?random"
+      src="https://img.xjh.me/random_img.php?type=bg&ctype=nature&return=302"
       fade-img-on-scroll
     >
       <template v-slot:img="{ props }">
@@ -45,7 +45,17 @@
         ></v-img>
       </template>
 
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-if="!isBack"
+        @click="drawer = !drawer"
+      ></v-app-bar-nav-icon>
+      <v-btn
+        v-else
+        icon
+        @click="$router.back()"
+      >
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
       <v-toolbar-title class="title">外包服务平台</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -58,11 +68,12 @@
       <v-form @submit.prevent="search">
         <v-text-field
           v-if="searchBar"
-          height="30px"
           type="text"
           v-model="keywords"
           label="你想搜索"
           filled
+          dense
+          hide-details
         ></v-text-field>
       </v-form>
       <v-btn
@@ -152,7 +163,7 @@
               <div>{{isLoged?nick:'游客'}}</div>
               <img
                 v-if="isLoged"
-                :src="'/Platform'+img"
+                :src="utils.baseURL + ''+img"
               />
             </div>
           </div>
@@ -236,7 +247,7 @@
         v-else
       >
         <v-list-item-avatar>
-          <v-img :src="'/Platform'+img"></v-img>
+          <v-img :src="utils.baseURL + ''+img"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>{{nick}}</v-list-item-title>
@@ -252,7 +263,7 @@
             v-for="(item,i) in menu"
             :key="i"
           >
-            <v-list-item-title @click="$router.push({path:item.path})">{{item.name}}</v-list-item-title>
+            <v-list-item-title @click="$emit('keyword', i-1) && $router.push({path:item.path})">{{item.name}}</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -266,8 +277,8 @@
           >
             <v-list-item-title>
               <router-link
-                @click.native="menuSelected = 1"
-                :to="{name:'search',params:{ctg: i + 1}}"
+                @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,0])"
+                :to="{name:'search'}"
               >{{item.name}}</router-link>
             </v-list-item-title>
           </v-list-item>
@@ -278,8 +289,8 @@
             <template v-slot:activator>
               <v-list-item-title>
                 <router-link
-                  @click.native="menuSelected = 1"
-                  :to="{name:'search',params:{ctg: i + 1}}"
+                  @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,0])"
+                  :to="{name:'search'}"
                 >{{item.name}}</router-link>
               </v-list-item-title>
             </template>
@@ -289,8 +300,8 @@
             >
               <v-list-item-title>
                 <router-link
-                  @click.native="menuSelected = 1"
-                  :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}"
+                  @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,j+1])"
+                  :to="{name:'search'}"
                 >{{subctg}}</router-link>
               </v-list-item-title>
             </v-list-item>
@@ -309,7 +320,8 @@ export default {
     isLoged: Boolean,
     nick: String,
     img: String,
-    ctg: Array
+    ctg: Array,
+    isBack: Boolean
   },
   data () {
     return {
@@ -326,15 +338,15 @@ export default {
   methods: {
     search () {
       if (this.$route.path === '/search') {
-        this.$emit('keyword', this.keywords)
+        this.$emit('keyword', [this.keywords])
       } else {
-        this.$emit('keyword', this.keywords)
+        this.$emit('keyword', [this.keywords])
         this.$router.push({ path: '/search' })
       }
     }
   },
   created () {
-    Axios.post('/Platform/notify').then(response => { this.message = response.data }).catch(error => { console.log(error) })
+    Axios.post(this.utils.baseURL + '/notify').then(response => { this.message = response.data }).catch(error => { console.log(error) })
   }
 }
 </script>

@@ -241,6 +241,28 @@
           </v-card-actions>
         </v-card>
       </template>
+
+      <template v-if="dialog.state === 6">
+        <v-card>
+          <v-card-title>{{'上传学生证件'}}</v-card-title>
+          <v-card-text>
+            <v-file-input
+              :label="身份证正面"
+              v-model="file0"
+              accept="image/*"
+              filled
+            ></v-file-input>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click="upload(3)"
+            >上传</v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
     </v-dialog>
 
     <div :class="cardClass === true?'v-card v-sheet theme--light':''">
@@ -285,7 +307,7 @@
             >
               <v-parallax
                 height="200"
-                :src="myinfo.img?'Platform'+myinfo.img:''"
+                :src="myinfo.img?utils.baseURL+myinfo.img:''"
               >
 
                 <v-icon
@@ -304,7 +326,7 @@
                 <v-img
                   @mouseenter="overlay = true"
                   @mouseleave="overlay = false"
-                  :src="myinfo.avatar?'/Platform' + myinfo.avatar:''"
+                  :src="myinfo.avatar?utils.baseURL + '' + myinfo.avatar:''"
                 >
                   <v-overlay
                     :value="overlay"
@@ -401,6 +423,13 @@
                 >
                   注销
                 </v-btn>
+                <v-btn
+                  color="error accent-4"
+                  text
+                  @click="(dialog.open = true) && (dialog.state = 6)"
+                >
+                  学生认证
+                </v-btn>
               </v-card-actions>
             </v-card>
           </template>
@@ -487,6 +516,7 @@
             <v-btn
               outlined
               color="primary"
+              class="mb-2"
               @click.stop="(dialog.state = 1) && (dialog.open = true)"
             >添加</v-btn>
             <Table
@@ -586,7 +616,7 @@ export default {
         mem.info = this.mem.info
         mem.tel = this.mem.tel
         mem.email = this.mem.email
-        Axios.post('/Platform/addMember', qs.stringify(mem))
+        Axios.post(this.utils.baseURL + '/addMember', qs.stringify(mem))
           .then(response => {
             if (response.data === 'success') {
               this.member.push(mem)
@@ -607,7 +637,7 @@ export default {
       }
     },
     deleteItem (item) {
-      Axios.post('/Platform/delMember', 'id=' + JSON.stringify(item.id))
+      Axios.post(this.utils.baseURL + '/delMember', 'id=' + JSON.stringify(item.id))
         .then(response => {
           this.member.forEach((it, i) => {
             if (it.id === item.id)
@@ -622,16 +652,37 @@ export default {
         })
     },
     upload (a) {
+      let fd = new FormData()
       if (a === 2) {
-        let fd = new FormData()
         Object.keys(this.prj).forEach((item, i) => {
-          fd.append(item, this.prj[Object.keys(this.prj)[i]])
+          if (item === 'ctg' || item === 'subctg')
+            fd.append(item, this.prj[Object.keys(this.prj)[i]] + 1)
+          else
+            fd.append(item, this.prj[Object.keys(this.prj)[i]])
         })
-        Axios.post('/Platform/register_prj', fd)
+        Axios.post(this.utils.baseURL + '/register_prj', fd)
           .then(response => {
             if (response.data === 'success') {
               this.snackbar.color = 'green'
               this.snackbar.text = '发布成功'
+              this.snackbar.open = true
+              this.dialog.open = false
+            }
+          })
+          .catch(error => {
+            console.log(error)
+            this.snackbar.color = 'error'
+            this.snackbar.text = '服务器错误'
+            this.snackbar.open = true
+          })
+      } else if (a === 3) {
+        fd.append('type', 2)
+        fd.append('file', this.file0)
+        Axios.post(this.utils.baseURL + '/verify', fd)
+          .then(response => {
+            if (response.data) {
+              this.snackbar.color = 'green'
+              this.snackbar.text = '成功上传请等待通过'
               this.snackbar.open = true
             }
           })
@@ -642,9 +693,8 @@ export default {
             this.snackbar.open = true
           })
       } else {
-        let fd = new FormData()
         fd.append('file', a === 0 ? this.file : this.avatar)
-        Axios.post(a === 0 ? '/Platform/uploadimg' : '/Platform/upload_avatar', fd)
+        Axios.post(a === 0 ? this.utils.baseURL + '/uploadimg' : this.utils.baseURL + '/upload_avatar', fd)
           .then(response => {
             if (response.data) {
               this.myinfo.avatar = response.data
@@ -659,7 +709,7 @@ export default {
       }
     },
     pay () {
-      Axios.post(this.info.type === 0 ? '/Platform/ad_register_prj' : '/Platform/ad_register_stu', 'ad_price=' + this.price)
+      Axios.post(this.info.type === 0 ? this.utils.baseURL + '/ad_register_prj' : this.utils.baseURL + '/ad_register_stu', 'ad_price=' + this.price)
         .then(response => {
           if (response.data) {
             var id = window.open('', '_blank', 'height=800,width=1000')
@@ -677,7 +727,7 @@ export default {
         })
     },
     logoff () {
-      Axios.post('/Platform/logoff').then(response => {
+      Axios.post(this.utils.baseURL + '/logoff').then(response => {
         if (response.data === 'success') {
           this.info.type = null
           this.$router.push({ path: '/Login' })
@@ -690,7 +740,7 @@ export default {
 
     utils.getTextValue(utils.ctg.slice(1), this.ctgValue, (item, i) => { return { text: item.name, value: i } })
 
-    Axios.post('/Platform/center').then(response => {
+    Axios.post(this.utils.baseURL + '/center').then(response => {
       this.myinfo = response.data
       if (response.data.isValid === 0) {
         this.dialog.open = true
@@ -698,12 +748,15 @@ export default {
       }
     }).catch(error => { console.log(error) })
 
-    Axios.post('/Platform/notify').then(response => {
+    Axios.post(this.utils.baseURL + '/notify').then(response => {
       this.message = response.data
     }).catch(error => { console.log(error) })
 
     if ((this.info.type === 1) && (this.tabs.length === 4)) {
       this.tabs.push({ name: '我的成员', icon: 'mdi-account-group' })
+      Axios.post(this.utils.baseURL + '/member', 'id=').then(response => {
+        this.member = response.data
+      }).catch(error => { console.log(error) })
     }
   },
   watch: {
@@ -715,7 +768,7 @@ export default {
       if (loaded === true)
         if (this.info.type === 1) {
           this.tabs.push({ name: '我的成员', icon: 'mdi-account-group' })
-          Axios.post('/Platform/member', 'id=').then(response => {
+          Axios.post(this.utils.baseURL + '/member', 'id=').then(response => {
             this.member = response.data
           }).catch(error => { console.log(error) })
         }

@@ -30,7 +30,7 @@ const ctg = [
 ]
 
 function refreshCtg() {
-  Axios.post('getCtg')
+  Axios.post(baseURL + '/getCtg')
     .then(response => {
       if (response.data) ctg.response.data
     })
@@ -61,6 +61,11 @@ function getTextValue(a, b, callback) {
   return b
 }
 
+var baseURL =
+  process.env.NODE_ENV === 'production'
+    ? 'http://47.94.212.141:8080/Platform'
+    : '/Platform'
+
 Array.prototype.contain = function(val) {
   for (var i = 0; i < this.length; i++) {
     if (JSON.stringify(this[i]) === JSON.stringify(val)) {
@@ -76,5 +81,6 @@ export default {
   refreshCtg,
   toFormData,
   getReal,
-  getTextValue
+  getTextValue,
+  baseURL
 }

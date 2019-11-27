@@ -92,7 +92,7 @@
         @click="dialog = true"
       >修改密码</v-btn>
       <v-btn
-        @click="upload"
+        @click="upload()"
         color="primary"
       >
         保存
@@ -139,7 +139,7 @@ export default {
         temp['tag'] = JSON.stringify(this.editinfo[2].value)
       else
         temp['tag'] = undefined
-      Axios.post('/Platform/edit', qs.stringify(temp))
+      Axios.post(this.utils.baseURL + '/edit', qs.stringify(temp))
         .then(response => {
           if (response.data === 'success') {
             this.snackbar.color = 'green'
@@ -155,7 +155,7 @@ export default {
     },
     change () {
       if (this.$refs.form.validate())
-        Axios.post('/Platform/changepassword', 'password=' + this.password)
+        Axios.post(this.utils.baseURL + '/changepassword', 'password=' + this.password)
           .then(response => {
             if (response.data === 'success') {
               this.snackbar.color = 'green'

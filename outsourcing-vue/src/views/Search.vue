@@ -98,24 +98,28 @@ export default {
     LoadCard
   },
   props: {
-    keyword: String
+    keyword: String,
+    type: {
+      type: Number,
+      default: 0
+    },
+    ctg: {
+      type: Number,
+      default: 0
+    },
+    subctg: {
+      type: Number,
+      default: 0
+    }
   },
   data () {
     return {
       utils: utils,
       types: ['招标', '工作室'],
-      type: utils.getReal(this.$route.params.type, 0),
-      ctg: utils.getReal(this.$route.params.ctg, 0),
-      subctg: utils.getReal(this.$route.params.subctg, 0),
       sorts: ['默认', '酬金', '首付款'],
       sortsStudio: ['默认', '评分'],
       sort: 0,
       sortrule: 0
-    }
-  },
-  watch: {
-    ctg: function () {
-      this.subctg = 0
     }
   }
 }

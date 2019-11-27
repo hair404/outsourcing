@@ -21,7 +21,7 @@
               >
                 <v-parallax
                   style="width:100%"
-                  :src="'/Platform' + item.img"
+                  :src="utils.baseURL + '' + item.img"
                 />
               </v-row>
             </v-sheet>
@@ -84,7 +84,7 @@ export default {
   methods: {
     loadActivities () {
       axios
-        .post('/Platform/activity', 'type=basic')
+        .post(this.utils.baseURL + '/activity', 'type=basic')
         .then(response => {
           this.activities = response.data
         })

@@ -23,6 +23,12 @@
             :rules="[v => !!v || '必需项',]"
             required
           ></v-text-field>
+          <v-select
+            :items="[{ text: '管理员', value: 2 },{ text: '专家', value: 3 }]"
+            v-model="man.type"
+            label="点击以选择"
+            filled
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -45,7 +51,7 @@
             required
           ></v-text-field>
           <v-file-input
-            :label="图片"
+            label="图片"
             v-model="activity.img"
             accept="image/*"
             filled
@@ -54,7 +60,7 @@
             v-model="activity.url"
             filled
             label="url"
-            type="password"
+            type="text"
             :rules="[v => !!v || '必需项',]"
             required
           ></v-text-field>
@@ -125,8 +131,33 @@
           <v-btn
             color="primary"
             text
-            @click="(addsubctg===true?ctg[selectCtg].subctg.push(ctgName):ctg.push({name:ctgName})) && (dialog.open=false)"
+            @click="(addsubctg===true && ctg[selectCtg]?ctg[selectCtg].subctg.push(ctgName):ctg.push({name:ctgName})) && (dialog.open=false)"
           >添加</v-btn>
+        </v-card-actions>
+      </v-card>
+
+      <v-card v-if="dialog.state===4">
+        <v-card-title>验证图片</v-card-title>
+        <v-card-text>
+          <v-img :src="utils.baseURL+clickedrow.img"></v-img>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="action(1,[clickedrow,1])"
+          >通过</v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="action(0,[clickedrow,1])"
+          >不通过</v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="$router.push({name:'display',params:{id:clickedrow.id}})"
+          >查看信息</v-btn>
         </v-card-actions>
       </v-card>
 
@@ -186,6 +217,16 @@
                 ></v-select>
               </v-col>
               <v-col>
+                <v-select
+                  v-model="selectVerified"
+                  :items="utils.getTextValue(['全部','等待认证为用户','等待认证为学生'])"
+                  width="100%"
+                  color="primary"
+                  label="类型"
+                  outlined
+                ></v-select>
+              </v-col>
+              <v-col>
                 <v-text-field
                   v-model="text"
                   filled
@@ -220,7 +261,7 @@
               issort
               callbackIcon="mdi-trash-can-outline"
               :itemperPage="10"
-              :rowCallback="(item)=>{$router.push(item.type === 0?{name:'display',params:{id:item.id}}:{name:'detail',params:{id:item.id}})}"
+              :rowCallback="(item)=>{$router.push({name:'display',params:{id:item.id}})}"
             ></Table>
             <v-fab-transition>
               <v-btn
@@ -248,8 +289,8 @@
               issort
               :callbackIcon="['mdi-check','mdi-close']"
               :itemperPage="10"
-              :rowCallback="(item)=>{$router.push({name:'detail',params:{id:item.prjid}})}"
-              :isCallback="item=>{return item.state === 0}"
+              :rowCallback="(item)=>{item.img?clickedrow = item&&(dialog.open = true)&&(dialog.state = 4):$router.push({name:'detail',params:{id:item.prjid}})}"
+              :isCallback="item=>{return item.state === '未通过'}"
             ></Table>
           </template>
 
@@ -258,7 +299,7 @@
               <v-col>
                 <v-select
                   v-model="select"
-                  :items="utils.getTextValue(types)"
+                  :items="utils.getTextValue(['项目','工作室'])"
                   width="100%"
                   color="primary"
                   label="类型"
@@ -291,7 +332,7 @@
               :callbackIcon="['mdi-check','mdi-close']"
               :rowCallback="(item)=>{$router.push(item.type === 0?{name:'display',params:{id:item.solr_id}}:{name:'detail',params:{id:item.solr_id}})}"
               :itemperPage="10"
-              :isCallback="item=>{return item.state === 0}"
+              :isCallback="item=>{return item.state === '未通过'}"
             ></Table>
           </template>
 
@@ -300,7 +341,7 @@
               <v-col>
                 <v-select
                   v-model="select"
-                  :items="utils.getTextValue(types)"
+                  :items="utils.getTextValue(moneyType)"
                   width="100%"
                   color="primary"
                   label="类型"
@@ -338,10 +379,16 @@
           <template v-if="state === 3">
             <v-btn
               color="primary"
-              class="mt-4"
+              class="mt-4 ml-2"
               @click="(dialog.open = true) && (dialog.state = 1)"
               outlined
             >添加活动</v-btn>
+            <v-btn
+              color="primary"
+              class="mt-4 ml-2"
+              @click="activityLookup()"
+              outlined
+            >刷新</v-btn>
             <Table
               :data="dataActivity"
               :headers="headersActivity"
@@ -419,6 +466,7 @@
     <div style="height:50px"></div>
 
     <v-bottom-navigation
+      v-if="!(info.type === 3 && state === 0)"
       class="d-flex d-md-none"
       color="primary"
       v-model="state"
@@ -460,7 +508,8 @@ export default {
       window: window,
       man: {
         name: '',
-        password: ''
+        password: '',
+        type: 2
       },
       dialog: {
         open: false,
@@ -477,8 +526,11 @@ export default {
         { name: '活动', icon: 'mdi-ticket' },
         { name: '分类管理', icon: 'mdi-shape-outline' }],
       select: 0,
+      selectVerified: 0,
+      clickedrow: 0,
       text: '',
       types: ['全部', '企业', '工作室'],
+      moneyType: ['全部', '首付款', '押金', '阶段款', '广告投放退款', '延误罚款', '赔款'],
       headers: [{ text: '用户id', value: 'id' }, { text: '用户名', value: 'username' }, { text: '类型', value: 'type' }],
       headersAD: [{ text: '广告id', value: 'id' }, { text: '名字', value: 'name' }, { text: '所属', value: 'belong' }, { text: '金额', value: 'money' }, { text: '类型', value: 'type' }, { text: '状态', value: 'state' }],
       ADstate: ['未通过', '通过'],
@@ -508,12 +560,12 @@ export default {
   },
   methods: {
     login () {
-      Axios.post('/Platform/login', qs.stringify(this.man))
+      Axios.post(this.utils.baseURL + '/login', qs.stringify(this.man))
         .then(response => {
           if (response.data === 'success') {
             this.dialog.open = false
             Axios
-              .post('/Platform/info', 'type=basic')
+              .post(this.utils.baseURL + '/info', 'type=basic')
               .then(response => {
                 if (!(response.data === 'NotLogin')) {
                   this.info.id = response.data.id
@@ -521,7 +573,7 @@ export default {
                   this.info.type = response.data.type
                   if (this.info.type === 3) {
                     this.tabs = [{ name: '申诉管理', icon: 'mdi-shape-outline' }]
-                    Axios.post('/Platform/manager', 'state=5')
+                    Axios.post(this.utils.baseURL + '/manager', 'state=5')
                       .then(response => {
                         this.data[5] = response.data
                       }).catch(error => {
@@ -533,23 +585,35 @@ export default {
                   }
                 }
               })
-              .catch(error => { console.log(error) })
+              .catch(error => {
+                console.log(error)
+                this.snackbar.color = 'error'
+                this.snackbar.text = '服务器错误'
+                this.snackbar.open = true
+              })
           }
         })
-        .catch()
+        .catch(error => {
+          console.log(error)
+          this.snackbar.color = 'error'
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
+        })
     },
     lookup (a, b) {
       var extra = ''
       switch (a) {
         case 0:
+          extra += 'isVerified=' + this.selectVerified + '&'
+        // eslint-disable-next-line
         case 1:
         case 2:
-          extra = 'type=' + this.select + '&text=' + this.text
+          extra += 'type=' + this.select + '&text=' + this.text
           break
         default:
           break
       }
-      Axios.post('/Platform/manager', 'state=' + this.state + '&' + extra)
+      Axios.post(this.utils.baseURL + '/manager', 'state=' + this.state + '&' + extra)
         .then(response => {
           if (response.data) {
             response.data.forEach((item, i) => {
@@ -557,6 +621,20 @@ export default {
               b[i].type = utils.type[item.type]
               b[i].state = this.ADstate[item.state]
             })
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          this.snackbar.color = 'error'
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
+        })
+    },
+    activityLookup () {
+      Axios.post(this.utils.baseURL + '/activity')
+        .then(response => {
+          if (response.data) {
+            this.dataActivity = response.data
           }
         })
         .catch(error => {
@@ -590,10 +668,11 @@ export default {
         default:
           break
       }
-      Axios.post('/Platform/manager_action', 'state=' + a + extra)
+      Axios.post(this.utils.baseURL + '/manager_action', 'state=' + a + extra)
         .then(response => {
           if (response.data === 'success') {
             this.dialog.open = false
+            this.CDialog.open = false
             this.snackbar.color = 'green'
             this.snackbar.text = '成功'
             this.snackbar.open = true
@@ -607,26 +686,25 @@ export default {
         })
     },
     atvt_register () {
-      if (this.$refs.form.validate()) {
-        let fd = new FormData()
-        fd.append('name', this.activity.name)
-        fd.append('img', this.activity.img)
-        fd.append('url', this.activity.url)
-        Axios.post('/Platform/activity_register', fd)
-          .then(response => {
-            if (response.data === 'success') {
-              this.snackbar.color = 'green'
-              this.snackbar.text = '成功'
-              this.snackbar.open = true
-            }
-          })
-          .catch(error => {
-            console.log(error)
-            this.snackbar.color = 'error'
-            this.snackbar.text = '服务器错误'
+      let fd = new FormData()
+      fd.append('name', this.activity.name)
+      fd.append('img', this.activity.img)
+      fd.append('url', this.activity.url)
+      Axios.post(this.utils.baseURL + '/activity_register', fd)
+        .then(response => {
+          if (response.data === 'success') {
+            this.snackbar.color = 'green'
+            this.snackbar.text = '成功'
             this.snackbar.open = true
-          })
-      }
+            this.dialog.open = false
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          this.snackbar.color = 'error'
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
+        })
     }
   },
   created () {
@@ -637,6 +715,8 @@ export default {
         this.dialog.open = true
       } else
         this.$router.push('/home')
+    else
+      this.dialog.open = true
   },
   watch: {
     infoLoaded: function () {

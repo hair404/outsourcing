@@ -34,7 +34,7 @@
       <v-img
         class="white--text align-end"
         :height="height/2"
-        :src="'Platform/'+info.img"
+        :src="utils.baseURL+info.img"
       >
         <v-card-title>{{info.username}}</v-card-title>
       </v-img>
@@ -46,13 +46,27 @@
         readonly
         half-increments
       ></v-rating>
-      <v-card-subtitle class="pb-0">身份</v-card-subtitle>
-      <v-card-text class="text--primary">
-        <div>{{utils.type[info.type]}}</div>
-      </v-card-text>
-      <v-card-subtitle class="pb-0">邮箱</v-card-subtitle>
-      <v-card-text class="text--primary">
-        <div>{{info.email}}</div>
+      <v-card-text>
+        <v-list-item
+          class="py-0"
+          style="height: 24px"
+          v-ripple
+        >
+          <v-list-item-content>身份</v-list-item-content>
+          <v-list-item-icon>
+            {{utils.type[info.type]}}
+          </v-list-item-icon>
+        </v-list-item>
+        <v-list-item
+          class="py-0"
+          style="height: 24px"
+          v-ripple
+        >
+          <v-list-item-content>邮箱</v-list-item-content>
+          <v-list-item-icon>
+            {{info.email}}
+          </v-list-item-icon>
+        </v-list-item>
       </v-card-text>
       <v-card-actions v-if="!isOthers">
         <v-btn
@@ -71,7 +85,7 @@
         <v-btn
           color="red"
           text
-          @click="logoff"
+          @click="logoff()"
         >
           注销
         </v-btn>
@@ -101,7 +115,7 @@ export default {
   },
   methods: {
     logoff () {
-      Axios.post('/logoff').then(response => {
+      Axios.post(this.utils.baseURL + '/logoff').then(response => {
         if (response.data === 'success') {
           this.info.type = null
           this.$router.push({ path: '/Login' })

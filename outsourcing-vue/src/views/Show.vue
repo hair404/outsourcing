@@ -9,11 +9,11 @@
       <v-img
         class="white--text align-end"
         height="200"
-        :src="'Platform/img/' + displayinfo.img"
+        :src="utils.baseURL + displayinfo.img"
       >
         <v-card-title>
           <v-avatar>
-            <img :src="'Platform/img/' + displayinfo.avatar" />
+            <img :src="utils.baseURL + displayinfo.avatar" />
           </v-avatar>
           {{displayinfo.username}}
         </v-card-title>
@@ -32,19 +32,22 @@
           class="mx-auto"
           max-height="900"
         >
-          <v-list-item-content>
-            <div style="padding:16px">
-              <v-list-item-title class="headline mb-1">公司信息</v-list-item-title>
-            </div>
-            <v-divider></v-divider>
-            <div style="padding:16px;">
-              <v-list-item-subtitle style="font-size:20px">联系电话:{{displayinfo.tel}}</v-list-item-subtitle>
-              <br />
-              <v-list-item-subtitle style="font-size:20px">公司邮箱:{{displayinfo.email}}</v-list-item-subtitle>
-              <br />
-              <v-list-item-subtitle style="font-size:20px">公司简介:{{displayinfo.info}}</v-list-item-subtitle>
-            </div>
-          </v-list-item-content>
+          <v-card-title class="headline mb-1">公司信息</v-card-title>
+          <v-divider></v-divider>
+          <v-list>
+            <v-list-item>
+              <v-list-item-content>联系电话</v-list-item-content>
+              <v-list-item-icon>{{displayinfo.tel}}</v-list-item-icon>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>公司邮箱</v-list-item-content>
+              <v-list-item-icon>{{displayinfo.email}}</v-list-item-icon>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>公司简介</v-list-item-content>
+              <v-list-item-action>{{displayinfo.info}}</v-list-item-action>
+            </v-list-item>
+          </v-list>
         </v-card>
       </v-tab-item>
 
@@ -107,7 +110,7 @@ export default {
   methods: {
     loaddisplayinfo () {
       axios
-        .post('/Platform/display_info', 'id=' + this.$route.params.id)
+        .post(this.utils.baseURL + '/display_info', 'id=' + this.$route.params.id)
         .then(response => {
           this.displayinfo = response.data
           this.complete = response.data.complete ? response.data.complete.slice(1) : []
@@ -118,7 +121,7 @@ export default {
         })
         .catch(error => { console.log(error) })
 
-      axios.post('/Platform/member', 'id=' + this.$route.params.id).then(response => {
+      axios.post(this.utils.baseURL + '/member', 'id=' + this.$route.params.id).then(response => {
         this.member = response.data
       }).catch(error => { console.log(error) })
     }

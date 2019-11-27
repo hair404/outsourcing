@@ -1,89 +1,103 @@
 <template>
-  <div class="body">
-    <v-snackbar
-      color="error"
-      v-model="snackbar"
-    >
-      {{ text }}
-      <v-btn
-        text
-        color="red"
-        @click="snackbar = false"
-      >
-        关闭
-      </v-btn>
-    </v-snackbar>
 
-    <Head />
-    <div class="hover">
-      <div class="blur"></div>
-      <div class="cover"></div>
-      <v-icon
-        @click="$router.push({path:'/login'})"
-        style="cursor: pointer;position:absolute;margin-left:10%;margin-top:25px;z-index:10"
-      >mdi-arrow-left-circle</v-icon>
-      <h1>注册</h1>
-      <form
+  <v-card
+    style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -40%);"
+    width="500px"
+  >
+    <v-card-title>
+      <v-btn icon>
+        <v-icon @click="$router.push('/login')">mdi-arrow-left</v-icon>
+      </v-btn>注册
+    </v-card-title>
+    <v-card-text class="pb-0">
+      <v-form
         id="form"
-        @submit.prevent="submit"
         class="content"
       >
-        <select v-model="type">
-          <option value="0">发包公司</option>
-          <option value="1">工作室</option>
-          <option value="2">管理员</option>
-        </select>
-        <input
+        <v-select
+          :items="[{ text: '企业', value: 0 },{ text: '工作室', value: 1 }]"
+          v-model="type"
+          label="点击以选择"
+          filled
+          outlined
+        />
+        <v-text-field
           v-model="username"
-          :placeholder="userTypeName[type]"
+          :label="userTypeName[type]"
           type="text"
           required
-        >
-        <input
+          filled
+        />
+        <v-text-field
           v-model="name"
-          placeholder="联系人姓名"
+          label="联系人姓名"
           type="text"
           required
-        >
-        <input
+          filled
+        />
+        <v-text-field
           v-model="phone"
-          placeholder="电话"
+          label="电话"
+          type="text"
+          style="width: 70%"
+          class="d-inline-block mr-4"
+          required
+          filled
+        />
+        <v-btn
+          color="primary"
+          width="25%"
+          @click="send()"
+        >发送验证码</v-btn>
+        <v-text-field
+          v-model="code"
+          label="手机验证码"
           type="text"
           required
-        >
-        <input
+          filled
+        />
+        <v-text-field
           v-model="password"
-          placeholder="密码"
+          label="密码"
           type="password"
           required
-        >
-        <input
+          filled
+        />
+        <v-text-field
           v-model="repeatpassword"
-          placeholder="重复密码"
+          label="重复密码"
           type="password"
           @click="check"
           required
-        >
-        <input
+          filled
+        />
+        <v-text-field
           v-model="email"
-          placeholder="邮箱"
+          label="邮箱"
           type="email"
           required
-        >
-        <button>注册</button>
-      </form>
-    </div>
-  </div>
+          filled
+        />
+      </v-form>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn
+        width="100%"
+        color="primary"
+        @click="submit()"
+      >注册</v-btn>
+    </v-card-actions>
+  </v-card>
+
 </template>
 
 <script>
-import Head from '@/components/Head.vue'
 import axios from 'axios'
 
 export default {
   name: 'register',
-  components: {
-    Head
+  props: {
+    snackbar: Object
   },
   data () {
     return {
@@ -94,16 +108,16 @@ export default {
       password: '',
       repeatpassword: '',
       email: '',
-      snackbar: false,
       text: '',
+      code: '',
       type: 0
     }
   },
   methods: {
     submit: function () {
       if (this.password !== this.repeatpassword) {
-        this.text = '密码不匹配!'
-        this.snackbar = true
+        this.snackbar.text = '密码不匹配!'
+        this.snackbar.open = true
         return false
       }
       let data = new FormData()
@@ -113,14 +127,15 @@ export default {
       data.append('password', this.password)
       data.append('email', this.email)
       data.append('type', this.type)
+      data.append('code', this.code)
       axios
-        .post('/Platform/register', data)
+        .post(this.utils.baseURL + '/register', data)
         .then(response => {
           if (response.data === 'success') {
             this.$router.push({ path: './home' })
             var OneSignal = window.OneSignal || []
             OneSignal.getUserId(function (userId) {
-              axios.post('/Platform/token', userId)
+              axios.post(this.utils.baseURL + '/token', userId)
                 .then(response => {
                   if (response.data !== 'success') console.log('token上传失败')
                 })
@@ -132,15 +147,29 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
-          this.text = '服务器错误'
-          this.snackbar = true
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
         })
     },
     check: function () {
       if (this.password.length < 6) {
-        this.text = '密码太短!'
-        this.snackbar = true
+        this.snackbar.text = '密码太短!'
+        this.snackbar.open = true
       }
+    },
+    send () {
+      axios
+        .post(this.utils.baseURL + '/getverifycode')
+        .then(response => {
+          if (response.data === 'success') {
+            this.snackbar.text = '发送成功!'
+            this.snackbar.open = true
+          }
+        }).catch(error => {
+          console.log(error)
+          this.snackbar.text = '服务器错误'
+          this.snackbar.open = true
+        })
     }
   }
 }
@@ -148,144 +177,144 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.title {
-  top: 10%;
-}
+// .title {
+//   top: 10%;
+// }
 
-.body {
-  background-image: url('../assets/backimg.jpg');
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  background-position: center;
-  overflow: hidden;
-}
+// .body {
+//   background-image: url('../assets/backimg.jpg');
+//   height: 100%;
+//   width: 100%;
+//   position: absolute;
+//   background-position: center;
+//   overflow: hidden;
+// }
 
-form {
-  top: 55%;
-}
+// form {
+//   top: 55%;
+// }
 
-form button {
-  width: 100%;
-  margin-top: 20px;
-  height: 30px;
-}
+// form button {
+//   width: 100%;
+//   margin-top: 20px;
+//   height: 30px;
+// }
 
-a {
-  text-decoration: none;
-  outline: none;
-  color: #000000;
-}
+// a {
+//   text-decoration: none;
+//   outline: none;
+//   color: #000000;
+// }
 
-.hover {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  height: 550px;
-  width: 400px;
-}
+// .hover {
+//   position: absolute;
+//   left: 50%;
+//   top: 50%;
+//   transform: translate(-50%, -50%);
+//   height: 550px;
+//   width: 400px;
+// }
 
-.cover {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
-  transition: 200ms;
-  background-color: rgba(255, 255, 255, 0.4);
-  border: transparent;
-  border-radius: 3px;
-  box-shadow: grey 0px 1px 4px;
-}
+// .cover {
+//   position: absolute;
+//   height: 100%;
+//   width: 100%;
+//   z-index: -1;
+//   transition: 200ms;
+//   background-color: rgba(255, 255, 255, 0.4);
+//   border: transparent;
+//   border-radius: 3px;
+//   box-shadow: grey 0px 1px 4px;
+// }
 
-.cover:hover {
-  box-shadow: grey 0px 1px 10px;
-}
+// .cover:hover {
+//   box-shadow: grey 0px 1px 10px;
+// }
 
-.blur {
-  position: absolute;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  z-index: -2;
-  background-image: url('../assets/backimg.jpg');
-  filter: blur(4px);
-  background-position: center;
-}
+// .blur {
+//   position: absolute;
+//   overflow: hidden;
+//   height: 100%;
+//   width: 100%;
+//   z-index: -2;
+//   background-image: url('../assets/backimg.jpg');
+//   filter: blur(4px);
+//   background-position: center;
+// }
 
-.title {
-  position: absolute;
-  left: 50%;
-  top: 7%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  text-align: center;
-}
+// .title {
+//   position: absolute;
+//   left: 50%;
+//   top: 7%;
+//   transform: translate(-50%, -50%);
+//   width: 300px;
+//   text-align: center;
+// }
 
-form {
-  position: absolute;
-  transform: translate(0, -50%);
-  width: 100%;
-  text-align: center;
-}
+// form {
+//   position: absolute;
+//   transform: translate(0, -50%);
+//   width: 100%;
+//   text-align: center;
+// }
 
-input,
-select {
-  border: transparent;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
-  transition: 200ms;
-}
+// input,
+// select {
+//   border: transparent;
+//   background: rgba(255, 255, 255, 0.4);
+//   border-radius: 3px;
+//   transition: 200ms;
+// }
 
-input:hover,
-select:hover {
-  background: white;
-  box-shadow: grey 0px 1px 4px;
-}
+// input:hover,
+// select:hover {
+//   background: white;
+//   box-shadow: grey 0px 1px 4px;
+// }
 
-.content {
-  padding-right: 10%;
-  padding-left: 10%;
-  padding-bottom: 20px;
-  height: fit-content;
-}
+// .content {
+//   padding-right: 10%;
+//   padding-left: 10%;
+//   padding-bottom: 20px;
+//   height: fit-content;
+// }
 
-.content select,
-.content input {
-  margin-top: 20px;
-  display: block;
-  width: 100%;
-  height: 42px;
-}
+// .content select,
+// .content input {
+//   margin-top: 20px;
+//   display: block;
+//   width: 100%;
+//   height: 42px;
+// }
 
-h1 {
-  position: absolute;
-  top: 25px;
-  width: 100%;
-  text-align: center;
-  font-size: 16px;
-}
+// h1 {
+//   position: absolute;
+//   top: 25px;
+//   width: 100%;
+//   text-align: center;
+//   font-size: 16px;
+// }
 
-.register {
-  cursor: pointer;
-  padding-top: 10px;
-  font-size: 15px;
-}
+// .register {
+//   cursor: pointer;
+//   padding-top: 10px;
+//   font-size: 15px;
+// }
 
-.img {
-  cursor: pointer;
-}
+// .img {
+//   cursor: pointer;
+// }
 
-button {
-  padding: 5px;
-  border: transparent;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.4);
-  transition: 200ms;
-}
+// button {
+//   padding: 5px;
+//   border: transparent;
+//   border-radius: 3px;
+//   background: rgba(255, 255, 255, 0.4);
+//   transition: 200ms;
+// }
 
-button:hover {
-  background: white;
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px;
-}
+// button:hover {
+//   background: white;
+//   box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px;
+// }
 </style>

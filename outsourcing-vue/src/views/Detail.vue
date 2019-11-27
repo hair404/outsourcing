@@ -106,8 +106,31 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog
+      max-width="400"
+      v-model="infoDialog"
+    >
+      <v-card>
+        <v-card-title>{{projectInfo.prjname}}</v-card-title>
+        <v-card-text>{{projectInfo.info}}</v-card-text>
+        <v-divider></v-divider>
+        <v-card-title>具体信息</v-card-title>
+        <v-list>
+          <v-list-item
+            v-for="(item,i) in displayinfo"
+            :key="i"
+          >
+            <v-list-item-content>{{item.key}}</v-list-item-content>
+            <v-list-item-icon>
+              {{projectInfo[item.value]}}
+            </v-list-item-icon>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-dialog>
+
     <v-container>
-      <v-row v-resize="onResize">
+      <!-- <v-row v-resize="onResize">
         <v-col :cols="cols">
           <Prjinfo :info="projectInfo"></Prjinfo>
         </v-col>
@@ -120,7 +143,66 @@
           >
           </MyInfo>
         </v-col>
+      </v-row> -->
+
+      <v-row
+        align="center"
+        v-resize="onResize"
+      >
+        <v-col cols="3">
+          <img
+            style="border-radius: 14px;width: 100%"
+            :src="utils.baseURL + ''+projectInfo.img"
+          />
+        </v-col>
+        <v-col cols="9">
+          <v-card-title>{{projectInfo.prjname}}</v-card-title>
+          <v-card-subtitle>
+            <v-btn
+              class="primary--text text--darken-2 pa-0"
+              text
+              @click="$router.push({name:'display',params:{id:projectInfo.id}})"
+            >{{projectInfo.companyName}}</v-btn>
+          </v-card-subtitle>
+        </v-col>
       </v-row>
+
+      <v-row>
+        <v-btn
+          color="primary"
+          width="95%"
+          class="mx-auto"
+          v-if="state === 1 && info.type === 1 && !isEnter"
+          @click="dialog.state = 1 && (dialog.open = 1)"
+        >我要投标</v-btn>
+      </v-row>
+
+      <v-row>
+        <v-col
+          class="pb-0"
+          cols="12"
+        >
+          <v-card-title
+            v-ripple
+            @click="infoDialog = true"
+            class="px-0"
+          >关于此项目<v-spacer></v-spacer>
+            <v-icon>mdi-arrow-right</v-icon>
+          </v-card-title>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12">
+          <p>{{projectInfo.info}}</p>
+          <v-chip
+            outlined
+            class="mr-4"
+          >{{infoLoaded===true?utils.ctg[projectInfo.tag].name:''}}</v-chip>
+          <v-chip outlined>{{infoLoaded===true? ( projectInfo.subtag === 0 ? '': utils.ctg[projectInfo.tag].subctg[projectInfo.subtag - 1]):''}}</v-chip>
+        </v-col>
+      </v-row>
+
       <v-row>
         <v-col cols="12">
           <v-stepper
@@ -157,13 +239,13 @@
                   v-if="state === (i+1)"
                   style="position: absolute;right: 20px"
                 >
-                  <v-btn
+                  <!-- <v-btn
                     v-if="state === 1 && info.type === 1 && !isEnter"
                     outlined
                     color="red"
                     style="margin-right: 10px"
                     @click="dialog = true"
-                  >我要竞标</v-btn>
+                  >我要竞标</v-btn> -->
 
                   <template v-if="state === 2 && info.type === 1 && projectInfo.isform === 0">
                     <div class="d-inline mr-4">{{'剩余可以分配的时间：' + getLeftTime(projectInfo.deadline)}}</div>
@@ -196,6 +278,11 @@
                   :btnText="projectInfo.companyID === 'self'?'中标':null"
                   :callback="win"
                 ></LoadCard>
+
+                <div
+                  v-if="projectInfo.enroll?projectInfo.enroll.length === 0:false"
+                  class="headline"
+                >没有工作室参与竞标</div>
 
                 <div
                   v-if="(i+1) === 1 && state === 1 && isEnter"
@@ -339,7 +426,7 @@
               class="headline"
               style="text-align: center"
             >在<Countdown
-                class="headline"
+                class="headline d-inline-block"
                 :deadline="projectInfo.countdown"
               ></Countdown>之前可以申诉</v-card-subtitle>
             <v-btn
@@ -371,8 +458,6 @@
 import axios from 'axios'
 import qs from 'qs'
 import utils from '../js/utils'
-import Prjinfo from '../components/Prjinfo'
-import MyInfo from '../components/MyInfo'
 import LoadCard from '../components/LoadCard'
 import Paid from '../components/Paid'
 import Table from '../components/Table'
@@ -383,8 +468,6 @@ import Countdown from '../components/Countdown'
 export default {
   name: 'detail',
   components: {
-    Prjinfo,
-    MyInfo,
     LoadCard,
     Paid,
     Table,
@@ -398,8 +481,12 @@ export default {
   },
   data () {
     return {
+      utils: utils,
       projectInfo: {},
-      displayInfo: this.info, // 右上角展示信息
+      displayinfo: [{ key: '发布时间', value: 'releaseTime' },
+        { key: '整个项目截止时间', value: 'deadline' },
+        { key: '薪金', value: 'price' },
+        { key: '首付款', value: 'payinadvance' }],
       infoLoaded: false,
       vertical: true,
       processWidth: 'width: 95%',
@@ -407,6 +494,7 @@ export default {
       cols: 8, // 控制自适应
       state: 1, // 控制进度条
       dialog: false,
+      infoDialog: false,
       enroll: Array,
       isEnter: false,
       id: 0,
@@ -432,7 +520,7 @@ export default {
   },
   methods: {
     getinfo () {
-      axios.post('/Platform/project_info', 'id=' + this.$route.params.id)
+      axios.post(this.utils.baseURL + '/project_info', 'id=' + this.$route.params.id)
         .then(response => {
           this.projectInfo = response.data
           this.state = response.data.state
@@ -444,12 +532,6 @@ export default {
             })
           this.table = utils.getReal(response.data.table, [])
           this.infoLoaded = true
-          if (response.data.companyID !== 'self')
-            axios.post('/Platform/display_info', 'id=' + response.data.companyID)
-              .then(response => {
-                this.displayInfo = response.data
-              })
-              .catch(error => { console.log(error) })
         })
         .catch(error => { console.log(error) })
     },
@@ -496,10 +578,13 @@ export default {
       return day + '天'
     },
     action (a, extra, callback) {
-      axios.post(this.info.type === 0 ? '/Platform/company_action' : '/Platform/studio_action', qs.stringify(Object.assign({ id: this.projectInfo.id, action: a }, extra)))
+      axios.post(this.info.type === 0 ? this.utils.baseURL + '/company_action' : this.utils.baseURL + '/studio_action', qs.stringify(Object.assign({ id: this.projectInfo.id, action: a }, extra)))
         .then(response => {
           if (response.data === 'success')
             if (callback) {
+              this.snackbar.color = 'green'
+              this.snackbar.text = '成功'
+              this.snackbar.open = true
               callback()
             } else;
           else if (response.data[0] === '<') {

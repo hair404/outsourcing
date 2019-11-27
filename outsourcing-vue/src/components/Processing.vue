@@ -152,7 +152,7 @@
               text
               color="primary"
               class="mr-4"
-              @click="window.open('/Platform/'+prjinfo.path) || (stepid = item.part)"
+              @click="window.open(this.utils.baseURL + '/'+prjinfo.path) || (stepid = item.part)"
             >下载文件</v-btn>
             <v-btn
               v-if="item.state === 2 && type === 0"
@@ -265,7 +265,7 @@ export default {
       reason: '',
       punishCompany: [{ text: '减少进度款', value: 0 }, { text: '延长时间', value: 1 }, { text: '取消', value: 2 }],
       punishStudio: ['扣押金', '延长时间', '取消'],
-      punishSelect: '减少进度款',
+      punishSelect: 0,
       progress: 0
     }
   },
@@ -276,7 +276,7 @@ export default {
       fd.append('action', 6)
       fd.append('file', this.file)
       fd.append('stepid', this.stepid)
-      axios.post('/Platform/studio_action', fd)
+      axios.post(this.utils.baseURL + '/studio_action', fd)
         .then(response => {
           if (response.data === 'success') {
             this.data[this.stepid].state += 1

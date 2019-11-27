@@ -2,7 +2,7 @@ module.exports = {
   devServer: {
     // proxy: {
     //   '/Platform': {
-    //     target: 'http://192.168.1.185:8080',
+    //     target: 'http://192.168.1.223:8080',
     //     pathRewrite: {
     //       '^/Platform': ''
     //     },
@@ -11,9 +11,10 @@ module.exports = {
     // }
     proxy: {
       '/Platform': {
-        target: 'http://localhost:9000',
+        target: 'http://47.94.212.141:8080',
         changeOrigin: true
       }
     }
-  }
+  },
+  publicPath: './'
 }

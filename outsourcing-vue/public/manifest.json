@@ -1,0 +1,10 @@
+{
+  "name": "人力和项目服务平台",
+  "short_name": "平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#333",
+  "description": "人力和项目服务平台",
+  "orientation": "portrait-primary",
+  "theme_color": "#b3d4fc"
+}

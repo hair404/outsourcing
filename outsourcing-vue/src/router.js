@@ -9,6 +9,9 @@ import Center from './views/Center.vue'
 import Edit from './views/Edit.vue'
 import Search from './views/Search.vue'
 import Show from './views/Show.vue'
+import Manage from './views/Manage.vue'
+import Account from './views/Account.vue'
+import Forget from './views/Forget.vue'
 
 Vue.use(Router)
 
@@ -49,18 +52,35 @@ export default new Router({
           path: '/detail',
           name: 'detail',
           component: Detail
+        },
+        {
+          path: '/manage',
+          name: 'manage',
+          component: Manage
         }
       ]
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: Register
+      path: '/account',
+      name: 'account',
+      component: Account,
+      children: [
+        {
+          path: '/login',
+          name: 'login',
+          component: Login
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: Register
+        },
+        {
+          path: '/forget',
+          name: 'forget',
+          component: Forget
+        }
+      ]
     }
   ]
 })

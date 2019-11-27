@@ -52,12 +52,36 @@
           :key="i + 1"
           :value="i + 1"
         >{{item}}</v-btn>
+      </v-btn-toggle><br />
+      <div class="label">排序</div>
+      <v-btn-toggle
+        v-model="sort"
+        tile
+        color="primary"
+        group
+        mandatory
+      >
+        <v-btn
+          v-for="(item,i) in type === 0 ? sorts:sortsStudio"
+          :key="i"
+          :value="i"
+          @click="()=>{if(sort === i) sortrule = 1 - sortrule}"
+        >{{item}}
+          <v-icon
+            v-if="sort === i && sortrule === 0"
+            color="primary"
+          >mdi-chevron-down</v-icon>
+          <v-icon
+            v-if="sort === i && sortrule === 1"
+            color="primary"
+          >mdi-chevron-up</v-icon>
+        </v-btn>
       </v-btn-toggle>
     </v-card>
     <LoadCard
       :type="1 - type"
       address="search"
-      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg, keyword})"
+      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg, keyword, sort, sortrule})"
       :number="20"
       ref="LoadCard"
     />
@@ -69,24 +93,33 @@ import utils from '../js/utils'
 import LoadCard from '../components/LoadCard'
 
 export default {
+  name: 'search',
   components: {
     LoadCard
   },
   props: {
-    keyword: String
+    keyword: String,
+    type: {
+      type: Number,
+      default: 0
+    },
+    ctg: {
+      type: Number,
+      default: 0
+    },
+    subctg: {
+      type: Number,
+      default: 0
+    }
   },
   data () {
     return {
       utils: utils,
       types: ['招标', '工作室'],
-      type: utils.getReal(this.$route.params.type, 0),
-      ctg: utils.getReal(this.$route.params.ctg, 0),
-      subctg: utils.getReal(this.$route.params.subctg, 0)
-    }
-  },
-  watch: {
-    ctg: function () {
-      this.subctg = 0
+      sorts: ['默认', '酬金', '首付款'],
+      sortsStudio: ['默认', '评分'],
+      sort: 0,
+      sortrule: 0
     }
   }
 }

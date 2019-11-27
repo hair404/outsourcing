@@ -1,6 +1,129 @@
 <template>
   <div>
-    <div class="head">
+    <v-dialog v-model="dialog">
+      <v-card height="100px">
+        <v-card-title style="display: inline-block">消息</v-card-title>
+        <v-card-title style="display: inline-block;float:right">
+          <v-btn text>清除通知</v-btn>
+        </v-card-title>
+        <div
+          v-if="message.length === 0"
+          style="margin-left: 40%"
+          class="subtitle-1"
+        >无通知</div>
+        <v-list v-else>
+          <v-list-item-group color="primary">
+            <v-list-item
+              v-for="(item, i) in message"
+              :key="i"
+              @click="this.$router.push(item.url)"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
+    </v-dialog>
+
+    <v-app-bar
+      class="d-block d-md-none"
+      color="primary"
+      fixed
+      dark
+      shrink-on-scroll
+      prominent
+      src="https://img.xjh.me/random_img.php?type=bg&ctype=nature&return=302"
+      fade-img-on-scroll
+    >
+      <template v-slot:img="{ props }">
+        <v-img
+          v-bind="props"
+          gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
+        ></v-img>
+      </template>
+
+      <v-app-bar-nav-icon
+        v-if="!isBack"
+        @click="drawer = !drawer"
+      ></v-app-bar-nav-icon>
+      <v-btn
+        v-else
+        icon
+        @click="$router.back()"
+      >
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-toolbar-title class="title">外包服务平台</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn
+        v-if="!searchBar"
+        icon
+        @click="searchBar = true"
+      >
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+      <v-form @submit.prevent="search">
+        <v-text-field
+          v-if="searchBar"
+          type="text"
+          v-model="keywords"
+          label="你想搜索"
+          filled
+          dense
+          hide-details
+        ></v-text-field>
+      </v-form>
+      <v-btn
+        v-if="searchBar"
+        icon
+        @click="searchBar = false"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+      <v-menu
+        open-on-hover
+        offset-y
+        nudge-left="50%"
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            v-on="on"
+            icon
+            @click="if(window.innerWidth < 600) dialog = true"
+          >
+            <v-icon>mdi-bell</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="d-none d-sm-flex">
+          <v-subheader style="float:left">消息</v-subheader>
+          <v-subheader style="float:right">
+            <v-btn text>清除通知</v-btn>
+          </v-subheader>
+          <v-list-item-group color="primary">
+            <v-list-item
+              v-for="(item, i) in message"
+              :key="i"
+              @click="this.router.push(item.url)"
+            >
+              <v-list-item-content>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+
+    <div
+      class="d-block d-md-none"
+      style="width: 100%;height: 128px"
+    ></div>
+
+    <div class="head d-none d-md-block">
       <div style="overflow: hidden;width: 100%;height: 42px;position: absolute;z-index: -1">
         <img
           src="../assets/head.jpg"
@@ -28,33 +151,64 @@
           color="black"
           @click="drawer = !drawer"
         >mdi-menu</v-icon>
-        <div
-          v-if="!isLoged"
-          style="float: right;line-height: 42px;"
-          @click="$router.push({path:'/Login'})"
-        >游客</div>
-        <div
-          v-else
-          style="float: right;height: 42px;"
-        >
+        <div style="float: right;height: 42px;">
           <div
             class="nav d-none d-sm-flex"
             style="float: right;height: 42px;"
           >
-            <div class="account">
-              <div>{{nick}}</div>
-              <img :src="'/Platform'+img" />
+            <div
+              @click="!isLoged?$router.push({path:'/Login'}):$router.push({path:'/Center'})"
+              class="account"
+            >
+              <div>{{isLoged?nick:'游客'}}</div>
+              <img
+                v-if="isLoged"
+                :src="utils.baseURL + ''+img"
+              />
             </div>
           </div>
-          <div class="message">收藏</div>
-          <div class="message">消息</div>
+
+          <v-menu
+            open-on-hover
+            offset-y
+            nudge-left="50%"
+          >
+            <template v-slot:activator="{ on }">
+              <div
+                class="message"
+                v-on="on"
+                @click="if(window.innerWidth < 600) dialog = true"
+              >消息</div>
+            </template>
+            <v-list class="d-none d-sm-flex">
+              <v-subheader style="float:left">消息</v-subheader>
+              <v-subheader style="float:right">
+                <v-btn text>清除通知</v-btn>
+              </v-subheader>
+              <v-list-item-group color="primary">
+                <v-list-item
+                  v-for="(item, i) in message"
+                  :key="i"
+                  @click="this.router.push(item.url)"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-menu>
+
         </div>
       </div>
     </div>
+
     <v-parallax
+      class="d-none d-md-block"
       height="170"
       src="../assets/head_bkgrd.jpg"
-      style="margin-top:-42px"
+      style="margin-top: -50px"
     >
       <div class="logo"><img src="../assets/logo2.png"></div>
       <form
@@ -80,12 +234,20 @@
     </v-parallax>
     <v-navigation-drawer
       v-model="drawer"
-      absolute
+      fixed
       temporary
     >
-      <v-list-item>
+      <v-list-item v-if="!isLoged">
+        <v-list-item-content>
+          <v-list-item-title @click="$router.push({path:'/Login'})">游客</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
+        @click="$router.push({path:'/Center'})"
+        v-else
+      >
         <v-list-item-avatar>
-          <v-img :src="'/Platform'+img"></v-img>
+          <v-img :src="utils.baseURL + ''+img"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>{{nick}}</v-list-item-title>
@@ -101,7 +263,7 @@
             v-for="(item,i) in menu"
             :key="i"
           >
-            <v-list-item-title @click="$router.push({path:item.path})">{{item.name}}</v-list-item-title>
+            <v-list-item-title @click="$emit('keyword', i-1) && $router.push({path:item.path})">{{item.name}}</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -114,7 +276,10 @@
             v-if="item.subctg == null"
           >
             <v-list-item-title>
-              <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+              <router-link
+                @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,0])"
+                :to="{name:'search'}"
+              >{{item.name}}</router-link>
             </v-list-item-title>
           </v-list-item>
           <v-list-group
@@ -123,7 +288,10 @@
           >
             <template v-slot:activator>
               <v-list-item-title>
-                <router-link :to="{name:'search',params:{ctg: i + 1}}">{{item.name}}</router-link>
+                <router-link
+                  @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,0])"
+                  :to="{name:'search'}"
+                >{{item.name}}</router-link>
               </v-list-item-title>
             </template>
             <v-list-item
@@ -131,7 +299,10 @@
               :key="j"
             >
               <v-list-item-title>
-                <router-link :to="{name:'search',params:{ctg: i + 1,subctg: j + 1}}">{{subctg}}</router-link>
+                <router-link
+                  @click.native="menuSelected = 1 && $emit('keyword', ['',i+1,j+1])"
+                  :to="{name:'search'}"
+                >{{subctg}}</router-link>
               </v-list-item-title>
             </v-list-item>
           </v-list-group>
@@ -142,31 +313,40 @@
 </template>
 
 <script>
+import Axios from 'axios'
 export default {
   name: 'Nav',
   props: {
     isLoged: Boolean,
     nick: String,
     img: String,
-    ctg: Array
+    ctg: Array,
+    isBack: Boolean
   },
   data () {
     return {
       drawer: null,
+      searchBar: false,
       menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
       menuSelected: 0,
-      keywords: ''
+      keywords: '',
+      dialog: false,
+      message: [],
+      window: window
     }
   },
   methods: {
     search () {
       if (this.$route.path === '/search') {
-        this.$emit('keyword', this.keywords)
+        this.$emit('keyword', [this.keywords])
       } else {
-        this.$emit('keyword', this.keywords)
+        this.$emit('keyword', [this.keywords])
         this.$router.push({ path: '/search' })
       }
     }
+  },
+  created () {
+    Axios.post(this.utils.baseURL + '/notify').then(response => { this.message = response.data }).catch(error => { console.log(error) })
   }
 }
 </script>
@@ -245,6 +425,12 @@ export default {
   line-height: 42px;
   padding-left: 10px;
   padding-right: 10px;
+  transition: 300ms;
+}
+
+.message:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .info {

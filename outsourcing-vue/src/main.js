@@ -2,9 +2,15 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
-import Axios from 'axios'
+import axios from 'axios'
+import utils from './js/utils'
 
 Vue.config.productionTip = false
+
+Vue.prototype.utils = utils
+
+axios.defaults.crossDomain = true
+axios.defaults.withCredentials = true
 
 new Vue({
   router,
@@ -17,9 +23,10 @@ OneSignal.push(function () {
   OneSignal.init({
     appId: 'c386c41e-fba0-4c27-b561-10d8a6d9b13c'
   })
-  OneSignal.on('subscriptionChange', function (isSubscribed) {
+  OneSignal.on('subscriptionChange', function () {
     OneSignal.getUserId(function (userId) {
-      Axios.post('/Platform/token', userId)
+      axios
+        .post(this.utils.baseURL + '/token', userId)
         .then(response => {
           if (response.data !== 'success') console.log('token上传失败')
         })

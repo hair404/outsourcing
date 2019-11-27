@@ -21,7 +21,7 @@
               >
                 <v-parallax
                   style="width:100%"
-                  :src="'/Platform' + item.img"
+                  :src="utils.baseURL + '' + item.img"
                 />
               </v-row>
             </v-sheet>
@@ -60,12 +60,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import LoadCard from '../components/LoadCard'
 import MyInfo from '../components/MyInfo'
 import utils from '../js/utils'
 
 export default {
+  name: 'home',
   components: {
     LoadCard,
     MyInfo
@@ -82,8 +83,8 @@ export default {
   },
   methods: {
     loadActivities () {
-      Axios
-        .post('/Platform/activity', 'type=basic')
+      axios
+        .post(this.utils.baseURL + '/activity', 'type=basic')
         .then(response => {
           this.activities = response.data
         })

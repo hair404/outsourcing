@@ -14,6 +14,7 @@
           ></v-file-input>
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
@@ -26,15 +27,17 @@
         <v-card-title>延迟原因</v-card-title>
         <v-card-text>
           <v-text-field
+            v-model="reason"
             filled
             label="原因"
           />
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
-            @click="$emit('submit',7,{reason:reason},()=>{dialog = false})"
+            @click="$emit('submit',7,{reason:reason,stepid:stepid},()=>{data[stepid].state = 3;dialog = false})"
           >提交</v-btn>
         </v-card-actions>
       </v-card>
@@ -52,21 +55,25 @@
               filled
               label="点击以选择"
             />
-            <v-text-field
-              v-if="punishSelect === 0"
-              v-model="money"
-              :rules="v => v < 100 && v > 0 || 必须小于100大于0"
-              type="Number"
-              label="金额百分比"
-              required
-            />%
+            <template v-if="punishSelect === 0">
+              <v-text-field
+                v-model="money"
+                :rules="[v => v < 100 && v > 0 || '必须小于100大于0']"
+                type="Number"
+                label="金额百分比"
+                required
+                style="display: inline-block;width :90%"
+              />
+              <div style="display: inline-block;width: 10%;text-align: center">%</div>
+            </template>
           </v-form>
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
-            @click="$emit('submit',9,{measure:punishSelect,money:money},()=>{dialog = false})"
+            @click="$emit('submit',9,{measure:punishSelect,stepid:stepid,money:money},()=>{dialog = false})"
           >提交</v-btn>
         </v-card-actions>
       </v-card>
@@ -77,17 +84,20 @@
           <v-text-field
             filled
             label="原因"
+            v-model="reason"
           />
           <v-text-field
-            v-if="punishSelect === 0"
             v-model="money"
-            :rules="v => v <= 100 && v > 0 || 必须小于100大于0"
+            :rules="[v => (v <= 100 && v > 0) || '必须小于100大于0']"
             type="Number"
             label="我要求退回金额（需要赔偿金额的百分比）"
             required
-          />%
+            style="display: inline-block;width :90%"
+          />
+          <div style="display: inline-block;width: 10%;text-align: center">%</div>
         </v-card-text>
         <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
@@ -97,6 +107,7 @@
       </v-card>
     </v-dialog>
 
+    <v-progress-linear :value="progress"></v-progress-linear>
     <v-expansion-panels
       v-model="expand"
       accordion
@@ -107,9 +118,9 @@
         :key="i"
       >
         <v-expansion-panel-header disable-icon-rotate>
-          {{(item.state === 1?expand = i:true)&&item.name}}
+          {{getName(item,i)}}
           <template v-slot:actions>
-            <div class="text--secondary mr-4">截止时间：{{item.time}}</div>
+            <div class="text--secondary mr-4">截止时间：{{new Date(new Date() - item.time * 24* 60*60*1000).toLocaleDateString().replace(/\//g, "-") }}</div>
             <v-icon :color="state[item.state].color">{{state[item.state].icon}}</v-icon>
           </template>
         </v-expansion-panel-header>
@@ -127,28 +138,35 @@
               outlined
               color="primary"
               class="mr-4"
-              @click.stop="(dialog = true) && (stepid = item.part)"
+              @click.stop="(dialogState = 0) || (stepid = item.part) || (dialog = true)"
             >上传文件</v-btn>
             <v-btn
               v-if="item.state === 1 && type === 1"
               text
               color="primary"
               class="mr-4"
-              @click.stop="(dialogState = 1) && (dialog = true)"
+              @click.stop="(dialogState = 1) && (dialog = true) || (stepid = item.part)"
             >我无法准时完成！</v-btn>
+            <v-btn
+              v-if="item.state === 2 && type === 0"
+              text
+              color="primary"
+              class="mr-4"
+              @click="window.open(this.utils.baseURL + '/'+prjinfo.path) || (stepid = item.part)"
+            >下载文件</v-btn>
             <v-btn
               v-if="item.state === 2 && type === 0"
               outlined
               color="primary"
               class="mr-4"
-              @click="$emit('submit',8,{stepid:item.part},()=>{dialog = false})"
+              @click="$emit('submit',8,{stepid:item.part},()=>{dialog = false}) || (stepid = item.part)"
             >通过</v-btn>
             <v-btn
               v-if="item.state === 2 && type === 0"
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 2) && (dialog = true)"
+              @click="(dialogState = 2) && (dialog = true) || (stepid = item.part)"
             >不通过</v-btn>
 
             <div
@@ -160,7 +178,7 @@
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 2) && (dialog = true)"
+              @click="(dialogState = 2) && (dialog = true) && (stepid = item.part)"
             >进行处罚</v-btn>
 
             <v-btn
@@ -168,7 +186,7 @@
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 3) && (dialog = true)"
+              @click="(dialogState = 3) && (dialog = true) || (stepid = item.part)"
             >不合理，申诉</v-btn>
 
             <v-btn
@@ -176,8 +194,8 @@
               outlined
               color="green"
               class="mr-4"
-              @click="$emit('submit',6,{stepid:item.part})"
-            >付款</v-btn>
+              @click="$emit('submit',6,{stepid:item.part}) || (stepid = item.part)"
+            >付款({{item.price}})</v-btn>
             <div
               v-if="item.state === 5 && type === 1"
               class="text--secondary mr-4"
@@ -188,14 +206,14 @@
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 2) && (dialog = true)"
+              @click="(dialogState = 2) && (dialog = true) || (stepid = item.part)"
             >要求进行处罚</v-btn>
             <v-btn
               v-if="item.state === 6 && type === 1"
               outlined
               color="primary"
               class="mr-4"
-              @click="$emit('submit',10)"
+              @click="$emit('submit',10) || (stepid = item.part)"
             >催促公司付款</v-btn>
 
             <v-btn
@@ -203,7 +221,7 @@
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 3) && (dialog = true)"
+              @click="(dialogState = 3) && (dialog = true) || (stepid = item.part)"
             >不合理，申诉</v-btn>
           </div>
         </v-expansion-panel-content>
@@ -214,14 +232,15 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
   props: {
     data: Array,
     type: Number,
     id: Number,
-    snackbar: Boolean
+    snackbar: Object,
+    prjinfo: Object
   },
   data () {
     return {
@@ -242,11 +261,12 @@ export default {
       dialogState: 0,
       stepid: 0,
       file: null,
+      window: window,
       reason: '',
-      punishCompany: ['减少进度款', '延长时间', '取消'],
+      punishCompany: [{ text: '减少进度款', value: 0 }, { text: '延长时间', value: 1 }, { text: '取消', value: 2 }],
       punishStudio: ['扣押金', '延长时间', '取消'],
       punishSelect: 0,
-      vaild: true
+      progress: 0
     }
   },
   methods: {
@@ -255,11 +275,13 @@ export default {
       fd.append('id', this.id)
       fd.append('action', 6)
       fd.append('file', this.file)
-      Axios.post('studio_action', fd)
+      fd.append('stepid', this.stepid)
+      axios.post(this.utils.baseURL + '/studio_action', fd)
         .then(response => {
-          if (this.response.data === 'success')
-            ;
-          else {
+          if (response.data === 'success') {
+            this.data[this.stepid].state += 1
+            this.dialog = false
+          } else {
             this.snackbar.color = 'error'
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
@@ -270,6 +292,13 @@ export default {
           this.snackbar.text = '服务器错误'
           this.snackbar.open = true
         })
+    },
+    getName (item, i) {
+      if (item.state === 1) {
+        this.expand = i
+        this.progress = i / this.data.length * 100
+      }
+      return item.name
     }
   }
 }

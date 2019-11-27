@@ -1,3 +1,5 @@
+import Axios from 'axios'
+
 /* eslint-disable */
 
 const type = ['企业', '工作室', '管理员', '游客']
@@ -27,6 +29,16 @@ const ctg = [
   { name: 'IT综合服务' }
 ]
 
+function refreshCtg() {
+  Axios.post(baseURL + '/getCtg')
+    .then(response => {
+      if (response.data) ctg.response.data
+    })
+    .catch(error => {
+      console.log(error)
+    })
+}
+
 function toFormData(a) {
   var fd = []
   for (var k in a) {
@@ -41,9 +53,34 @@ function getReal(a, d, callback) {
   return a
 }
 
+function getTextValue(a, b, callback) {
+  if (!b) b = []
+  a.forEach((item, i) => {
+    b.push(callback ? callback(item, i) : { text: item, value: i })
+  })
+  return b
+}
+
+var baseURL =
+  process.env.NODE_ENV === 'production'
+    ? 'http://47.94.212.141:8080/Platform'
+    : '/Platform'
+
+Array.prototype.contain = function(val) {
+  for (var i = 0; i < this.length; i++) {
+    if (JSON.stringify(this[i]) === JSON.stringify(val)) {
+      return true
+    }
+  }
+  return false
+}
+
 export default {
   type,
   ctg,
+  refreshCtg,
   toFormData,
-  getReal
+  getReal,
+  getTextValue,
+  baseURL
 }

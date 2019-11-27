@@ -1,10 +1,8 @@
 src/test/
 .metadata
-/.recommenders/
-.idea
-platformservlet/payment/alipayCertPublicKey_RSA2.crt
+.idea/
 
-platformservlet/payment/alipayRootCert.crt
+/.recommenders/
 
 platformservlet/payment/
 

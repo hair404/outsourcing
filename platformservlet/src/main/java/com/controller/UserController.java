@@ -150,7 +150,10 @@ public class UserController {
         if (id != null) {
             if (userType == 0 || userType == 1) {
                 String tel = (String) session.getAttribute("tel");
-                User user = (User) userRepository.getInfoByTel(tel);
+                User user = userRepository.getInfoByTel(tel);
+                if (user == null){
+                    return "NotLogin";
+                }
                 ObjectMapper mapper = new ObjectMapper();
                 String username = user.getUsername();
                 String email = user.getEmail();

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import com.type.PictureType;
 import com.utils.FileTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,15 +40,12 @@ public class ActivityController {
         return JsonUtils.objectToJson(ar.findAll());
     }
 
-    private static String url ="/usr/local/tomcat/work/Catalina/localhost/Platform/";;
-    private static final String root_ac = url + "img/activity_img";
-
     @GetMapping(value = "/activity_img/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_activity_img(@PathVariable String filename) {
-    	try {
-			return ResponseEntity.ok(FileTools.getBytes(new File(root_ac + "/" + filename)));
-		} catch (IOException e) {
-			return ResponseEntity.notFound().build();
-		}
-	}
+        try {
+            return ResponseEntity.ok(FileTools.getBytes(new File(PictureType.ACTIVITY.getSaveFolder(), filename)));
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

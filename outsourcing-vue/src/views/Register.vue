@@ -134,7 +134,7 @@ export default {
           if (response.data === 'success') {
             this.$router.push({ path: './home' })
             var OneSignal = window.OneSignal || []
-            OneSignal.getUserId(function (userId) {
+            OneSignal.getUserId((userId) =>
               axios.post(this.utils.baseURL + '/token', userId)
                 .then(response => {
                   if (response.data !== 'success') console.log('token上传失败')
@@ -142,7 +142,10 @@ export default {
                 .catch(error => {
                   console.log(error)
                 })
-            })
+            )
+          } else {
+            this.snackbar.text = '注册失败'
+            this.snackbar.open = true
           }
         })
         .catch(function (error) {
@@ -161,10 +164,12 @@ export default {
       axios
         .post(this.utils.baseURL + '/getverifycode' + '?tel=' + this.phone)
         .then(response => {
-          if (response.data === 'success') {
+          if (response.status === 200) {
             this.snackbar.text = '发送成功!'
+            this.snackbar.color = 'green'
             this.snackbar.open = true
-          }
+          } else
+            throw 'error'
         }).catch(error => {
           console.log(error)
           this.snackbar.text = '服务器错误'

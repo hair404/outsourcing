@@ -2,7 +2,7 @@
 <template>
   <v-app>
     <v-snackbar
-      color="error"
+      :color="snackbar.color"
       v-model="snackbar.open"
     >
       {{ snackbar.text }}
@@ -88,7 +88,8 @@ export default {
       type: 0,
       snackbar: {
         open: false,
-        text: ''
+        text: '',
+        color: 'error'
       },
       drawer: null,
       searchBar: false,

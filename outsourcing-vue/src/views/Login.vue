@@ -12,7 +12,7 @@
           name="name"
           id="account"
           type="text"
-          label="账号或者E-mail"
+          label="手机号"
           required
           filled
         />

@@ -7,14 +7,14 @@
     <v-dialog
       max-width="400"
       v-model="dialog.open"
-      :persistent="response.data.isValid === 0"
+      :persistent="myinfo.isValid === 0"
     >
       <template v-if="dialog.state === 0">
         <v-card>
-          <v-card-title>{{info.type === 0 ? '上传身份证':'上传营业执照'}}</v-card-title>
+          <v-card-title>{{info.type === 1 ? '上传身份证':'上传营业执照'}}</v-card-title>
           <v-card-text>
             <v-file-input
-              :label="info.type === 0 ? '身份证正面':'上传营业执照'"
+              :label="info.type === 1 ? '身份证正面':'上传营业执照'"
               v-model="file0"
               accept="image/*"
               filled

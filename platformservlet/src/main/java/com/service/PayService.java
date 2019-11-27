@@ -89,14 +89,14 @@ public class PayService {
 
             switch (payment.getType()) {
                 case STEP:
-                    Optional<ChildForm> opChildForm = childFormRepository.findById((long) payment.getTypeId());
+                    Optional<ChildForm> opChildForm = childFormRepository.findById(payment.getTypeId());
                     if (opChildForm.isPresent()) {
                         ChildForm childForm = opChildForm.get();
                         //TODO 小进度付款成功
                     }
                     break;
                 case PAY_IN_ADVANCED:
-                    Optional<Project> opProject = projectRepository.findById((long) payment.getTypeId());
+                    Optional<Project> opProject = projectRepository.findById(payment.getTypeId());
                     if (opProject.isPresent()) {
                         Project project = opProject.get();
                         project.setIspia(1);
@@ -104,7 +104,7 @@ public class PayService {
                     }
                     break;
                 case DEPOSIT_TO_STUDIO:
-                    opProject = projectRepository.findById((long) payment.getTypeId());
+                    opProject = projectRepository.findById(payment.getTypeId());
                     if (opProject.isPresent()) {
                         Project project = opProject.get();
                         project.setIsdeposit(1);
@@ -112,7 +112,7 @@ public class PayService {
                     }
                     break;
                 case DEPOSIT_TO_COMPANY:
-                    opProject = projectRepository.findById((long) payment.getTypeId());
+                    opProject = projectRepository.findById(payment.getTypeId());
                     if (opProject.isPresent()) {
                         Project project = opProject.get();
                         project.setHasPaid(1);

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.model.ChildForm;
 
-public interface ChildFormRepository extends JpaRepository<ChildForm, Long> {
+public interface ChildFormRepository extends JpaRepository<ChildForm, Integer> {
 	@Query("select u from com.model.ChildForm u where u.project_id =:project_id")
 	public List<ChildForm> getChildForm(Integer project_id);
 	

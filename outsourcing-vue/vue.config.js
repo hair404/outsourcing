@@ -2,13 +2,14 @@ module.exports = {
   devServer: {
     proxy: {
       '/Platform': {
-        target: 'http://freetunnel.cc:20286',
+        target: 'http://hair405.natapp1.cc',
         pathRewrite: {
           '^/Platform': ''
         },
         changeOrigin: true
       }
-    }
+    },
+    disableHostCheck: true
     // proxy: {
     //   '/Platform': {
     //     target: 'http://47.94.212.141:8080',

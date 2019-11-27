@@ -6,12 +6,23 @@
     >
       <v-card v-if="state === 1">
         <v-card-title>确认？</v-card-title>
+        <v-card-text>
+          <p>必须等于或低于公司报价：{{projectInfo.price}}</p>
+          <v-text-field
+            v-if="info.type === 1"
+            v-model="quote"
+            label="报价"
+            type="number"
+            :rules="[v => !!v || '必须低于公司报价',]"
+            required
+          ></v-text-field>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
-            @click="info.type === 0?action(0, { studioid: id }, () => { state = 2 }):action(0);dialog = false"
+            @click="info.type === 0?action(0, { studioid: id }, () => { state = 2 }):action(0,{quote:quote}) && (dialog = false)"
           >确认</v-btn>
           <v-btn
             color="primary"
@@ -58,7 +69,7 @@
         </v-card-text>
       </v-card>
 
-      <v-card v-if="state == 2 && (info.type == 0) && (projectInfo.isform === 0) && (projectInfo.issetprice === 0)">
+      <v-card v-if="state === 2 && (info.type === 0) && (projectInfo.isform === 0) && (projectInfo.issetprice === 0)">
         <v-card-title>确认？</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -152,7 +163,7 @@
         <v-col cols="3">
           <img
             style="border-radius: 14px;width: 100%"
-            :src="utils.baseURL + ''+projectInfo.img"
+            :src="projectInfo.img?utils.baseURL + ''+projectInfo.img:''"
           />
         </v-col>
         <v-col cols="9">
@@ -173,7 +184,7 @@
           width="95%"
           class="mx-auto"
           v-if="state === 1 && info.type === 1 && !isEnter"
-          @click="dialog.state = 1 && (dialog.open = 1)"
+          @click="dialog = true"
         >我要投标</v-btn>
       </v-row>
 
@@ -199,7 +210,7 @@
             outlined
             class="mr-4"
           >{{infoLoaded===true?utils.ctg[projectInfo.tag].name:''}}</v-chip>
-          <v-chip outlined>{{infoLoaded===true? ( projectInfo.subtag === 0 ? '': utils.ctg[projectInfo.tag].subctg[projectInfo.subtag - 1]):''}}</v-chip>
+          <v-chip outlined>{{infoLoaded===true? ( utils.ctg[projectInfo.tag + 1].subctg[projectInfo.subtag]):''}}</v-chip>
         </v-col>
       </v-row>
 
@@ -483,6 +494,7 @@ export default {
     return {
       utils: utils,
       projectInfo: {},
+      quote: 0,
       displayinfo: [{ key: '发布时间', value: 'releaseTime' },
         { key: '整个项目截止时间', value: 'deadline' },
         { key: '薪金', value: 'price' },
@@ -524,6 +536,7 @@ export default {
         .then(response => {
           this.projectInfo = response.data
           this.state = response.data.state
+          this.quote = response.data.price
           this.enroll = utils.getReal(response.data.enroll, [])
           if (this.info.type === 1)
             this.enroll.forEach(item => {
@@ -605,9 +618,6 @@ export default {
     }
   },
   mounted () {
-    this.getinfo()
-  },
-  activated () {
     this.getinfo()
   }
 }

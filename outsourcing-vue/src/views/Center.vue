@@ -32,7 +32,7 @@
             <v-btn
               color="primary"
               text
-              @click="upload(0)"
+              @click="upload(3)"
             >上传</v-btn>
           </v-card-actions>
         </v-card>
@@ -180,10 +180,7 @@
                     选择截止日期
                   </v-btn>
                 </template>
-                <v-date-picker
-                  landscape
-                  v-model="prj.deadline"
-                ></v-date-picker>
+                <v-date-picker v-model="prj.deadline"></v-date-picker>
               </v-menu>
               <v-text-field
                 v-model="prj.price"
@@ -341,7 +338,7 @@
                 </v-img>
               </v-avatar>
 
-              <v-card-title class="ml-1 mt-8">{{myinfo.username}}</v-card-title>
+              <v-card-title class="ml-1 headline mt-10">{{myinfo.username}}</v-card-title>
 
               <v-card-text>
                 <v-row
@@ -425,6 +422,7 @@
                   注销
                 </v-btn>
                 <v-btn
+                  v-if="info.type === 1"
                   color="error accent-4"
                   text
                   @click="(dialog.open = true) && (dialog.state = 6)"
@@ -685,6 +683,7 @@ export default {
               this.snackbar.color = 'green'
               this.snackbar.text = '成功上传请等待通过'
               this.snackbar.open = true
+              this.dialog.open = false
             }
           })
           .catch(error => {
@@ -693,13 +692,15 @@ export default {
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
           })
-      } else {
+      } else if (a === 1 || a === 0) {
         fd.append('file', a === 0 ? this.file : this.avatar)
         Axios.post(a === 0 ? this.utils.baseURL + '/uploadimg' : this.utils.baseURL + '/upload_avatar', fd)
           .then(response => {
             if (response.data) {
               this.myinfo.avatar = response.data
-            }
+              this.dialog.open = false
+            } else
+              throw 'error'
           })
           .catch(error => {
             console.log(error)

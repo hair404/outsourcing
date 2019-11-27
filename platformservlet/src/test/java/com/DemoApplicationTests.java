@@ -1,5 +1,6 @@
 package com;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,15 +13,20 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.aliyuncs.exceptions.ClientException;
+import com.utils.MessageTools;
+import com.utils.alipay.OrderInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.integration.IntegrationProperties.Jdbc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -28,19 +34,27 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.dao.ProjectDao;
-import com.dao.TagDao;
-import com.dao.UserDao;
-import com.dao.UserRepository;
-import com.model.Account;
-import com.model.Project;
-import com.model.Tag;
-import com.model.UserInfo;
-import com.utils.JsonUtils;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+
+
 public class DemoApplicationTests {
+
+    public static void main(String[] args){
+//        try {
+//            EmailTools.sendEmail("848815969@qq.com","人力外包服务中心-验证邮件","您好，感谢您注册我们公司！这边是您的验证码：123456");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+////        }
+//    	@Value("${url}")  String url;
+//    	System.out.println(url);
+    }
+}
+
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
+//public class DemoApplicationTests {
 
 //	@Autowired
 //	private JdbcTemplate jdbcTemplate;
@@ -127,16 +141,21 @@ public class DemoApplicationTests {
 //	public void ccc() {
 //		Account account = userRepository.getAccountById(1);
 //		System.out.println(account.getTel());
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	TagDao tagDao;
-	@Autowired
-	JdbcTemplate jdbcTemplate;
-	@Autowired
-	ProjectDao projectDao;
-	@Test
-//	public void getCompletedProject() {
+//	@Autowired
+//	UserRepository userRepository;
+//	@Autowired
+//	TagDao tagDao;
+//	@Autowired
+//	JdbcTemplate jdbcTemplate;
+//	@Autowired
+//	ProjectDao projectDao;
+//	@Autowired
+//	RedisUtils redis;
+//	@Autowired
+//    StringRedisTemplate t;
+////	
+//	@Test
+////	public void getCompletedProject() {
 //		String sql ="select * from project where state = 1 and (companyId= ? or studioId=?)";
 //		List<Project> projectList = (List<Project>) jdbcTemplate.query(sql, new RowMapper<Project>() {
 //			@Override
@@ -191,12 +210,25 @@ public class DemoApplicationTests {
 //		   System.out.println(array);
 //		  
 //	   }
-	public void uuid() {
-		UUID i = UUID.randomUUID();
-		System.out.println(i);
-		
-	}
-}
+//	public void uuid() {
+////		JSONObject j  = new JSONObject();
+////		j.put("f", "f");
+////		System.out.println(j.toString());
+////		j.put("f", "d");
+////		System.out.println(j.toString());
+////
+////		JSONArray a = new JSONArray();
+////		Form f = new Form();
+////    	f.setPrice(122);
+////    	 t.opsForHash().put("1", "1", f);
+////		UUID i = UUID.randomUUID();
+////		System.out.println(i);
+//////		
+////	   	 String b = "[{\"name\":\"dawd\"},{\"name\":\"dwaghw\"}]";
+////			JSONArray j = new JSONArray(b);
+////			System.out.println(j.getJSONObject(1).get("name"));
+//	}
+//}
 
 //	}
 

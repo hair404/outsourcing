@@ -1,2 +1,11 @@
 src/test/
 .metadata
+/.recommenders/
+.idea
+platformservlet/payment/alipayCertPublicKey_RSA2.crt
+
+platformservlet/payment/alipayRootCert.crt
+
+platformservlet/payment/
+
+platformservlet/src/test/java/com/DemoApplicationTests.java

@@ -29,3 +29,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+demo.iml
+src/main/resources/application.properties

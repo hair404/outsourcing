@@ -1,6 +1,7 @@
 package com.model;
 
 
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,5 +17,6 @@ public class File_project {
 	private int id;
 	private String url;
 	private int prj_id;
-
+    private int ispassed;
+    private Integer step_id;
 }

@@ -47,6 +47,7 @@ public class BidService {
         bidRepository.saveAll(bids);
 
         project.setStudioID(studioId);
+        project.setPrice((float) bid.getQuote());
         projectRepository.save(project);
     }
 }

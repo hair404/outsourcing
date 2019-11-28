@@ -2,17 +2,18 @@ package com.controller;
 
 import java.io.File;
 
+import com.common.PictureCommon;
+import com.service.UserService;
+import com.type.PictureType;
 import com.utils.FileTools;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.UUID;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -29,67 +30,41 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ImgController {
     @Autowired
     ResourceLoader resourceLoader;
+
     @Autowired
     UserRepository userRepository;
 
-    public static final String root_user = "img/user_img/img";
-    public static final String root_avatar = "img/user_img/avatar";
-    public static final String root_prj = "img/prj_img";
-    private static String url = "/usr/local/tomcat/work/Catalina/localhost/Platform/";
+    @Resource
+    UserService userService;
 
     @PostMapping("uploadimg")
-    public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
         if (file.isEmpty()) {
             return "null";
         }
         if (id != null) {
-            String fileName = file.getOriginalFilename();
-            String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            String filePath = url + "img/user_img/img/";
-            fileName = UuidUtils.generateShortUuid() + suffixName;
-            File dest = new File(filePath + fileName);
-            if (!dest.getParentFile().exists()) {
-                dest.getParentFile().mkdirs();
-            }
-            try {
-                String url = "/userimg/" + fileName;
-                file.transferTo(dest);
-                userRepository.updateImg(url, id);
-                return url;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            File dest = PictureCommon.saveImage(file, PictureType.USER);
+            String url = "/userimg/" + dest.getName();
+            userService.updateBackground(id, url);
+            return url;
         }
         return "false";
     }
 
     @PostMapping("upload_avatar")
-    public String uploadAvatar(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    public String uploadAvatar(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
         if (file.isEmpty()) {
             return "null";
         }
         if (id != null) {
-            String fileName = file.getOriginalFilename();
-            String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            String filePath = url + "img/user_img/avatar/";
-            fileName = UuidUtils.generateShortUuid() + suffixName;
-            File dest = new File(filePath + fileName);
-            if (!dest.getParentFile().exists()) {
-                dest.getParentFile().mkdirs();
-            }
-            try {
-                String url = "/avatar/" + fileName;
-                file.transferTo(dest);
-                userRepository.updateAvatar(url, id);
-                return url;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            File dest = PictureCommon.saveImage(file, PictureType.AVATAR);
+            String url = "/avatar/" + dest.getName();
+            userService.updateAvatar(id, url);
+            return url;
         }
         return "false";
     }
@@ -97,7 +72,7 @@ public class ImgController {
     @GetMapping(value = "/userimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_user_img(@PathVariable String filename) {
         try {
-            return ResponseEntity.ok(FileTools.getBytes(new File(url + root_user + "/" + filename)));
+            return ResponseEntity.ok(FileTools.getBytes(new File(PictureType.USER.getSaveFolder(), filename)));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -106,7 +81,7 @@ public class ImgController {
     @GetMapping(value = "/avatar/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_user_avatar(@PathVariable String filename) {
         try {
-            return ResponseEntity.ok(FileTools.getBytes(new File(url + root_avatar + "/" + filename)));
+            return ResponseEntity.ok(FileTools.getBytes(new File(PictureType.AVATAR.getSaveFolder(), filename)));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -115,7 +90,7 @@ public class ImgController {
     @GetMapping(value = "/prjimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_prj_img(@PathVariable String filename) {
         try {
-            return ResponseEntity.ok(FileTools.getBytes(new File(url + root_prj + "/" + filename)));
+            return ResponseEntity.ok(FileTools.getBytes(new File(PictureType.PROJECT.getSaveFolder(), filename)));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

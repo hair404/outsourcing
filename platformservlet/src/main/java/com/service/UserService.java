@@ -12,6 +12,7 @@ import com.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,16 +23,16 @@ public class UserService {
     @Autowired
     MemberRepository mr;
 
-	
-	public boolean ifExsit(String tel) {
-		try {
-			if (userRepository.getAccountByTel(tel).getTel().equals(tel))
-				return true;
-		} catch (Exception e) {
-			System.out.println("无数据");
-		}
-		return false;
-	}
+
+    public boolean ifExsit(String tel) {
+        try {
+            if (userRepository.getAccountByTel(tel).getTel().equals(tel))
+                return true;
+        } catch (Exception e) {
+            System.out.println("无数据");
+        }
+        return false;
+    }
 
     public boolean isCompany(Integer id) {
         if (userRepository.getInfoById(id).getType() == 0)
@@ -52,11 +53,16 @@ public class UserService {
         user.setTel(tel);
         user.setType(type);
         user.setEntity(entity);
+        user.setIsValid(0);
+        user.setStudent(false);
+        user.setImg("/userimg/default.jpg");
+        user.setAvatar("/avatar/default.jpg");
         userRepository.save(user);
     }
 
     /**
      * 计算某类所有用户的主观打分
+     *
      * @param type UserType 用户类型
      * @return
      */
@@ -84,20 +90,50 @@ public class UserService {
         return scores;
     }
 
-	public Boolean checkCode(String code,String sessionCode) {
-		if (code!=null&&sessionCode!=null&&code.toUpperCase().equals(sessionCode)) 	
-			return true;
-		else 
-			return false;
-	}
-	
-	public void addMember(String name,String tel,String email, String info,Integer studio_id) {
-		Member member  =  new Member();
-		member.setName(name);
-		member.setTel(tel);
-		member.setEmail(email);
-		member.setInfo(info);
-		member.setStudioid(studio_id);
-		mr.save(member);
-	}
+    public Boolean checkCode(String code, String sessionCode) {
+        if (code != null && sessionCode != null && code.toUpperCase().equals(sessionCode))
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * 改变用户背景图
+     *
+     * @param userId 用户id
+     * @param url    图片地址
+     */
+    public void updateBackground(int userId, String url) {
+        Optional<User> op = userRepository.findById(userId);
+        if (op.isPresent()) {
+            User user = op.get();
+            user.setImg(url);
+            userRepository.save(user);
+        }
+    }
+
+    /**
+     * 改变用户头像
+     *
+     * @param userId 用户id
+     * @param url 图片地址
+     */
+    public void updateAvatar(int userId, String url) {
+        Optional<User> op = Optional.ofNullable(userRepository.getInfoById(userId));
+        if (op.isPresent()) {
+            User user = op.get();
+            user.setAvatar(url);
+            userRepository.save(user);
+        }
+    }
+
+    public void addMember(String name, String tel, String email, String info, Integer studio_id) {
+        Member member = new Member();
+        member.setName(name);
+        member.setTel(tel);
+        member.setEmail(email);
+        member.setInfo(info);
+        member.setStudioid(studio_id);
+        mr.save(member);
+    }
 }

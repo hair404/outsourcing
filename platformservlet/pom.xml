@@ -178,7 +178,13 @@
             <version>1.4.1</version>
             <scope>provided</scope><!--这里你视项目情况而定-->
         </dependency>
-		
+
+		<!--图片处理库-->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>[0.4, 0.5)</version>
+		</dependency>
 
 	</dependencies>
 

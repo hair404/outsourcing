@@ -104,6 +104,9 @@ public class UserController {
             String sessionCode = (String) session.getAttribute("code");
             if (type == 0 || type == 1) {
                 Account account = userRepository.getAccountByTel(tel);
+                if (account == null){
+                    return "fail";
+                }
                 if (account.getPassword().equals(password) && userService.checkCode(code, sessionCode)) {
                     session.setMaxInactiveInterval(24 * 60 * 60);
                     session.setAttribute("id", account.getId());
@@ -150,7 +153,10 @@ public class UserController {
         if (id != null) {
             if (userType == 0 || userType == 1) {
                 String tel = (String) session.getAttribute("tel");
-                User user = (User) userRepository.getInfoByTel(tel);
+                User user = userRepository.getInfoByTel(tel);
+                if (user == null){
+                    return "NotLogin";
+                }
                 ObjectMapper mapper = new ObjectMapper();
                 String username = user.getUsername();
                 String email = user.getEmail();

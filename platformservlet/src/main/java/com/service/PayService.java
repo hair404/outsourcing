@@ -21,7 +21,7 @@ import java.util.UUID;
 @Service
 public class PayService {
 
-    @Value("${application.url}")
+    @Value("${application.alipay.callback.url}")
     private String url;
 
     @Resource

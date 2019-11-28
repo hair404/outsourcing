@@ -28,7 +28,7 @@ public class Project {
 	private String info;
 	private Integer state;
 	private Integer ifAd;
-	private Float price;
+	private Float price; //最终报价
 	private Integer companyID;
 	private String companyName;
 	private Integer studioID;
@@ -47,5 +47,6 @@ public class Project {
 	private Date countdown;
 	private Float studioRate;
 	private String entity;
+	private Float companyPrice; //企业报价
 	
 }

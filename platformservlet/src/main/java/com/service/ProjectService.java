@@ -175,7 +175,7 @@ public class ProjectService {
         project.setIsconfirm(0);
         project.setIsdeposit(0);
         project.setIsform(0);
-
+        project.setCompanyPrice(price);
         projectRepository.save(project);
     }
 

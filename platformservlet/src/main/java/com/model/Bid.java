@@ -19,4 +19,4 @@ public class Bid {
   private Integer state;
   private Integer company_id;
   private Integer quote;
-  }
+}

@@ -69,7 +69,6 @@ public class ProjectController {
                 File dest = PictureCommon.saveImage(file, PictureType.PROJECT);
                 String url = "/prjimg/" + dest.getName();
                 String company_name = "";
-                file.transferTo(dest);
                 projectService.insertPrj(company_name, name, tag, sub_tag, url,
                         releaseTime, info, deadline, price, id,
                         solr_id, entity, pia);

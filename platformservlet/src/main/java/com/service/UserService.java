@@ -55,6 +55,8 @@ public class UserService {
         user.setEntity(entity);
         user.setIsValid(0);
         user.setStudent(false);
+        user.setImg("/userimg/default.jpg");
+        user.setAvatar("/avatar/default.jpg");
         userRepository.save(user);
     }
 
@@ -117,7 +119,7 @@ public class UserService {
      * @param url 图片地址
      */
     public void updateAvatar(int userId, String url) {
-        Optional<User> op = userRepository.findById(userId);
+        Optional<User> op = Optional.ofNullable(userRepository.getInfoById(userId));
         if (op.isPresent()) {
             User user = op.get();
             user.setAvatar(url);

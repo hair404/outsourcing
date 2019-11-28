@@ -12,7 +12,7 @@ public class PictureCommon {
 
     public static File saveImage(MultipartFile file, PictureType type) throws IOException {
         File dest = new File(type.getSaveFolder(), UUID.randomUUID() + ".jpg");
-        Thumbnails.of(file.getInputStream()).outputFormat("jpeg").toFile(dest);
+        Thumbnails.of(file.getInputStream()).outputFormat("jpeg").scale(1.0f).toFile(dest);
         return dest;
     }
 

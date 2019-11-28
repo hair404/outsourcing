@@ -4,10 +4,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -156,11 +153,18 @@ public class OperationController {
                                 @RequestParam(value = "contents", required = false) String contents,
                                 @RequestParam(value = "table", required = false) String table, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        Project project = projectRepository.get_info(id);
+        Optional<Project> op = projectService.getProject(id);
+        if (!op.isPresent()){
+            return "fail";
+        }
+        Project project = op.get();
         Integer studio_id = (Integer) session.getAttribute("id");
         Integer company_id = project.getCompanyID();
         if (action == 0) {
-            // todo:判断是否可以投标
+            if (!projectService.canBid(project.getId())){
+                return "fail";
+            }
+            
             Bid bid = new Bid();
             bid.setCompany_id(company_id);
             bid.setProject_id(id);

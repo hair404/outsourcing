@@ -10,17 +10,18 @@ import com.model.Member;
 import com.model.User;
 
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UserService {
-    @Autowired
+    @Resource
     private ProjectRepository projectRepository;
-    @Autowired
+    @Resource
     private UserRepository userRepository;
-    @Autowired
+    @Resource
     MemberRepository mr;
 
 
@@ -35,9 +36,7 @@ public class UserService {
     }
 
     public boolean isCompany(Integer id) {
-        if (userRepository.getInfoById(id).getType() == 0)
-            return true;
-        return false;
+        return userRepository.getInfoById(id).getType() == UserType.COMPANY;
 
     }
 
@@ -51,7 +50,7 @@ public class UserService {
         user.setUsername(username);
         user.setSolr_id(solr_id);
         user.setTel(tel);
-        user.setType(type);
+        user.setType(UserType.fromId(type));
         user.setEntity(entity);
         user.setIsValid(0);
         user.setStudent(false);
@@ -64,7 +63,6 @@ public class UserService {
      * 计算某类所有用户的主观打分
      *
      * @param type UserType 用户类型
-     * @return
      */
     public Map<Integer, Double> getUsersScore(UserType type) {
         Map<Integer, Double> total = new HashMap<>();
@@ -91,10 +89,7 @@ public class UserService {
     }
 
     public Boolean checkCode(String code, String sessionCode) {
-        if (code != null && sessionCode != null && code.toUpperCase().equals(sessionCode))
-            return true;
-        else
-            return false;
+        return code != null && code.toUpperCase().equals(sessionCode);
     }
 
     /**

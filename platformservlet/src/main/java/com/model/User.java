@@ -2,6 +2,7 @@ package com.model;
 
 import javax.persistence.*;
 
+import com.type.UserType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +30,14 @@ public class User {
     private Integer isValid;
     @Column(name = "is_student")
     private boolean student;
+
+    @Transient
+    public UserType getType() {
+        return UserType.fromId(type);
+    }
+
+    @Transient
+    public void setType(UserType type) {
+        this.type = type.getId();
+    }
 }

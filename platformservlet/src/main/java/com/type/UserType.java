@@ -2,10 +2,11 @@ package com.type;
 
 public enum UserType {
 
-    UNKNOWN(0),
-    COMPANY(1),
-    STUDIO(2),
-    ADMIN(3);
+    UNKNOWN(-1),
+    COMPANY(0),
+    STUDIO(1),
+    ADMIN(2),
+    EXPERT(3);
 
     private int typeId;
 
@@ -13,7 +14,7 @@ public enum UserType {
         this.typeId = typeId;
     }
 
-    public int getTypeId() {
+    public int getId() {
         return typeId;
     }
 

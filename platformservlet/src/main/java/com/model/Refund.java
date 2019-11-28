@@ -14,17 +14,17 @@ import lombok.Setter;
 @Entity
 @Table(name = "refund")
 public class Refund {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	private String reason;
-	private Float money;
-	private String from;
-	private String to;
-	private Integer  fromid;
-	private Integer toid;
-	private Integer prjid;
-    private Integer type; 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String reason;
+    private Float money;
+    private String from;
+    private String to;
+    private Integer fromid;
+    private Integer toid;
+    private Integer prjid;
+    private Integer type;
     private Integer state;
     private String name;
 }

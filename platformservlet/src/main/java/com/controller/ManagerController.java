@@ -112,28 +112,36 @@ public class ManagerController {
 			@RequestParam(name = "solr_id", required = false) String solr_id,
 			@RequestParam(name = "do", required = false) Integer action,
 			@RequestParam(name = "ctg", required = false) String ctg) {
-		if (state == 0) {
-			ur.deleteById(id);
-			ar.deleteById(id);
-		} else if (state == 1) {
-			if (adService.isProject(solr_id)) {
-				if (action == 1)
-					apr.updateState(1, solr_id);
-			} else {
-				if (action == 1)
-					asr.updateState(1, solr_id);
-			}
-		} else if (state == 2) {
+		switch (state) {
+			case 0:
+				ur.deleteById(id);
+				ar.deleteById(id);
+				break;
+			case 1:
+				if (adService.isProject(solr_id)) {
+					if (action == 1)
+						apr.updateState(1, solr_id);
+				} else {
+					if (action == 1)
+						asr.updateState(1, solr_id);
+				}
+				break;
+			case 2:
 
-		} else if (state == 3) {
-			acr.deleteById((long) id);
-		} else if (state == 4) {
-			cr.updateCtg(ctg);
-		} else if (state == 5) {
+				break;
+			case 3:
+				acr.deleteById((long) id);
+				break;
+			case 4:
+				cr.updateCtg(ctg);
+				break;
+			case 5:
 
-        } else if (state == 6) {
-        	//直接计算评分
-        }
+				break;
+			case 6:
+				//直接计算评分
+				break;
+		}
         return "success";
     }
 

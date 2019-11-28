@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.type.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,29 +44,29 @@ import com.utils.UuidUtils;
 
 @RestController
 public class UserController {
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private UserRepository userRepository;
-    @Autowired
+    @Resource
     private TagService tagService;
-    @Autowired
+    @Resource
     private UserDao userDao;
-    @Autowired
+    @Resource
     private TagDao tagDao;
-    @Autowired
+    @Resource
     private ProjectRepository projectRepository;
-    @Autowired
+    @Resource
     AccountRepository accountRepository;
-    @Autowired
+    @Resource
     MemberRepository memberRepository;
-    @Autowired
+    @Resource
     private TagRepository tagR;
-    @Autowired
+    @Resource
     ProjectService ps;
-    @Autowired
+    @Resource
     AdminRepository ar;
-    @Autowired
+    @Resource
     Code co;
 
     User user = new User();
@@ -102,9 +104,9 @@ public class UserController {
         try {
             HttpSession session = request.getSession(true);
             String sessionCode = (String) session.getAttribute("code");
-            if (type == 0 || type == 1) {
+            if (type == UserType.COMPANY.getId() || type == UserType.STUDIO.getId()) {
                 Account account = userRepository.getAccountByTel(tel);
-                if (account == null){
+                if (account == null) {
                     return "fail";
                 }
                 if (account.getPassword().equals(password) && userService.checkCode(code, sessionCode)) {
@@ -114,7 +116,7 @@ public class UserController {
                     session.setAttribute("type", type);
                     return "success";
                 }
-            } else {
+            } else if (type == UserType.ADMIN.getId()) {
                 Admin admin = ar.findByAccount(tel);
                 if (admin.getPassword().equals(password)) {
                     session.setMaxInactiveInterval(24 * 60 * 60);
@@ -154,14 +156,14 @@ public class UserController {
             if (userType == 0 || userType == 1) {
                 String tel = (String) session.getAttribute("tel");
                 User user = userRepository.getInfoByTel(tel);
-                if (user == null){
+                if (user == null) {
                     return "NotLogin";
                 }
                 ObjectMapper mapper = new ObjectMapper();
                 String username = user.getUsername();
                 String email = user.getEmail();
                 String img_url = user.getImg();
-                Integer user_type = user.getType();
+                Integer user_type = user.getType().getId();
                 Integer id_check = user.getAccount_id();
                 String info = user.getInfo();
                 String name = user.getName();
@@ -241,7 +243,7 @@ public class UserController {
     @PostMapping("display_info")
     public JSONObject display(HttpServletRequest request, @RequestParam("id") Integer id,
                               @RequestParam("first") Integer first) {
-        JSONObject json = new JSONObject();
+        JSONObject json;
         json = JSONObject.parseObject(JSON.toJSONString(userRepository.getInfoById(id)));
         if (userService.isCompany(id))
             json.put("bid", projectRepository.findByStateAndCompanyID(2, id));
@@ -270,7 +272,6 @@ public class UserController {
         HttpSession session = request.getSession();
         if (id == null)
             id = (Integer) session.getAttribute("id");
-        JSONArray array = JSONArray.parseArray(JSON.toJSONString(memberRepository.findByStudioid(id)));
-        return array;
+        return JSONArray.parseArray(JSON.toJSONString(memberRepository.findByStudioid(id)));
     }
 }

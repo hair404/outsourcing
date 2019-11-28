@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
 import com.model.*;
+import com.service.BidService;
 import com.service.PayService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,12 @@ public class OperationController {
     TokenController tc;
     @Autowired
     Token token;
+
     @Resource
     private PayService payService;
+
+    @Resource
+    private BidService bidService;
 
     @PostMapping("company_action")
     public String company_action(@RequestParam("id") Integer id, @RequestParam("action") Integer action,
@@ -151,26 +156,23 @@ public class OperationController {
                                 @RequestParam(value = "money", required = false) Float money,
                                 @RequestParam(value = "headings", required = false) String headings,
                                 @RequestParam(value = "contents", required = false) String contents,
-                                @RequestParam(value = "table", required = false) String table, HttpServletRequest request) {
+                                @RequestParam(value = "table", required = false) String table,
+                                @RequestParam(value = "quote", required = false) int quote,
+                                HttpServletRequest request) {
         HttpSession session = request.getSession();
         Optional<Project> op = projectService.getProject(id);
-        if (!op.isPresent()){
+        if (!op.isPresent()) {
             return "fail";
         }
         Project project = op.get();
-        Integer studio_id = (Integer) session.getAttribute("id");
+        Integer studioId = (Integer) session.getAttribute("id");
         Integer company_id = project.getCompanyID();
         if (action == 0) {
-            if (!projectService.canBid(project.getId())){
+            if (!projectService.canBid(project.getId())) {
                 return "fail";
             }
-            
-            Bid bid = new Bid();
-            bid.setCompany_id(company_id);
-            bid.setProject_id(id);
-            bid.setState(0);
-            bid.setStudio_id(studio_id);
-            bid.setCompany_id(company_id);
+            bidService.bid(project, studioId, quote);
+            return "success";
         } else if (action == 1) {
             List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);
             for (int i = 0; i < l.size(); i++) {
@@ -207,7 +209,7 @@ public class OperationController {
             child.updateState(1, id, 1);
             return "success";
         } else if (action == 5) {
-            return payService.payDepositToCompany(project.getId(),project.getPrice() * 0.1);
+            return payService.payDepositToCompany(project.getId(), project.getPrice() * 0.1);
         } else if (action == 6) {
             //ser.upload(file, id, step_id);
             child.updateState(2, id, project.getCurrent());
@@ -220,12 +222,12 @@ public class OperationController {
             r.setToid(company_id);
             r.setPrjid(id);
             r.setReason(reason);
-            r.setFromid(studio_id);
+            r.setFromid(studioId);
             r.setType(0);
             r.setMoney(money);
             r.setState(0);
             rr.save(r);
-            child.updateState(9, studio_id, step_id);
+            child.updateState(9, studioId, step_id);
             return "success";
         } else if (action == 9) {
             if (measure == 0) {
@@ -262,7 +264,7 @@ public class OperationController {
             r.setToid(company_id);
             r.setPrjid(id);
             r.setReason(reason);
-            r.setFromid(studio_id);
+            r.setFromid(studioId);
             r.setType(1);
             r.setMoney(money);
             r.setState(0);

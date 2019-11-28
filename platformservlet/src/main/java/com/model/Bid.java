@@ -14,9 +14,9 @@ import lombok.Setter;
 public class Bid {
   @Id
   private Integer id;
-  private Integer project_id;
-  private Integer studio_id;
+  private Integer projectId;
+  private Integer studioId;
   private Integer state;
-  private Integer company_id;
+  private Integer companyId;
   private Integer quote;
 }

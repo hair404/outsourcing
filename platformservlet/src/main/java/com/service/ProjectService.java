@@ -42,7 +42,7 @@ public class ProjectService {
     @Autowired
     CancelReasonRepository reasonRepository;
     @Autowired
-    ChildFormRepository child_formRepository;
+    ChildFormRepository childFormRepository;
     @Autowired
     TagDao tagDao;
     @Autowired
@@ -87,7 +87,7 @@ public class ProjectService {
             project_info.put("payDeadline", f.format(date));
         } else if (project.getState() == 4) {
 
-            List<ChildForm> child_form = child_formRepository.getChildForm(project_id);
+            List<ChildForm> child_form = childFormRepository.getChildForm(project_id);
             ChildForm child = child_form.get(project.getCurrent());
             if (child.getState() == 4 || child.getState() == 7)
                 project_info.put("payDeadline", project.getPayDeadline());
@@ -200,12 +200,36 @@ public class ProjectService {
      * @return 步骤
      */
     public ChildForm getPart(int projectId, int part) {
-        List<ChildForm> forms = child_formRepository.getChildForm(projectId);
+        List<ChildForm> forms = childFormRepository.getChildForm(projectId);
         for (ChildForm form : forms) {
             if (form.getPart() == part) {
                 return form;
             }
         }
         return null;
+    }
+
+    /**
+     * 是否可投标
+     *
+     * @param projectId 项目ID
+     * @return
+     */
+    public boolean canBid(int projectId) {
+        Optional<Project> op = projectRepository.findById(projectId);
+        if (op.isPresent()) {
+            Project project = op.get();
+            return project.getStudioRate() == 1;
+        }
+        return false;
+    }
+
+    /**
+     * 获取项目
+     * @param projectId 项目ID
+     * @return
+     */
+    public Optional<Project> getProject(int projectId){
+        return projectRepository.findById(projectId);
     }
 }

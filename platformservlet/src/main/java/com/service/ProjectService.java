@@ -68,7 +68,7 @@ public class ProjectService {
                 System.out.println(rs.toString());
                 for (int i = 0; i < rs.size(); i++) {
                     Bid bid = rs.get(i);
-                    User userInfo = userRepository.getInfoById(bid.getStudio_id());
+                    User userInfo = userRepository.getInfoById(bid.getStudioId());
                     JSONObject user_info = new JSONObject(userInfo);
                     user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
                     user_info.put("quote", bid.getQuote());
@@ -226,10 +226,11 @@ public class ProjectService {
 
     /**
      * 获取项目
+     *
      * @param projectId 项目ID
      * @return
      */
-    public Optional<Project> getProject(int projectId){
+    public Optional<Project> getProject(int projectId) {
         return projectRepository.findById(projectId);
     }
 }

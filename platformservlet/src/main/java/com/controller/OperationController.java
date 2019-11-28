@@ -72,12 +72,13 @@ public class OperationController {
                                  @RequestParam(value = "isfirst", required = false) Integer isfirst, HttpServletRequest request) {
         HttpSession session = request.getSession();
         Integer company_id = (Integer) session.getAttribute("id");
-        Project project = projectRepository.get_info(id);
+        Optional<Project> op = projectService.getProject(id);
+        if (!op.isPresent()) {
+            return "fail";
+        }
+        Project project = op.get();
         if (action == 0) {
-            projectRepository.update_studioid(studioid, id);
-            bidRepository.updateAllState(0, id);
-            bidRepository.updateState(2, id, studioid);
-            projectRepository.update_state(2, id);
+            bidService.pick(project, studioid);
             return "success";
         } else if (action == 1) {
             List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);

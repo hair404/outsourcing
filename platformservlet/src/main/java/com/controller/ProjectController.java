@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import com.alibaba.fastjson.JSONArray;
 import com.common.PictureCommon;
 import com.model.Project;
+import com.service.UserService;
 import com.type.PictureType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,9 @@ public class ProjectController {
     @Autowired
     ProjectRepository projectRepository;
 
+    @Resource
+    private UserService userService;
+
     @PostMapping("project_info")
     public String info(HttpServletRequest request, @RequestParam("id") String solr_id) {
         HttpSession session = request.getSession();
@@ -68,8 +73,8 @@ public class ProjectController {
             if (id != null) {
                 File dest = PictureCommon.saveImage(file, PictureType.PROJECT);
                 String url = "/prjimg/" + dest.getName();
-                String company_name = "";
-                projectService.insertPrj(company_name, name, tag, sub_tag, url,
+                String companyName = userService.getCompanyName(id);
+                projectService.insertPrj(companyName, name, tag, sub_tag, url,
                         releaseTime, info, deadline, price, id,
                         solr_id, entity, pia);
                 return "success";

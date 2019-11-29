@@ -6,6 +6,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.common.FileCommon;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +25,12 @@ import com.dao.ChildFormRepository;
 import com.dao.UserRepository;
 import com.model.Bid;
 import com.model.ChildForm;
-import com.model.File_project;
+import com.model.FileProject;
 import com.model.Project;
 import com.model.User;
 import com.utils.JsonUtils;
+
+import javax.annotation.Resource;
 
 @Service
 public class ProjectService {
@@ -48,6 +51,9 @@ public class ProjectService {
     @Autowired
     File_projectRepository fpr;
 
+    @Resource
+    private FileCommon fileCommon;
+
     @Value("${url}")
     private static String url;
 
@@ -56,69 +62,65 @@ public class ProjectService {
 
         Project project = projectRepository.getInfoBySolrId(solr_id);
         Integer project_id = project.getId();
-        JSONObject project_info = new JSONObject(project);
+        JSONObject projectInfo = new JSONObject(project);
 
         if (project.getCompanyID().equals(user_id)) {
-            project_info.put("companyID", "self");
+            projectInfo.put("companyID", "self");
         }
-        if (project.getState() == 1) {
-            JSONArray enroll = new JSONArray();
-            List<Bid> rs = bidRepository.get_info(project_id);
-            if (!rs.isEmpty()) {
-                System.out.println(rs.toString());
-                for (int i = 0; i < rs.size(); i++) {
-                    Bid bid = rs.get(i);
-                    User userInfo = userRepository.getInfoById(bid.getStudioId());
-                    JSONObject user_info = new JSONObject(userInfo);
-                    user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
-                    user_info.put("quote", bid.getQuote());
-                    enroll.add(user_info);
-                    project_info.put("enroll", enroll);
-                }
-            } else
-                project_info.put("enroll", new JSONArray());
-        } else if (project.getState() == 3) {
-            Calendar calendar = new GregorianCalendar();
-            Date date = project.getStartTime();
-            Format f = new SimpleDateFormat("yyyy-MM-dd");
-            calendar.setTime(date);
-            calendar.add(Calendar.DATE, 1);
-            date = calendar.getTime();
-            project_info.put("payDeadline", f.format(date));
-        } else if (project.getState() == 4) {
 
+        if (project.getIsform() == 1) {
             List<ChildForm> child_form = childFormRepository.getChildForm(project_id);
-            ChildForm child = child_form.get(project.getCurrent());
-            if (child.getState() == 4 || child.getState() == 7)
-                project_info.put("payDeadline", project.getPayDeadline());
-            if (child.getState() == 2) {
-                project_info.put("path", fpr.get_file(project_id, project.getCurrent()));
+            if (project.getCurrent() != null) {
+                ChildForm child = child_form.get(project.getCurrent());
+                if (child.getState() == 4 || child.getState() == 7)
+                    projectInfo.put("payDeadline", project.getPayDeadline());
+                if (child.getState() == 2) {
+                    projectInfo.put("path", fpr.get_file(project_id, project.getCurrent()));
+                }
             }
-            project_info.put("table", JSONArray.parseArray(JsonUtils.objectToJson(child_form)));
-        } else
-            return project_info.toString();
-        return project_info.toString();
+            projectInfo.put("table", JSONArray.parseArray(JsonUtils.objectToJson(child_form)));
+        }
+
+        switch (project.getState()) {
+            case 1:
+                JSONArray enroll = new JSONArray();
+                List<Bid> rs = bidRepository.findAllByProjectId(project_id);
+                if (!rs.isEmpty()) {
+                    for (int i = 0; i < rs.size(); i++) {
+                        Bid bid = rs.get(i);
+                        User userInfo = userRepository.getInfoById(bid.getStudioId());
+                        JSONObject user_info = new JSONObject(userInfo);
+                        user_info.put("tag", tagDao.QueryTag(userInfo.getId()));
+                        user_info.put("quote", bid.getQuote());
+                        enroll.add(user_info);
+                        projectInfo.put("enroll", enroll);
+                    }
+                } else
+                    projectInfo.put("enroll", new JSONArray());
+                break;
+            case 3:
+                Calendar calendar = new GregorianCalendar();
+                Date date = project.getStartTime();
+                Format f = new SimpleDateFormat("yyyy-MM-dd");
+                calendar.setTime(date);
+                calendar.add(Calendar.DATE, 1);
+                date = calendar.getTime();
+                projectInfo.put("payDeadline", f.format(date));
+                break;
+            default:
+                return projectInfo.toString();
+        }
+        return projectInfo.toString();
     }
 
-    public void upload(MultipartFile file, int prj_id, int step_id) {
-        String fileName = file.getOriginalFilename();
-        String filePath = url + "//file//" + prj_id + "/" + step_id + "/";
-        File dest = new File(filePath + fileName);
-        if (!dest.getParentFile().exists()) {
-            dest.getParentFile().mkdirs();
-        }
-        try {
-            file.transferTo(dest);
-            File_project prj = new File_project();
-            prj.setUrl("/file/" + prj_id + "/" + step_id + "/" + fileName);
-            prj.setPrj_id(prj_id);
-            prj.setIspassed(0);
-            prj.setStep_id(step_id);
-            fpj.save(prj);
-            file.transferTo(dest);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void upload(MultipartFile file, int prj_id, int step_id) throws IOException {
+        File dest = fileCommon.saveFile(file, prj_id);
+        FileProject prj = new FileProject();
+        prj.setUrl(prj_id + "/" + dest.getName());
+        prj.setPrj_id(prj_id);
+        prj.setIspassed(0);
+        prj.setStep_id(step_id);
+        fpj.save(prj);
     }
 
     public JSONArray myPrjWithoutState(Integer id, Integer first) {
@@ -219,7 +221,7 @@ public class ProjectService {
         Optional<Project> op = projectRepository.findById(projectId);
         if (op.isPresent()) {
             Project project = op.get();
-            return project.getStudioRate() == 1;
+            return project.getState() == 1;
         }
         return false;
     }

@@ -130,6 +130,7 @@ public class ManagerController {
         }
         switch (state) {
             case 0:
+                //删除用户
                 ur.deleteById(id);
                 ar.deleteById(id);
                 break;
@@ -157,6 +158,9 @@ public class ManagerController {
             case 6:
                 //直接计算评分
                 break;
+            case 7:
+                //审核
+
         }
         return "success";
     }

@@ -77,7 +77,7 @@ public class AdService {
 		as.setAccount_id(account_id);
 		as.setAvatar(ui.getAvatar());
 		as.setAd_price(ad_price);
-		as.setTag(tagDao.QueryTag(account_id));
+		as.setTag(tagDao.QueryTag(account_id).toString());
 		as.setEmail(ui.getEmail());
 		as.setWeight(weight(ad_price));
 		as.setTel(ui.getTel());

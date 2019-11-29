@@ -1,9 +1,6 @@
 package com.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import com.type.BidState;
 import lombok.Getter;
@@ -15,6 +12,7 @@ import lombok.Setter;
 @Table(name = "bid")
 public class Bid {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer projectId;
     private Integer studioId;

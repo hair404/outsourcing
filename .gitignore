@@ -9,3 +9,5 @@ platformservlet/payment/
 platformservlet/src/test/java/com/DemoApplicationTests.java
 
 platformservlet/img/
+
+platformservlet/file/

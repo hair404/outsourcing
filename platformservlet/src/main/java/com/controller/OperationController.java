@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -44,8 +45,6 @@ public class OperationController {
     @Autowired
     BidRepository bidRepository;
     @Autowired
-    ProjectService projectService;
-    @Autowired
     RefundRepository rr;
     @Autowired
     TokenController tc;
@@ -57,6 +56,9 @@ public class OperationController {
 
     @Resource
     private BidService bidService;
+
+    @Resource
+    ProjectService projectService;
 
     @PostMapping("company_action")
     public String company_action(@RequestParam("id") Integer id, @RequestParam("action") Integer action,
@@ -158,8 +160,8 @@ public class OperationController {
                                 @RequestParam(value = "headings", required = false) String headings,
                                 @RequestParam(value = "contents", required = false) String contents,
                                 @RequestParam(value = "table", required = false) String table,
-                                @RequestParam(value = "quote", required = false) int quote,
-                                HttpServletRequest request) {
+                                @RequestParam(value = "quote", required = false) Integer quote,
+                                HttpServletRequest request) throws IOException {
         HttpSession session = request.getSession();
         Optional<Project> op = projectService.getProject(id);
         if (!op.isPresent()) {
@@ -207,12 +209,12 @@ public class OperationController {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            child.updateState(1, id, 1);
+            child.updateState(1, id, 0);
             return "success";
         } else if (action == 5) {
             return payService.payDepositToCompany(project.getId(), project.getPrice() * 0.1);
         } else if (action == 6) {
-            //ser.upload(file, id, step_id);
+            projectService.upload(file, id, step_id);
             child.updateState(2, id, project.getCurrent());
             return "success";
         } else if (action == 7) {

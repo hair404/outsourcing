@@ -101,6 +101,7 @@ public class PayService {
                         Project project = opProject.get();
                         project.setIspia(1);
                         projectRepository.save(project);
+                        checkPayState(project);
                     }
                     break;
                 case DEPOSIT_TO_STUDIO:
@@ -109,6 +110,7 @@ public class PayService {
                         Project project = opProject.get();
                         project.setIsdeposit(1);
                         projectRepository.save(project);
+                        checkPayState(project);
                     }
                     break;
                 case DEPOSIT_TO_COMPANY:
@@ -117,9 +119,17 @@ public class PayService {
                         Project project = opProject.get();
                         project.setHasPaid(1);
                         projectRepository.save(project);
+                        checkPayState(project);
                     }
                     break;
             }
+        }
+    }
+
+    private void checkPayState(Project project) {
+        if (project.getIspia() == 1 && project.getHasPaid() == 1 && project.getIsdeposit() == 1) {
+            project.setState(4);
+            projectRepository.save(project);
         }
     }
 

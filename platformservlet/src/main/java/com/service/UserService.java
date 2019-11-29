@@ -2,7 +2,6 @@ package com.service;
 
 import com.dao.ProjectRepository;
 import com.type.UserType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.dao.MemberRepository;
 import com.dao.UserRepository;
@@ -43,6 +42,7 @@ public class UserService {
     public void insertInfo(String solr_id, Integer account_id, String name, String tel, String email, String username,
                            Integer type, String entity) {
         User user = new User();
+        user.setId(account_id);
         user.setAccount_id(account_id);
         user.setCredit((float) 0);
         user.setEmail(email);
@@ -107,6 +107,16 @@ public class UserService {
         }
     }
 
+    public String getCompanyName(int companyId){
+        Optional<User> op = userRepository.findById(companyId);
+        if (op.isPresent()){
+            User user = op.get();
+            if (user.getType() == UserType.COMPANY){
+                return user.getUsername();
+            }
+        }
+        return "";
+    }
     /**
      * 改变用户头像
      *

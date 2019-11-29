@@ -31,13 +31,13 @@ public class TagDao {
 		jdbcTemplate.update(sql, id);
 	}
 
-	public String QueryTag(Integer id) {
+	public JSONArray QueryTag(Integer id) {
 		String sql = String.format("select tag from tag where user_id = '%d'", id);
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(sql);
 		JSONArray json = new JSONArray();
 		while (rs.next()) {
 			json.put(rs.getInt("tag"));
 		}
-		return json.toString();
+		return json;
 	}
 }

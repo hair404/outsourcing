@@ -12,7 +12,6 @@ import lombok.Setter;
 @Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; //primary key
     private String solr_id; // be used in solr
     private Integer account_id; //foreign key

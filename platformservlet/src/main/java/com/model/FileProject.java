@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "file_project")
-public class File_project {
+public class FileProject {
 	@Id
 	private int id;
 	private String url;

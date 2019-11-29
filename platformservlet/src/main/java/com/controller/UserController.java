@@ -148,7 +148,7 @@ public class UserController {
     }
 
     @RequestMapping("info")
-    public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) {
+    public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
         Integer userType = (Integer) session.getAttribute("type");
@@ -174,26 +174,11 @@ public class UserController {
                 basic.put("img", img_url);
                 basic.put("type", user_type);
                 basic.put("avatar", avatar);
-                try {
-                    if (type.equals("all")) {
-                        if (id_check.equals(id)) {
-                            basic.put("tel", tel);
-                            basic.put("info", info);
-                            basic.put("name", name);
-                            basic.put("id", "self");
-                            return mapper.writeValueAsString(basic);
-                        } else {
-                            basic.put("tel", tel);
-                            basic.put("info", info);
-                            basic.put("name", name);
-                            basic.put("id", id);
-                            return mapper.writeValueAsString(basic);
-                        }
-                    }
-                    return mapper.writeValueAsString(basic);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                basic.put("tel", tel);
+                basic.put("info", info);
+                basic.put("name", name);
+                basic.put("id", id);
+                return mapper.writeValueAsString(basic);
             } else {
                 return JSON.toJSONString(ar.findById(id));
             }

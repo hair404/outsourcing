@@ -1,4 +1,14 @@
 package com.dp.dto;
 
-public class ServerUser {
+import com.model.User;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+public class ServerUser extends User {
+
+    private List<Integer> tag;
 }

@@ -121,7 +121,6 @@ export default {
         { name: '真实名字', value: this.myinfo.name },
         { tag: '标签', value: this.myinfo.tag },
         { email: '电子邮件', value: this.myinfo.email },
-        { tel: '电话', value: this.myinfo.tel },
         { info: '介绍', value: this.myinfo.info }
       ],
       password: '',
@@ -168,6 +167,14 @@ export default {
             this.snackbar.text = '服务器错误'
             this.snackbar.open = true
           })
+    },
+    addCtg (i) {
+      for (const item in this.editinfo[2].value) {
+        if (item === i) {
+          return
+        }
+      }
+      this.editinfo[2].value.push(i)
     }
   }
 }

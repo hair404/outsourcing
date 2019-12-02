@@ -6,10 +6,9 @@
     >
       <v-card v-if="state === 1">
         <v-card-title>确认？</v-card-title>
-        <v-card-text>
+        <v-card-text v-if="info.type === 1">
           <p>必须等于或低于公司报价：{{projectInfo.price}}</p>
           <v-text-field
-            v-if="info.type === 1"
             v-model="quote"
             label="报价"
             type="number"
@@ -172,7 +171,8 @@
             <v-btn
               class="primary--text text--darken-2 pa-0"
               text
-              @click="$router.push({name:'display',params:{id:projectInfo.id}})"
+              style="min-width: 0px"
+              @click="$router.push({name:'display',params:{id:projectInfo.companyID==='self'?info.id:projectInfo.companyID}})"
             >{{projectInfo.companyName}}</v-btn>
           </v-card-subtitle>
         </v-col>
@@ -183,7 +183,7 @@
           color="primary"
           width="95%"
           class="mx-auto"
-          v-if="state === 1 && info.type === 1 && !isEnter"
+          v-if="state === 1 && info.type === 1 && (!isEnter)"
           @click="dialog = true"
         >我要投标</v-btn>
       </v-row>
@@ -209,8 +209,11 @@
           <v-chip
             outlined
             class="mr-4"
-          >{{infoLoaded===true?utils.ctg[projectInfo.tag].name:''}}</v-chip>
-          <v-chip outlined>{{infoLoaded===true? ( utils.ctg[projectInfo.tag + 1].subctg[projectInfo.subtag]):''}}</v-chip>
+          >{{infoLoaded===true?utils.ctg[projectInfo.tag + 1].name:''}}</v-chip>
+          <v-chip
+            v-if="utils.ctg[projectInfo.tag + 1].subctg"
+            outlined
+          >{{infoLoaded===true ? ( utils.ctg[projectInfo.tag + 1].subctg[projectInfo.subtag]):''}}</v-chip>
         </v-col>
       </v-row>
 
@@ -277,7 +280,7 @@
               <v-stepper-content
                 :step="i + 1"
                 :key="(i+1) * 10"
-                :style="!vertical &&state !== i + 1 ? 'display:none':''"
+                :style="!vertical &&state !== i + 1 ? 'display:none;':''"
               >
                 <LoadCard
                   v-if="(i+1) === 1 && state === 1 && info.type === 0 && projectInfo.companyID === 'self'"
@@ -289,6 +292,11 @@
                   :btnText="projectInfo.companyID === 'self'?'中标':null"
                   :callback="win"
                 ></LoadCard>
+
+                <div
+                  v-if="info.type === 0 && projectInfo.companyID !== 'self'"
+                  class="headline"
+                >您无权限查看</div>
 
                 <div
                   v-if="projectInfo.enroll?projectInfo.enroll.length === 0:false"
@@ -306,7 +314,7 @@
                       ref="table"
                       :data="table"
                       :isCompany="info.type === 0?true : false"
-                      :isPriceCol="(info.type == 1 && projectInfo.isform === 0)"
+                      :isPriceCol="(info.type === 1 && projectInfo.isform === 0)||(info.type == 0 && projectInfo.isform === 1 && projectInfo.issetprice === 0)"
                       :headers="headers"
                       itemkey="name"
                     ></Table>
@@ -322,7 +330,7 @@
                       color="primary"
                       class="my-4"
                       outlined
-                      @click="action(1,{table:JSON.stringify(table)},()=>{info.type === 1?projectInfo.isform = 1:projectInfo.issetprice = 1})"
+                      @click="submitTable()"
                     >提交</v-btn>
 
                   </div>
@@ -379,6 +387,7 @@
                   :style="processWidth"
                   @submit="action"
                   :prjinfo="projectInfo"
+                  :expandProp="expandProp"
                 ></Processing>
 
                 <Comment
@@ -520,6 +529,7 @@ export default {
         text: '所需时间(天)', value: 'time'
       }],
       table: [],
+      expandProp: 0,
       step: {
         name: '',
         info: '',
@@ -544,6 +554,11 @@ export default {
                 this.isEnter = true
             })
           this.table = utils.getReal(response.data.table, [])
+          if (this.state === 4)
+            this.table.forEach((item, i) => {
+              if (item.state === 1)
+                this.expand = i
+            })
           this.infoLoaded = true
         })
         .catch(error => { console.log(error) })
@@ -560,6 +575,23 @@ export default {
       }
     },
     win (id) { this.id = id; this.dialog = true },
+    submitTable () {
+      if (this.info.type === 1 || (this.info.type === 0 && this.calPrice()))
+        this.action(1, { table: JSON.stringify(this.table) }, () => { this.info.type === 1 ? this.projectInfo.isform = 1 : this.projectInfo.issetprice = 1 })
+      else {
+        this.snackbar.color = 'red'
+        this.snackbar.text = '不等于总款项'
+        this.snackbar.open = true
+      }
+    },
+    calPrice () {
+      var a = 0
+      this.table.forEach((item, i) => {
+        a += parseInt(item.price)
+      })
+      console.log(a)
+      return (a === (this.projectInfo.price - this.projectInfo.payinadvance))
+    },
     add () {
       if (this.$refs.form.validate() && this.step.time > 0) {
         var step = {}
@@ -595,6 +627,8 @@ export default {
         .then(response => {
           if (response.data === 'success')
             if (callback) {
+              this.isEnter = true
+              this.dialog = false
               this.snackbar.color = 'green'
               this.snackbar.text = '成功'
               this.snackbar.open = true
@@ -617,7 +651,7 @@ export default {
         })
     }
   },
-  mounted () {
+  activated () {
     this.getinfo()
   }
 }

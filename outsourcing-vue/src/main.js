@@ -4,6 +4,7 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
 import utils from './js/utils'
+import GoEasy from 'goeasy'
 
 Vue.config.productionTip = false
 
@@ -12,27 +13,23 @@ Vue.prototype.utils = utils
 axios.defaults.crossDomain = true
 axios.defaults.withCredentials = true
 
+Vue.prototype.$goEasy = new GoEasy({
+  host: 'hangzhou.goeasy.io', // 应用所在的区域地址，杭州：hangzhou.goeasy.io，新加坡：singapore.goeasy.io
+  appkey: 'BS-a4ed6edd774b4e66bd3205a7788f85c5', // 替换为您的应用appkey
+  forceTLS: false,
+  onConnected: function () {
+    console.log('连接成功！')
+  },
+  onDisconnected: function () {
+    console.log('连接断开！')
+  },
+  onConnectFailed: function () {
+    console.log('连接失败或错误！')
+  }
+})
+
 new Vue({
   router,
   vuetify,
   render: h => h(App)
 }).$mount('#app')
-
-var OneSignal = window.OneSignal || []
-OneSignal.push(function () {
-  OneSignal.init({
-    appId: 'c386c41e-fba0-4c27-b561-10d8a6d9b13c'
-  })
-  OneSignal.on('subscriptionChange', function () {
-    OneSignal.getUserId(function (userId) {
-      axios
-        .post(this.utils.baseURL + '/token', userId)
-        .then(response => {
-          if (response.data !== 'success') console.log('token上传失败')
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    })
-  })
-})

@@ -33,6 +33,7 @@
           color="green"
         >mdi-check</v-icon>
         <v-btn
+          v-if="info.type === 0"
           :disabled="!(info.type === 0 && prjinfo.ispia === 0)"
           color="primary"
           text

@@ -222,7 +222,7 @@
                   :items="utils.getTextValue(['全部','等待认证为用户','等待认证为学生'])"
                   width="100%"
                   color="primary"
-                  label="类型"
+                  label="认证"
                   outlined
                 ></v-select>
               </v-col>
@@ -261,7 +261,7 @@
               issort
               callbackIcon="mdi-trash-can-outline"
               :itemperPage="10"
-              :rowCallback="(item)=>{$router.push({name:'display',params:{id:item.id}})}"
+              :rowCallback="(item)=>{item.img?clickedrow = item&&(dialog.open = true)&&(dialog.state = 4):$router.push({name:'display',params:{id:item.id}})}"
             ></Table>
             <v-fab-transition>
               <v-btn
@@ -289,7 +289,7 @@
               issort
               :callbackIcon="['mdi-check','mdi-close']"
               :itemperPage="10"
-              :rowCallback="(item)=>{item.img?clickedrow = item&&(dialog.open = true)&&(dialog.state = 4):$router.push({name:'detail',params:{id:item.prjid}})}"
+              :rowCallback="(item)=>{$router.push({name:'detail',params:{id:item.prjid}})}"
               :isCallback="item=>{return item.state === '未通过'}"
             ></Table>
           </template>
@@ -575,7 +575,7 @@ export default {
                     this.tabs = [{ name: '申诉管理', icon: 'mdi-shape-outline' }]
                     Axios.post(this.utils.baseURL + '/manager', 'state=5')
                       .then(response => {
-                        this.data[5] = response.data
+                        this.dataCom = response.data
                       }).catch(error => {
                         console.log(error)
                         this.snackbar.color = 'error'
@@ -664,6 +664,9 @@ export default {
           break
         case 4:
           extra += 'ctg=' + JSON.stringify(['全部'].concat(this.ctg))
+          break
+        case 7:
+          extra += 'id=' + e[0].id + '&do=' + e[1]
           break
         default:
           break

@@ -84,7 +84,7 @@ export default {
   name: 'Login',
   data () {
     return {
-      menuSelected: 0,
+      menuSelected: -1,
       type: 0,
       snackbar: {
         open: false,

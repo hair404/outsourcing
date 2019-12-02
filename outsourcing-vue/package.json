@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build && node src/js/onesignal.js",
+    "build": "vue-cli-service build",
     "lint": "eslint --fix --ext .js,.vue src"
   },
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "^2.6.10",
+    "goeasy": "^1.0.3",
     "qs": "^6.9.1",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",

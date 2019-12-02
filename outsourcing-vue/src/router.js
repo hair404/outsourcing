@@ -34,7 +34,7 @@ export default new Router({
           component: Center
         },
         {
-          path: '/display',
+          path: '/display/:id',
           name: 'display',
           component: Show
         },

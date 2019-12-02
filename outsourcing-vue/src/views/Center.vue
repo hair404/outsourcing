@@ -19,13 +19,6 @@
               accept="image/*"
               filled
             ></v-file-input>
-            <v-file-input
-              v-if="info.type === 1"
-              label="身份证反面"
-              v-model="file1"
-              accept="image/*"
-              filled
-            ></v-file-input>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -363,6 +356,8 @@
                   {{myinfo.email}}
                 </div>
 
+                <br>
+
                 <v-icon>mdi-phone</v-icon>
 
                 <div class="my-4 subtitle-1 black--text d-inline-block">
@@ -576,7 +571,6 @@ export default {
     return {
       utils: utils,
       file0: null,
-      file1: null,
       dialog: {
         open: false,
         state: 0
@@ -750,7 +744,7 @@ export default {
       }
     }).catch(error => { console.log(error) })
 
-    Axios.post(this.utils.baseURL + '/notify').then(response => {
+    Axios.get(this.utils.baseURL + '/notify').then(response => {
       this.message = response.data
     }).catch(error => { console.log(error) })
 

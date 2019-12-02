@@ -68,8 +68,10 @@
               v-if="type === 0"
               style="overflow-x: auto;"
             >
-              <div style="display: inline-flex">
+              <div style="display: inline-flex;height: 40px">
+                <span v-if="item.tag.length === 0">他没有选择类别</span>
                 <v-chip
+                  v-else
                   outlined
                   class="ma-1"
                   v-for="(tag ,i) in item.tag"
@@ -83,7 +85,7 @@
             >
               <div style="overflow-x: auto;height: 30px">
                 <div style="display: inline-flex">
-                  <div style="white-space: nowrap">{{utils.ctg[item.tag].name}}{{item.subtag == 0 ? '': '-'+utils.ctg[item.tag].subctg[item.subtag - 1]}}</div>
+                  <div style="white-space: nowrap">{{utils.ctg[item.tag + 1].name}}{{item.subtag == 0 ? '': '-'+utils.ctg[item.tag + 1].subctg[item.subtag - 1]}}</div>
                 </div>
               </div>
               <v-spacer />
@@ -174,11 +176,11 @@ export default {
     },
     update () {
       axios
-        .post(this.utils.baseURL + '/' + this.address, 'first=' + this.index + '&number=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
+        .post(this.utils.baseURL + '/' + this.address, 'page=' + this.page + '&size=' + this.number + '&first=' + this.number + utils.getReal(this.extraParam, '', a => { return '&' + a }))
         .then(response => {
-          this.total = response.data[0]
-          this.cards = response.data.slice(1)
-          this.index += this.number
+          this.total = response.data.total
+          this.cards = response.data.data ? response.data.data : response.data.projectList
+          this.index += 1
           this.loaded = true
         })
         .catch(error => { console.log(error) })

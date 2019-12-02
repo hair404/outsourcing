@@ -12,13 +12,13 @@
         class="material-icons arrow_back"
         onclick="window.location.href='./login.html';"
         style="cursor: pointer;padding-left: 10%;padding-top: 10%;color: grey"
-      ></i>
+      />
       <h1>找回密码</h1>
       <form id="form" class="content">
         <v-row dense>
           <v-btn
             max-width="100"
-            v-if="state==1||state==2"
+            v-if="state===1||state===2"
             style="margin-left:50px"
             @click="change(0)"
           >邮箱找回</v-btn>

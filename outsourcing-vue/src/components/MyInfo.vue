@@ -39,6 +39,7 @@
         <v-card-title>{{info.username}}</v-card-title>
       </v-img>
       <v-rating
+        class="ml-2"
         v-if="info.type == 1 && !isOthers"
         v-model="info.rating"
         color="orange"
@@ -46,29 +47,31 @@
         readonly
         half-increments
       ></v-rating>
-      <v-card-text>
-        <v-list-item
-          class="py-0"
-          style="height: 24px"
-          v-ripple
-        >
-          <v-list-item-content>身份</v-list-item-content>
-          <v-list-item-icon>
-            {{utils.type[info.type]}}
-          </v-list-item-icon>
-        </v-list-item>
-        <v-list-item
-          class="py-0"
-          style="height: 24px"
-          v-ripple
-        >
-          <v-list-item-content>邮箱</v-list-item-content>
-          <v-list-item-icon>
-            {{info.email}}
-          </v-list-item-icon>
-        </v-list-item>
-      </v-card-text>
-      <v-card-actions v-if="!isOthers">
+
+      <v-list-item
+        class="py-0"
+        style="height: 24px"
+        v-ripple
+      >
+        <v-list-item-content>身份</v-list-item-content>
+        <v-list-item-icon>
+          {{utils.type[info.type]}}
+        </v-list-item-icon>
+      </v-list-item>
+      <v-list-item
+        class="py-0"
+        style="height: 24px"
+        v-ripple
+      >
+        <v-list-item-content>邮箱</v-list-item-content>
+        <v-list-item-icon>
+          {{info.email}}
+        </v-list-item-icon>
+      </v-list-item>
+      <v-card-actions
+        style="position: absolute;bottom: 5px"
+        v-if="!isOthers"
+      >
         <v-btn
           color="primary"
           text

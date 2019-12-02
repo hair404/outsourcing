@@ -1,16 +1,17 @@
 <template>
   <div class="wrapper">
     <v-card class="mx-auto my-2">
-      <v-icon
-        color="grey"
-        class="ml-4 my-4"
-        @click="$router.back()"
-      >mdi-arrow-left</v-icon>
       <v-img
         class="white--text align-end"
         height="200"
         :src="utils.baseURL + displayinfo.img"
       >
+        <v-icon
+          color="grey"
+          class="ml-4 my-4"
+          style="position: absolute;top: 0px;"
+          @click="$router.back()"
+        >mdi-arrow-left</v-icon>
         <v-card-title>
           <v-avatar>
             <img :src="utils.baseURL + displayinfo.avatar" />
@@ -40,11 +41,11 @@
               <v-list-item-icon>{{displayinfo.tel}}</v-list-item-icon>
             </v-list-item>
             <v-list-item>
-              <v-list-item-content>公司邮箱</v-list-item-content>
+              <v-list-item-content>他的邮箱</v-list-item-content>
               <v-list-item-icon>{{displayinfo.email}}</v-list-item-icon>
             </v-list-item>
             <v-list-item>
-              <v-list-item-content>公司简介</v-list-item-content>
+              <v-list-item-content>他的简介</v-list-item-content>
               <v-list-item-action>{{displayinfo.info}}</v-list-item-action>
             </v-list-item>
           </v-list>
@@ -110,7 +111,7 @@ export default {
   methods: {
     loaddisplayinfo () {
       axios
-        .post(this.utils.baseURL + '/display_info', 'id=' + this.$route.params.id)
+        .post(this.utils.baseURL + '/display_info', 'id=' + this.$route.params.id + '&first=1')
         .then(response => {
           this.displayinfo = response.data
           this.complete = response.data.complete ? response.data.complete.slice(1) : []

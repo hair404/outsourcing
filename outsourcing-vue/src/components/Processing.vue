@@ -4,6 +4,10 @@
       v-model="dialog"
       max-width="400"
     >
+      <v-progress-linear
+        v-if="dialogState === 0"
+        :value="uploadProgress"
+      ></v-progress-linear>
       <v-card v-if="dialogState === 0">
         <v-card-title>文件上传</v-card-title>
         <v-card-text>
@@ -120,7 +124,7 @@
         <v-expansion-panel-header disable-icon-rotate>
           {{getName(item,i)}}
           <template v-slot:actions>
-            <div class="text--secondary mr-4">截止时间：{{new Date(new Date() - item.time * 24* 60*60*1000).toLocaleDateString().replace(/\//g, "-") }}</div>
+            <div class="text--secondary mr-4">截止时间：{{new Date(new Date().setDate(new Date().getDate()+item.time)).toLocaleDateString().replace(/\//g, "-") }}</div>
             <v-icon :color="state[item.state].color">{{state[item.state].icon}}</v-icon>
           </template>
         </v-expansion-panel-header>
@@ -138,7 +142,7 @@
               outlined
               color="primary"
               class="mr-4"
-              @click.stop="(dialogState = 0) || (stepid = item.part) || (dialog = true)"
+              @click.stop="dialogState = 0 , (stepid = item.part) , (dialog = true)"
             >上传文件</v-btn>
             <v-btn
               v-if="item.state === 1 && type === 1"
@@ -152,21 +156,21 @@
               text
               color="primary"
               class="mr-4"
-              @click="window.open(this.utils.baseURL + '/'+prjinfo.path) || (stepid = item.part)"
+              @click="window.open(utils.baseURL + '/'+prjinfo.path) || (stepid = item.part)"
             >下载文件</v-btn>
             <v-btn
               v-if="item.state === 2 && type === 0"
               outlined
               color="primary"
               class="mr-4"
-              @click="$emit('submit',8,{stepid:item.part},()=>{dialog = false}) || (stepid = item.part)"
+              @click="$emit('submit',8,{stepid:item.part},()=>{expand+=1;dialog = false}) || (stepid = item.part)"
             >通过</v-btn>
             <v-btn
               v-if="item.state === 2 && type === 0"
               outlined
               color="error"
               class="mr-4"
-              @click="(dialogState = 2) && (dialog = true) || (stepid = item.part)"
+              @click="(dialogState = 2) && (dialog = true), (stepid = item.part)"
             >不通过</v-btn>
 
             <div
@@ -240,7 +244,8 @@ export default {
     type: Number,
     id: Number,
     snackbar: Object,
-    prjinfo: Object
+    prjinfo: Object,
+    expandProp: Number
   },
   data () {
     return {
@@ -266,7 +271,8 @@ export default {
       punishCompany: [{ text: '减少进度款', value: 0 }, { text: '延长时间', value: 1 }, { text: '取消', value: 2 }],
       punishStudio: ['扣押金', '延长时间', '取消'],
       punishSelect: 0,
-      progress: 0
+      progress: 0,
+      uploadProgress: 0
     }
   },
   methods: {
@@ -276,7 +282,13 @@ export default {
       fd.append('action', 6)
       fd.append('file', this.file)
       fd.append('stepid', this.stepid)
-      axios.post(this.utils.baseURL + '/studio_action', fd)
+      var config = {
+        onUploadProgress: progressEvent => {
+          var complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+          this.uploadProgress = complete
+        }
+      }
+      axios.post(this.utils.baseURL + '/studio_action', fd, config)
         .then(response => {
           if (response.data === 'success') {
             this.data[this.stepid].state += 1
@@ -295,11 +307,13 @@ export default {
     },
     getName (item, i) {
       if (item.state === 1) {
-        this.expand = i
         this.progress = i / this.data.length * 100
       }
       return item.name
     }
+  },
+  created () {
+    this.expand = this.expandProp
   }
 }
 </script>

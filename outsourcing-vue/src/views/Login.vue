@@ -44,7 +44,8 @@
           height="50"
           class="d-inline-block"
           style="margin-left: 28px;float: right"
-          :src="utils.baseURL+'/code'"
+          :src="codeURL !== ''? utils.baseURL + codeURL:''"
+          @click="codeURL = '/code?' + Math.ceil(Math.random()*10)"
         />
       </v-form>
     </v-card-text>
@@ -62,7 +63,7 @@
       >
         注册
       </v-btn>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn
         text
         @click="$router.push('/forget')"
@@ -76,6 +77,7 @@
 
 <script>
 import axios from 'axios'
+
 export default {
   name: 'Login',
   props: {
@@ -86,7 +88,8 @@ export default {
       username: '',
       password: '',
       code: '',
-      type: 0
+      type: 0,
+      codeURL: ''
     }
   },
   methods: {
@@ -101,16 +104,6 @@ export default {
         .then(response => {
           if (response.data === 'success') {
             this.$router.push({ path: '/home' })
-            var OneSignal = window.OneSignal || []
-            OneSignal.getUserId(function (userId) {
-              axios.post(this.utils.baseURL + '/token', userId)
-                .then(response => {
-                  if (response.data !== 'success') console.log('token上传失败')
-                })
-                .catch(error => {
-                  console.log(error)
-                })
-            })
           } else {
             console.log(this)
             this.snackbar.text = '验证码错误或者密码错误'
@@ -123,6 +116,9 @@ export default {
           console.log(error)
         })
     }
+  },
+  created () {
+    this.codeURL = '/code'
   }
 }
 

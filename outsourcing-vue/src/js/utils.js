@@ -63,7 +63,7 @@ function getTextValue(a, b, callback) {
 
 var baseURL =
   process.env.NODE_ENV === 'production'
-    ? 'http://47.94.212.141:8080/Platform'
+    ? 'http://192.168.1.222:8080'
     : '/Platform'
 
 Array.prototype.contain = function(val) {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-dialog v-model="dialog">
-      <v-card height="100px">
+      <v-card min-height="100px">
         <v-card-title style="display: inline-block">消息</v-card-title>
         <v-card-title style="display: inline-block;float:right">
           <v-btn text>清除通知</v-btn>
@@ -16,11 +16,11 @@
             <v-list-item
               v-for="(item, i) in message"
               :key="i"
-              @click="this.$router.push(item.url)"
+              @click="$router.push('/'+ item.url)"
             >
               <v-list-item-content>
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ item.content }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -243,7 +243,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-list-item
-        @click="$router.push({path:'/Center'})"
+        @click="$router.push({path:'/Center'}),menuSelected=-1"
         v-else
       >
         <v-list-item-avatar>
@@ -327,7 +327,7 @@ export default {
     return {
       drawer: null,
       searchBar: false,
-      menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
+      menu: [{ name: '首页', path: '/home' }, { name: '全部招标', path: '/search' }, { name: '全部工作室', path: '/search' }],
       menuSelected: 0,
       keywords: '',
       dialog: false,
@@ -346,7 +346,12 @@ export default {
     }
   },
   created () {
-    Axios.post(this.utils.baseURL + '/notify').then(response => { this.message = response.data }).catch(error => { console.log(error) })
+    Axios.get(this.utils.baseURL + '/notify')
+      .then(response => {
+        if (response.data !== 'NotLogin')
+          this.message = response.data
+      })
+      .catch(error => { console.log(error) })
   }
 }
 </script>

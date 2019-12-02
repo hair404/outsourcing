@@ -81,7 +81,7 @@
     <LoadCard
       :type="1 - type"
       address="search"
-      :extraParam="utils.toFormData({'type':(1 - type), ctg, subctg, keyword, sort, sortrule})"
+      :extraParam="utils.toFormData({'type':type, ctg, subctg, keyword, sort, 'sortrule':ruleArraySelect})"
       :number="20"
       ref="LoadCard"
     />
@@ -99,15 +99,15 @@ export default {
   },
   props: {
     keyword: String,
-    type: {
+    type_: {
       type: Number,
       default: 0
     },
-    ctg: {
+    ctg_: {
       type: Number,
       default: 0
     },
-    subctg: {
+    subctg_: {
       type: Number,
       default: 0
     }
@@ -119,7 +119,26 @@ export default {
       sorts: ['默认', '酬金', '首付款'],
       sortsStudio: ['默认', '评分'],
       sort: 0,
-      sortrule: 0
+      sortrule: 0,
+      sortruleArray: ['DESC', 'ASC'],
+      type: 0,
+      ctg: 0,
+      subctg: 0,
+      ruleArraySelect: 'DESC'
+    }
+  },
+  watch: {
+    type_: function (newV) {
+      this.type = newV
+    },
+    ctg_: function (newV) {
+      this.ctg = newV
+    },
+    subctg_: function (newV) {
+      this.subctg = newV
+    },
+    sortrule: function (newV) {
+      this.ruleArraySelect = this.sortruleArray[this.sortrule]
     }
   }
 }

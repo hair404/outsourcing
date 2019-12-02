@@ -35,9 +35,9 @@
           :info="info"
           :infoLoaded="infoLoaded"
           :keyword="keyword"
-          :type="typeEmit"
-          :ctg="ctgEmit"
-          :subctg="subctgEmit"
+          :type_="typeEmit"
+          :ctg_="ctgEmit"
+          :subctg_="subctgEmit"
           :snackbar="snackbar"
         />
       </keep-alive>
@@ -81,6 +81,22 @@ export default {
           if (!(response.data === 'NotLogin')) {
             this.infoLoaded = true
             this.info = response.data
+            this.$goEasy.subscribe({
+              channel: String(response.data.id), // 替换为您自己的channel
+              onMessage: function (message) {
+                var notification = new Notification(JSON.parse(message.content).title, {
+                  body: JSON.parse(message.content).content
+                })
+                notification.onclick = function () {
+                  this.$router.push(message.content.url)
+                }
+              }
+            })
+            Notification.requestPermission(function (permission) {
+              if (permission === 'granted') {
+                console.log(11)
+              }
+            })
           }
         })
         .catch(error => { console.log(error) })
@@ -104,7 +120,7 @@ export default {
   },
   watch: {
     $route: function (newV) {
-      if (newV.path === '/detail')
+      if (newV.path.includes('/detail'))
         this.isBack = true
       else
         this.isBack = false

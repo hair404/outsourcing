@@ -1,9 +1,20 @@
 package com.dao;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.model.Tag;
+import org.springframework.data.repository.CrudRepository;
 
-public interface TagRepository extends JpaRepository<Tag, Long> {
-	List<Tag> findByUserId(Integer user_id);
+import javax.transaction.Transactional;
+
+public interface TagRepository extends CrudRepository<Tag, Integer> {
+
+    List<Tag> findAllByUserId(Integer userId);
+
+    List<Tag> findAllByTag(int tag);
+
+    @Transactional
+    void deleteAllByUserId(int userId);
+
 }

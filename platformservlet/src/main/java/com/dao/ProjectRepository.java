@@ -31,7 +31,10 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
     public String findCompanyNameById(Integer id);
 
     @Query("select u from com.model.Project u where u.state=?1 and (u.companyID=?2 or u.studioID=?2)")
-    public List<Project> getProjectById(Integer state, Integer id);
+    public List<Project> getByStateAndUserId(Integer state, Integer id);
+
+    @Query("select u from com.model.Project u where (u.companyID=?1 or u.studioID=?1)")
+    public List<Project> getByUserId(int userId);
 
     @Query("select u from com.model.Project u where u.state=?1 and (u.companyID=?2 or u.studioID=?2)")
     public List<Project> getProjectById(Integer state, Integer id, Pageable pageable);

@@ -6,16 +6,21 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.model.*;
 import com.service.BidService;
 import com.service.PayService;
-import org.json.JSONObject;
+import com.service.UserService;
+import com.type.ActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,8 +53,6 @@ public class OperationController {
     RefundRepository rr;
     @Autowired
     TokenController tc;
-    @Autowired
-    Token token;
 
     @Resource
     private PayService payService;
@@ -58,7 +61,10 @@ public class OperationController {
     private BidService bidService;
 
     @Resource
-    ProjectService projectService;
+    private ProjectService projectService;
+
+    @Resource
+    private UserService userService;
 
     @PostMapping("company_action")
     public String company_action(@RequestParam("id") Integer id, @RequestParam("action") Integer action,
@@ -67,7 +73,7 @@ public class OperationController {
                                  @RequestParam(value = "reason", required = false) String reason,
                                  @RequestParam(value = "table", required = false) String table,
                                  @RequestParam(value = "measure", required = false) Integer measure,
-                                 @RequestParam(value = "money", required = false) Float money,
+                                 @RequestParam(value = "money", required = false) Float rate,
                                  @RequestParam(value = "companyRate", required = false) Float companyRate,
                                  @RequestParam(value = "headings", required = false) String headings,
                                  @RequestParam(value = "contents", required = false) String contents,
@@ -85,13 +91,13 @@ public class OperationController {
         } else if (action == 1) {
             List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);
             for (int i = 0; i < l.size(); i++) {
-                JSONObject json_form = new JSONObject(l.get(i));
+                JSONObject json_form = (JSONObject) JSON.toJSON(l.get(i));
                 child.updatePrice((Float) json_form.get("price"), id, i);
             }
             projectRepository.updateIssetprice(1, id);
             return "success";
         } else if (action == 2) {
-            Notification.send(token.getToken(), headings, contents);
+//            Notification.send(token.getToken(), headings, contents);
             return "success";
         } else if (action == 3) {
             projectRepository.update_state(7, id);
@@ -102,7 +108,7 @@ public class OperationController {
             return payService.payInAdvanced(id, project.getPayinadvance());
         } else if (action == 6) {
             ChildForm cf = projectService.getPart(project.getId(), project.getCurrent());
-            return payService.payPart(cf.getId(), cf.getPrice());
+            return payService.payPart(cf.getId(), cf.getPayPrice());
         } else if (action == 7) {
             Refund r = new Refund();
             r.setFromid(company_id);
@@ -110,27 +116,22 @@ public class OperationController {
             r.setReason(reason);
             r.setToid(studioid);
             r.setType(0);
-            r.setMoney(money);
+            r.setMoney(rate);
             r.setState(0);
             rr.save(r);
         } else if (action == 8) {
-            child.updateState(9, id, stepid);
-            if ((project.getTotalPart() - 1) != stepid) {
-                child.updateState(1, id, stepid + 1);
-                projectRepository.updateCurrent(stepid + 1, id);
-            }
+            projectService.passStep(project.getId(), stepid);
             return "success";
         } else if (action == 9) {
             if (measure == 0) {
-                child.updateState(4, project.getId(), stepid);
+                return projectService.punishStepMoney(id, stepid, rate);
             }
             if (measure == 1) {
-                child.updateState(1, project.getId(), stepid);
+                return projectService.restart(id, stepid);
             }
             if (measure == 2) {
-                projectRepository.update_state(7, id);
+                return projectService.cacelProject(id);
             }
-            return "success";
         } else if (action == 10) {
             projectRepository.updateCompanyRate(companyRate, company_id);
         } else if (action == 11) {
@@ -140,7 +141,7 @@ public class OperationController {
             r.setReason(reason);
             r.setToid(project.getStudioID());
             r.setType(1);
-            r.setMoney(money);
+            r.setMoney(rate);
             r.setState(0);
             rr.save(r);
             projectRepository.update_state(8, id);
@@ -175,25 +176,30 @@ public class OperationController {
                 return "fail";
             }
             bidService.bid(project, studioId, quote);
+            userService.notify(company_id, "系统通知", "有一个新的工作室投标了您的项目", ActionType.JUMP_PROJECT, "{\"solrId\":\"{0}\"}".replace("{0}", project.getSolr_id()));
             return "success";
         } else if (action == 1) {
-            List<ChildForm> l = com.alibaba.fastjson.JSONArray.parseArray(table, ChildForm.class);
-            for (int i = 0; i < l.size(); i++) {
-                JSONObject json_form = new JSONObject(l.get(i));
-                ChildForm c = new ChildForm();
-                c.setName((String) json_form.get("name"));
-                c.setTime((Integer) json_form.get("time"));
-                c.setPart(i);
-                c.setInfo((String) json_form.get("info"));
-                c.setPrice((float) 0);
-                c.setState(0);
-                c.setProject_id(id);
-                child.save(c);
-                projectRepository.updateIsform(1, id);
-            }
+            JSONArray array = JSON.parseArray(table);
+            AtomicInteger count = new AtomicInteger();
+            List<ChildForm> formList = new ArrayList<>();
+            array.forEach(it -> {
+                JSONObject json = (JSONObject) it;
+                ChildForm childForm = new ChildForm();
+                childForm.setName( json.getString("name"));
+                childForm.setTime( json.getInteger("time"));
+                childForm.setPart(count.get());
+                childForm.setInfo(json.getString("info"));
+                childForm.setPrice((float) 0);
+                childForm.setState(0);
+                childForm.setProjectId(id);
+                count.getAndIncrement();
+                formList.add(childForm);
+            });
+            projectService.setForm(project.getId(), formList);
+            userService.notify(company_id, "系统通知", "有一个工作室完成了进度表", ActionType.JUMP_PROJECT, "{\"solrId\":\"{0}\"}".replace("{0}", project.getSolr_id()));
             return "success";
         } else if (action == 2) {
-            Notification.send(token.getToken(), headings, contents);
+            userService.notify(company_id, "催促通知", "有一个工作室正在催促您尽快完成价格设定", ActionType.JUMP_PROJECT, "{\"solrId\":\"{0}\"}".replace("{0}", project.getSolr_id()));
             return "success";
         } else if (action == 3) {
             projectRepository.update_state(7, id);
@@ -210,11 +216,12 @@ public class OperationController {
                 e.printStackTrace();
             }
             child.updateState(1, id, 0);
+            userService.notify(company_id, "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, "{\"solrId\":\"{0}\"}".replace("{0}", project.getSolr_id()));
             return "success";
         } else if (action == 5) {
             return payService.payDepositToCompany(project.getId(), project.getPrice() * 0.1);
         } else if (action == 6) {
-            projectService.upload(file, id, step_id);
+            projectService.finish(file, id, step_id);
             child.updateState(2, id, project.getCurrent());
             return "success";
         } else if (action == 7) {
@@ -234,7 +241,7 @@ public class OperationController {
             return "success";
         } else if (action == 9) {
             if (measure == 0) {
-                child.updateState(7, project.getId(), step_id);
+                return projectService.punishDeposit(project.getId(), step_id, money);
             }
             if (measure == 1) {
                 child.updateState(5, project.getId(), step_id);
@@ -257,7 +264,7 @@ public class OperationController {
             }
             return "success";
         } else if (action == 10) {
-            Notification.send(token.getToken(), headings, contents);
+            Notification.send(userService.getToken(studioId), headings, contents);
             return "success";
         } else if (action == 11) {
             projectRepository.updateStudioRate(studioRate, company_id);

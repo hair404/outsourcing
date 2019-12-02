@@ -27,6 +27,7 @@ public class User {
     private Float credit;
     private String entity;
     private Integer isValid;
+    private String token;
     @Column(name = "is_student")
     private boolean student;
 
@@ -34,6 +35,7 @@ public class User {
     public UserType getType() {
         return UserType.fromId(type);
     }
+
 
     @Transient
     public void setType(UserType type) {

@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.aliyuncs.exceptions.ClientException;
+import com.utils.GoEasyNotification;
 import com.utils.MessageTools;
+import com.utils.Notification;
 import com.utils.alipay.OrderInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,20 +37,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-
-
 public class DemoApplicationTests {
 
-    public static void main(String[] args){
-//        try {
-//            EmailTools.sendEmail("848815969@qq.com","人力外包服务中心-验证邮件","您好，感谢您注册我们公司！这边是您的验证码：123456");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-////        }
-//    	@Value("${url}")  String url;
-//    	System.out.println(url);
+    public static void main(String[] args) throws InterruptedException {
+        GoEasyNotification.notify(5+"","asd","sadsa");
     }
 }
 

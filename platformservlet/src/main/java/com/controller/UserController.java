@@ -1,46 +1,31 @@
 package com.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dao.*;
+import com.dp.NotificationDataProcessor;
+import com.dp.UserDataProcessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.model.Account;
+import com.model.Admin;
+import com.model.User;
+import com.service.ProjectService;
+import com.service.TagService;
+import com.service.UserService;
+import com.type.UserType;
+import com.utils.Code;
+import com.utils.JsonUtils;
+import com.utils.UuidUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import com.type.UserType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.aliyuncs.exceptions.ClientException;
-import com.dao.AccountRepository;
-import com.dao.AdminRepository;
-import com.dao.MemberRepository;
-import com.dao.ProjectRepository;
-import com.dao.TagDao;
-import com.dao.TagRepository;
-import com.dao.UserDao;
-import com.dao.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.model.Account;
-import com.model.Admin;
-import com.model.Project;
-import com.model.User;
-import com.service.ProjectService;
-import com.service.TagService;
-import com.service.UserService;
-import com.utils.Code;
-import com.utils.MessageTools;
-import com.utils.UuidUtils;
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -61,13 +46,17 @@ public class UserController {
     @Resource
     MemberRepository memberRepository;
     @Resource
-    private TagRepository tagR;
-    @Resource
     ProjectService ps;
     @Resource
     AdminRepository ar;
     @Resource
     Code co;
+
+    @Resource
+    private NotificationDataProcessor notificationDataProcessor;
+
+    @Resource
+    private UserDataProcessor userDataProcessor;
 
     User user = new User();
 
@@ -187,40 +176,31 @@ public class UserController {
     }
 
     @PostMapping("edit")
-    public String edit(@RequestParam("name") String name, @RequestParam(name = "tag", required = false) String tag,
-                       @RequestParam("password") String password, @RequestParam("email") String email,
-                       @RequestParam("username") String username, @RequestParam("phone") String tel,
-                       @RequestParam("info") String info, HttpServletRequest request) {
+    public String edit(@RequestParam("name") String name,
+                       @RequestParam(name = "tag") String tag,
+                       @RequestParam("email") String email,
+                       @RequestParam("username") String username,
+                       @RequestParam("info") String info,
+                       HttpServletRequest request) {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
-        String tel_bef = (String) session.getAttribute("tel");
-        // Account account = userService.getAccountById("id");
-        userDao.updateAccount(tel, password, tel_bef);
-        userDao.updateInfo(name, email, username, tel, info, id);
-        tagService.tagService(id, tag);
-        return "succes";
+        if (id == null) {
+            return "NotLogin";
+        }
+
+        userService.edit(id, name, JsonUtils.jsonToList(tag, Integer.class), email, username, info);
+
+        return "success";
     }
 
     @PostMapping("center")
-    public JSONObject center(HttpServletRequest request) {
+    public Object center(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
         JSONObject json = new JSONObject();
 
         if (id != null) {
-            User user = userRepository.getInfoById(id);
-            json.put("img", user.getImg());
-            json.put("username", user.getUsername());
-            json.put("name", user.getName());
-
-            if (!userService.isCompany(id))
-                json.put("tag", tagDao.QueryTag(id));
-
-            json.put("avatar", user.getAvatar());
-            json.put("email", user.getEmail());
-            json.put("tel", user.getTel());
-            json.put("info", user.getInfo());
-            json.put("isValid", user.getIsValid());
+            return userDataProcessor.getCenter(id);
         }
         return json;
     }
@@ -258,5 +238,15 @@ public class UserController {
         if (id == null)
             id = (Integer) session.getAttribute("id");
         return JSONArray.parseArray(JSON.toJSONString(memberRepository.findByStudioid(id)));
+    }
+
+    @GetMapping("notify")
+    public Object notify(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        if (session.getAttribute("id") == null) {
+            return "NotLogin";
+        }
+        int id = (int) session.getAttribute("id");
+        return notificationDataProcessor.getNotifications(id);
     }
 }

@@ -3,23 +3,17 @@ package com.controller;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.alibaba.fastjson.JSONArray;
 import com.common.PictureCommon;
-import com.model.Project;
 import com.service.UserService;
 import com.type.PictureType;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +47,7 @@ public class ProjectController {
         HttpSession session = request.getSession();
         Integer account_id = (Integer) session.getAttribute("id");
         // Integer account_id =4;
-        return projectService.get_info(solr_id, account_id);
+        return projectService.getInfo(solr_id, account_id);
     }
 
     @PostMapping("register_prj")
@@ -61,7 +55,7 @@ public class ProjectController {
                            @RequestParam("prjname") String name, @RequestParam("tag") Integer tag,
                            @RequestParam("subtag") Integer sub_tag, @RequestParam("file") MultipartFile file,
                            @RequestParam("info") String info, @RequestParam("deadline") Date deadline,
-                           @RequestParam("price") float price, @RequestParam("pia") Integer pia) throws IOException {
+                           @RequestParam("price") float price, @RequestParam("pia") Integer pia) throws IOException, SolrServerException {
         String entity = "project";
         String solr_id = UuidUtils.generateShortUuid();
         Date releaseTime = new Date(System.currentTimeMillis());
@@ -85,17 +79,14 @@ public class ProjectController {
     }
 
     @PostMapping("my_prj")
-    public JSONArray myPrj(@RequestParam("state") Integer state, HttpServletRequest request,
-                           @RequestParam("first") Integer first) {
+    public Object getUserProject(@RequestParam("state") Integer state, HttpServletRequest request,
+                           @RequestParam("page") Integer page, @RequestParam("size") int size) {
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("id");
         if (id != null) {
-            if (state != 0)
-                return projectService.myPrj(id, first, state);
-            else
-                return projectService.myPrjWithoutState(id, first);
+            return projectService.getUserProject(id, page, size, state);
         } else
-            return null;
+            return "NotLogin";
     }
 
 }

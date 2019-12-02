@@ -1,27 +1,35 @@
 package com.service;
 
-import com.dao.ProjectRepository;
+import com.dao.*;
+import com.model.Notification;
+import com.model.Tag;
+import com.type.ActionType;
 import com.type.UserType;
+import com.utils.GoEasyNotification;
 import org.springframework.stereotype.Service;
-import com.dao.MemberRepository;
-import com.dao.UserRepository;
 import com.model.Member;
 import com.model.User;
 
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
     @Resource
     private ProjectRepository projectRepository;
+
     @Resource
     private UserRepository userRepository;
+
     @Resource
-    MemberRepository mr;
+    private MemberRepository mr;
+
+    @Resource
+    private NotificationRepository notificationRepository;
+
+    @Resource
+    private TagRepository tagRepository;
 
 
     public boolean ifExsit(String tel) {
@@ -107,21 +115,22 @@ public class UserService {
         }
     }
 
-    public String getCompanyName(int companyId){
+    public String getCompanyName(int companyId) {
         Optional<User> op = userRepository.findById(companyId);
-        if (op.isPresent()){
+        if (op.isPresent()) {
             User user = op.get();
-            if (user.getType() == UserType.COMPANY){
+            if (user.getType() == UserType.COMPANY) {
                 return user.getUsername();
             }
         }
         return "";
     }
+
     /**
      * 改变用户头像
      *
      * @param userId 用户id
-     * @param url 图片地址
+     * @param url    图片地址
      */
     public void updateAvatar(int userId, String url) {
         Optional<User> op = Optional.ofNullable(userRepository.getInfoById(userId));
@@ -140,5 +149,102 @@ public class UserService {
         member.setInfo(info);
         member.setStudioid(studio_id);
         mr.save(member);
+    }
+
+    /**
+     * 设置推送token
+     *
+     * @param userId 用户id
+     * @param token  token
+     */
+    public void setToken(int userId, String token) {
+        Optional<User> op = userRepository.findById(userId);
+        if (op.isPresent()) {
+            User user = op.get();
+            user.setToken(token);
+            userRepository.save(user);
+        }
+    }
+
+    /**
+     * 获取推送token
+     *
+     * @param userId 用户id
+     * @return
+     */
+    public String getToken(int userId) {
+        Optional<User> op = userRepository.findById(userId);
+        if (op.isPresent()) {
+            User user = op.get();
+            return user.getToken();
+        }
+        return "";
+    }
+
+    /**
+     * 发布通知
+     *
+     * @param userId  用户id
+     * @param title   标题
+     * @param content 内容
+     * @param action  操作
+     * @param params  参数
+     */
+    public void notify(int userId, String title, String content, ActionType action, String params) {
+        Notification notification = new Notification();
+        notification.setUid(userId);
+        notification.setTitle(title);
+        notification.setContent(content);
+        notification.setAction(action);
+        notification.setParams(params);
+        GoEasyNotification.notify(userId + "", title, content);
+        notificationRepository.save(notification);
+    }
+
+    /**
+     * 获取通知
+     *
+     * @param userId 用户id
+     * @return
+     */
+    public List<Notification> getNotifications(int userId) {
+        return notificationRepository.findAllByUid(userId);
+    }
+
+    public void edit(int userId, String name, List<Integer> tags, String email, String username, String info) {
+        Optional<User> op = userRepository.findById(userId);
+        if (!op.isPresent()) {
+            return;
+        }
+        User user = op.get();
+        user.setName(name);
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setInfo(info);
+        userRepository.save(user);
+
+        tagRepository.deleteAllByUserId(userId);
+        List<Tag> tagSave = new ArrayList<>();
+        tags.forEach(it -> {
+            Tag tag = new Tag();
+            tag.setTag(it);
+            tag.setUserId(userId);
+            tagSave.add(tag);
+        });
+        tagRepository.saveAll(tagSave);
+    }
+
+    public List<Tag> getTags(int userId) {
+        return tagRepository.findAllByUserId(userId);
+    }
+
+    public List<Integer> getTagIntList(int userId) {
+        List<Integer> ids = new ArrayList<>();
+        getTags(userId).forEach(it -> ids.add(it.getTag()));
+        return ids;
+    }
+
+    public Optional<User> getUser(int userId) {
+        return userRepository.findById(userId);
     }
 }

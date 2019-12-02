@@ -16,8 +16,8 @@ import com.dao.AdStudioRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.UserRepository;
-import com.model.Ad_project;
-import com.model.Ad_studio;
+import com.model.AdProject;
+import com.model.AdStudio;
 import com.model.Project;
 import com.model.User;
 import com.utils.JsonUtils;
@@ -52,7 +52,7 @@ public class AdService {
 
 	public void insert_ad_project(float ad_price, Integer prj_id) {
 		Project prj = pr.get_info(prj_id);
-		Ad_project ap = new Ad_project();
+		AdProject ap = new AdProject();
 		ap.setPrjname(prj.getPrjname());
 		ap.setDueTime(prj.getDeadline());
 		ap.setAd_price(ad_price);
@@ -61,7 +61,7 @@ public class AdService {
 		ap.setPrice(prj.getPrice());
 		ap.setImg(prj.getImg());
 		ap.setWeight(weight(ad_price));
-		ap.setPrj_id(prj_id);
+		ap.setPrjId(prj_id);
 		ap.setSolrid(prj.getSolr_id());
 		ap.setState(0);
 		apr.save(ap);
@@ -72,7 +72,7 @@ public class AdService {
 	}
 
 	public void insert_ad_studio(float ad_price, Integer account_id) {
-		Ad_studio as = new Ad_studio();
+		AdStudio as = new AdStudio();
 		User ui = ur.getInfoById(account_id);
 		as.setAccount_id(account_id);
 		as.setAvatar(ui.getAvatar());
@@ -99,14 +99,14 @@ public class AdService {
 	public JSONArray ad() {
 
 		JSONArray array = new JSONArray();
-		List<Ad_project> p = apr.findAll();
-		List<Ad_studio> s = asr.findAll();
+		List<AdProject> p = apr.findAll();
+		List<AdStudio> s = asr.findAll();
 		for (int i = 0; i < p.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_project project = p.get(i);
+			AdProject project = p.get(i);
 			ad.put("id", project.getId());
 			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
 			ad.put("solr_id", project.getSolrid());
@@ -115,7 +115,7 @@ public class AdService {
 		}
 		for (int i = 0; i < s.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_studio studio = s.get(i);
+			AdStudio studio = s.get(i);
 			ad.put("id", studio.getId());
 			ad.put("name", studio.getUsername());
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
@@ -130,13 +130,13 @@ public class AdService {
 
 	public JSONArray adP() {
 		JSONArray array = new JSONArray();
-		List<Ad_project> p = apr.findAll();
+		List<AdProject> p = apr.findAll();
 		for (int i = 0; i < p.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_project project = p.get(i);
+			AdProject project = p.get(i);
 			ad.put("id", project.getId());
 			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
 			ad.put("solr_id", project.getSolrid());
@@ -148,10 +148,10 @@ public class AdService {
 
 	public JSONArray adS() {
 		JSONArray array = new JSONArray();
-		List<Ad_studio> s = asr.findAll();
+		List<AdStudio> s = asr.findAll();
 		for (int i = 0; i < s.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_studio studio = s.get(i);
+			AdStudio studio = s.get(i);
 			ad.put("id", studio.getId());
 			ad.put("name", studio.getUsername());
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
@@ -166,13 +166,13 @@ public class AdService {
 	public JSONArray adP(String text) {
 		text = '%'+text+'%';
 		JSONArray array = new JSONArray();
-		List<Ad_project> p = apr.findByPrjnameLike(text);
+		List<AdProject> p = apr.findByPrjnameLike(text);
 		for (int i = 0; i < p.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_project project = p.get(i);
+			AdProject project = p.get(i);
 			ad.put("id", project.getId());
 			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrj_id()));
+			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
 			ad.put("type", 0);
 			ad.put("money", project.getAd_price());
 			ad.put("solr_id", project.getSolrid());
@@ -184,10 +184,10 @@ public class AdService {
 	public JSONArray adS(String text) {
 		text = '%'+text +'%';
 		JSONArray array = new JSONArray();
-		List<Ad_studio> s = asr.findByUsernameLike(text);
+		List<AdStudio> s = asr.findByUsernameLike(text);
 		for (int i = 0; i < s.size(); i++) {
 			JSONObject ad = new JSONObject();
-			Ad_studio studio = s.get(i);
+			AdStudio studio = s.get(i);
 			ad.put("id", studio.getId());
 			ad.put("name", studio.getUsername());
 			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));

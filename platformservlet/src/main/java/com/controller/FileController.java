@@ -1,10 +1,14 @@
 package com.controller;
 
+import java.io.File;
 import java.nio.file.Paths;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.common.FileCommon;
+import com.utils.FileTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -21,22 +25,20 @@ import com.service.ProjectService;
 
 @RestController
 public class FileController {
-	@Autowired
-	File_projectRepository fpj;
-	@Autowired
-	ResourceLoader resourceLoader;
-	@Autowired
-	ProjectService ser;
-	
-	private String url="/usr/local/tomcat/work/Catalina/localhost/Platform/";
-	
-@GetMapping(value = "/file/{project_id:.+}/{step_id:.+}/{filename:.+}",produces ="application/octet-stream;charset = utf-8")
-public ResponseEntity<?> get_user_img(@PathVariable String project_id,@PathVariable String step_id,@PathVariable String filename) {
-	try {
-		final String ROOT = url+"file//"+project_id+"//"+step_id;
-		return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
-	} catch (Exception e) {
-		return ResponseEntity.notFound().build();
-	}
-}
+    @Resource
+    private FileCommon fileCommon;
+
+
+    @GetMapping(value = "/file/{project_id:.+}/{step_id:.+}/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
+    public ResponseEntity<?> get_user_img(@PathVariable String project_id, @PathVariable String step_id, @PathVariable String filename) {
+        try {
+            File file = fileCommon.getFile(Integer.parseInt(project_id), Integer.parseInt(step_id), filename);
+            if (!file.exists()) {
+                throw new Exception();
+            }
+            return ResponseEntity.ok(FileTools.getBytes(file));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

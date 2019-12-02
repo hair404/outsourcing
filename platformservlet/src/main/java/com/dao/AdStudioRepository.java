@@ -2,17 +2,21 @@ package com.dao;
 
 import java.util.List;
 
+import com.alipay.api.domain.AdUser;
+import com.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import com.model.Ad_studio;
+import com.model.AdStudio;
 
-public interface AdStudioRepository extends JpaRepository<Ad_studio,Long> {
-	@Modifying   
-	@Query("update com.model.Ad_studio u set u.state=?1 where u.solrid=?2")    
-	void updateState(Integer state,String solrid);
+public interface AdStudioRepository extends JpaRepository<AdStudio, Integer> {
+    @Modifying
+    @Query("update com.model.AdStudio u set u.state=?1 where u.solrid=?2")
+    void updateState(Integer state, String solrid);
 
-	 public List<Ad_studio> findByUsernameLike(String name);
+    public List<AdStudio> findByUsernameLike(String name);
 
-	float findWeightBySolrid(String solrid);
+    float findWeightBySolrid(String solrid);
+
+    AdStudio findById(int id);
 }

@@ -6,6 +6,7 @@ import com.dao.ProjectRepository;
 import com.model.ChildForm;
 import com.model.Payment;
 import com.model.Project;
+import com.type.ActionType;
 import com.type.PayState;
 import com.type.PayType;
 import com.utils.alipay.AlipayTools;
@@ -32,6 +33,12 @@ public class PayService {
 
     @Resource
     private ProjectRepository projectRepository;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private ProjectService projectService;
 
     /**
      * 支付定金
@@ -92,7 +99,13 @@ public class PayService {
                     Optional<ChildForm> opChildForm = childFormRepository.findById(payment.getTypeId());
                     if (opChildForm.isPresent()) {
                         ChildForm childForm = opChildForm.get();
-                        //TODO 小进度付款成功
+                        if (childForm.getPayPrice() - childForm.getPrice() < 0.01) {
+                            childForm.setState(9);
+                        } else {
+                            childForm.setState(4);
+                        }
+                        childFormRepository.save(childForm);
+                        projectService.nextStep(childForm.getProjectId());
                     }
                     break;
                 case PAY_IN_ADVANCED:
@@ -102,6 +115,7 @@ public class PayService {
                         project.setIspia(1);
                         projectRepository.save(project);
                         checkPayState(project);
+                        userService.notify(project.getStudioID(), "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, "{solrId:{0}}".replace("{0}", project.getSolr_id()));
                     }
                     break;
                 case DEPOSIT_TO_STUDIO:
@@ -109,6 +123,7 @@ public class PayService {
                     if (opProject.isPresent()) {
                         Project project = opProject.get();
                         project.setIsdeposit(1);
+                        project.setRestDeposit((float) payment.getAmount());
                         projectRepository.save(project);
                         checkPayState(project);
                     }

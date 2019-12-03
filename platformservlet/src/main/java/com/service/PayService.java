@@ -35,7 +35,7 @@ public class PayService {
     private ProjectRepository projectRepository;
 
     @Resource
-    private UserService userService;
+    private NotificationService notificationService;
 
     @Resource
     private ProjectService projectService;
@@ -47,8 +47,12 @@ public class PayService {
      * @param amount    金额数量
      * @return 支付宝付款界面
      */
-    public String payDepositToStudio(int projectId, double amount) {
-        return pay(projectId, amount, PayType.DEPOSIT_TO_STUDIO, "项目押金");
+    public String payDepositToStudio(int projectId) {
+        Optional<Project> op = projectService.getProject(projectId);
+        if (!op.isPresent()) {
+            return "NotFound";
+        }
+        return pay(projectId, op.get().getPrice() * 0.1, PayType.DEPOSIT_TO_STUDIO, "项目押金");
     }
 
     public String payDepositToCompany(int projectId, double amount) {
@@ -115,7 +119,7 @@ public class PayService {
                         project.setIspia(1);
                         projectRepository.save(project);
                         checkPayState(project);
-                        userService.notify(project.getStudioID(), "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, "{solrId:{0}}".replace("{0}", project.getSolr_id()));
+                        notificationService.notify(project.getStudioID(), "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, "{solrId:{0}}".replace("{0}", project.getSolr_id()));
                     }
                     break;
                 case DEPOSIT_TO_STUDIO:

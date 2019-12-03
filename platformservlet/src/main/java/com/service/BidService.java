@@ -30,12 +30,19 @@ public class BidService {
         bidRepository.save(bid);
     }
 
-    public void pick(Project project, int studioId) {
-        Optional<Bid> opBid = bidRepository.getByProjectIdAndStudioId(project.getId(), studioId);
-        if (!opBid.isPresent()) {
-            return;
+    public String pick(int projectId, int studioId) {
+        Optional<Bid> optionalBid = bidRepository.getByProjectIdAndStudioId(projectId, studioId);
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (!optionalBid.isPresent()) {
+            return "NotFoundBid";
         }
-        Bid bid = opBid.get();
+        if (!optionalProject.isPresent()) {
+            return "NotFoundProject";
+        }
+
+        Bid bid = optionalBid.get();
+        Project project = optionalProject.get();
+
         bid.setState(BidState.WIN);
         bidRepository.save(bid);
         List<Bid> bids = bidRepository.findAllByProjectId(project.getId());
@@ -50,5 +57,6 @@ public class BidService {
         project.setPrice((float) bid.getQuote());
         project.setState(2);
         projectRepository.save(project);
+        return "success";
     }
 }

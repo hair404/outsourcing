@@ -182,26 +182,6 @@ public class UserService {
     }
 
     /**
-     * 发布通知
-     *
-     * @param userId  用户id
-     * @param title   标题
-     * @param content 内容
-     * @param action  操作
-     * @param params  参数
-     */
-    public void notify(int userId, String title, String content, ActionType action, String params) {
-        Notification notification = new Notification();
-        notification.setUid(userId);
-        notification.setTitle(title);
-        notification.setContent(content);
-        notification.setAction(action);
-        notification.setParams(params);
-        GoEasyNotification.notify(userId + "", title, content);
-        notificationRepository.save(notification);
-    }
-
-    /**
      * 获取通知
      *
      * @param userId 用户id

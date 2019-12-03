@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import com.annotation.AuthIgnore;
 import com.type.PictureType;
 import com.utils.FileTools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,19 @@ public class ActivityController {
     @Autowired
     ActivityRepository ar;
 
+    @AuthIgnore
     @PostMapping("activity_register")
     public void register_activity(@RequestParam("img") MultipartFile file, @RequestParam("url") String url) {
         as.register_activity(file, url);
     }
 
+    @AuthIgnore
     @PostMapping("activity")
     public String activity() {
         return JsonUtils.objectToJson(ar.findAll());
     }
 
+    @AuthIgnore
     @GetMapping(value = "/activity_img/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_activity_img(@PathVariable String filename) {
         try {

@@ -24,4 +24,9 @@ public enum ActionType {
         }
         return ActionType.UNKNOWN;
     }
+
+    public static String generateJumpProjectParams(String solrId) {
+        return "{\"solrId:\":\"{0}\"}".replace("{0}", solrId);
+    }
+
 }

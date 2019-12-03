@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.common.FileCommon;
 import com.common.result.ProjectPage;
+import com.model.*;
+import com.type.ActionType;
 import com.utils.TimeTool;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +25,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.dao.BidRepository;
 import com.dao.File_projectRepository;
 import com.dao.ProjectRepository;
-import com.dao.TagDao;
-import com.dao.CancelReasonRepository;
 import com.dao.ChildFormRepository;
 import com.dao.UserRepository;
-import com.model.Bid;
-import com.model.ChildForm;
-import com.model.FileProject;
-import com.model.Project;
-import com.model.User;
-import com.utils.JsonUtils;
 
 import javax.annotation.Resource;
 
@@ -49,8 +42,6 @@ public class ProjectService {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    CancelReasonRepository reasonRepository;
-    @Autowired
     ChildFormRepository childFormRepository;
     @Autowired
     File_projectRepository fpr;
@@ -62,7 +53,10 @@ public class ProjectService {
     private FileCommon fileCommon;
 
     @Resource
-    UserService userService;
+    private UserService userService;
+
+    @Resource
+    private NotificationService notificationService;
 
     @Value("${url}")
     private static String url;
@@ -85,7 +79,7 @@ public class ProjectService {
             int day = 0;
             for (ChildForm it : childForms) {
                 JSONObject json = (JSONObject) JSON.toJSON(it);
-                if (project.getIsconfirm() != 1){
+                if (project.getIsconfirm() != 1) {
                     arr.add(json);
                     continue;
                 }
@@ -456,15 +450,16 @@ public class ProjectService {
      * @param projectId 项目ID
      * @param stepId    步骤ID
      */
-    public void passStep(int projectId, int stepId) {
+    public String passStep(int projectId, int stepId) {
         Optional<ChildForm> op = childFormRepository.findByProjectIdAndPart(projectId, stepId);
         if (!op.isPresent()) {
-            return;
+            return "NotFound";
         }
         ChildForm childForm = op.get();
         childForm.setState(5);
         childForm.setPayPrice(childForm.getPrice());
         childFormRepository.save(childForm);
+        return "success";
     }
 
     public void nextStep(int projectId) {
@@ -515,5 +510,49 @@ public class ProjectService {
         }
         return day;
     }
+
+    /**
+     * 设定价格表
+     *
+     * @param projectId 项目ID
+     * @param priceMap  价格表<步骤，价格>
+     * @return
+     */
+    public String setPrice(int projectId, Map<Integer, Float> priceMap) {
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (!optionalProject.isPresent()) {
+            return "NotFound";
+        }
+
+        Project project = optionalProject.get();
+
+        priceMap.forEach((stepId, price) -> childFormRepository.updatePrice(price, projectId, stepId));
+
+        project.setState(1);
+
+        notificationService.notify(project.getStudioID(), "公司已完成定价", "公司已经完成了项目定价，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
+
+        return "success";
+    }
+
+    /**
+     * 催促工作室
+     *
+     * @param projectId 项目ID
+     * @return
+     */
+    public String urgeStudio(int projectId) {
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (!optionalProject.isPresent()) {
+            return "NotFound";
+        }
+
+        Project project = optionalProject.get();
+
+        notificationService.notify(project.getStudioID(), "公司正在催促您", "公司正在催促您尽快完成进度，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
+
+        return "success";
+    }
+
 
 }

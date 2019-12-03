@@ -3,6 +3,7 @@ package com.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.annotation.AuthIgnore;
 import com.dao.*;
 import com.dp.NotificationDataProcessor;
 import com.dp.UserDataProcessor;
@@ -58,8 +59,7 @@ public class UserController {
     @Resource
     private UserDataProcessor userDataProcessor;
 
-    User user = new User();
-
+    @AuthIgnore
     @PostMapping("register")
     public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
                            @RequestParam("password") String password, @RequestParam("email") String email,
@@ -81,11 +81,13 @@ public class UserController {
             return "fail";
     }
 
+    @AuthIgnore
     @RequestMapping("list")
     public java.util.List<User> list() {
         return userRepository.findAll();
     }
 
+    @AuthIgnore
     @PostMapping(value = "login")
     public String login(@RequestParam("name") String tel, @RequestParam("password") String password,
                         @RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
@@ -136,6 +138,7 @@ public class UserController {
         return "success";
     }
 
+    @AuthIgnore
     @RequestMapping("info")
     public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
         HttpSession session = request.getSession();
@@ -205,6 +208,7 @@ public class UserController {
         return json;
     }
 
+    @AuthIgnore
     @PostMapping("display_info")
     public JSONObject display(HttpServletRequest request, @RequestParam("id") Integer id,
                               @RequestParam("first") Integer first) {

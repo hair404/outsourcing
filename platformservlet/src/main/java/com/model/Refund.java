@@ -25,6 +25,6 @@ public class Refund {
     private Integer toid;
     private Integer prjid;
     private Integer type;
-    private Integer state;
+    private Integer state = 0;
     private String name;
 }

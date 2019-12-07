@@ -1,29 +1,29 @@
 package com.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.model.Advertisement;
-import com.type.AdState;
-import com.type.AdType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.fastjson.JSONArray;
+import com.alipay.api.AlipayApiException;
 import com.dao.AdvertisementRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.UserRepository;
+import com.model.Advertisement;
+import com.model.User;
+import com.type.AdState;
+import com.type.AdType;
+import com.utils.alipay.AlipayTools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.*;
 
 @Service
 public class AdService {
 
     @Resource
     AdvertisementRepository advertisementRepository;
-    @Autowired
-    UserRepository ur;
+    @Resource
+    UserRepository userRepository;
     @Autowired
     ProjectRepository pr;
     @Autowired
@@ -104,7 +104,7 @@ public class AdService {
 //            AdStudio studio = s.get(i);
 //            ad.put("id", studio.getId());
 //            ad.put("name", studio.getUsername());
-//            ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
+//            ad.put("belong", userRepository.findUsernameById(studio.getAccount_id()));
 //            ad.put("type", 1);
 //            ad.put("money", studio.getAd_price());
 //            ad.put("solr_id", studio.getSolrid());
@@ -124,17 +124,42 @@ public class AdService {
         return new ArrayList<>(advertisementRepository.findAllByType(adType.getId()));
     }
 
-    public String judge(int advertisementId, AdState adState) {
-        Optional<Advertisement> op = advertisementRepository.findById(advertisementId);
-        if (!op.isPresent()) {
+    public String judge(int advertisementId, AdState adState) throws AlipayApiException {
+        Optional<Advertisement> optionalAdvertisement = advertisementRepository.findById(advertisementId);
+        if (!optionalAdvertisement.isPresent()) {
             return "NotFound";
         }
-        Advertisement advertisement = op.get();
+        Advertisement advertisement = optionalAdvertisement.get();
+
+        Optional<User> optionalUser = userRepository.findById(advertisement.getTypeId());
+        if (!optionalUser.isPresent()) {
+            return "NotFound";
+        }
+        User user = optionalUser.get();
+
+
+        //判断是否被审核过
         if (advertisement.getState() != AdState.PADDING) {
             return "hasJudge";
         }
+
+        //设定广告审核状态
         advertisement.setState(adState);
+
+        //若未通过进行退款
+        if (adState == AdState.REJECT) {
+            //判断用户是否填写支付宝账号
+            if (user.getAlipay().isEmpty()) {
+                return "NullAlipayAccount";
+            }
+            if (!AlipayTools.transfer(user.getAlipay(), advertisement.getPrice())) {
+                return "RefundError";
+            }
+        }
+
         advertisementRepository.save(advertisement);
+
+
         return "success";
     }
 

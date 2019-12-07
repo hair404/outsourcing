@@ -49,8 +49,6 @@ public class UserController {
     ProjectService ps;
     @Resource
     AdminRepository ar;
-    @Resource
-    Code co;
 
     @Resource
     private NotificationDataProcessor notificationDataProcessor;
@@ -268,4 +266,5 @@ public class UserController {
 
         return userService.uploadVerification(id, verificationType, file);
     }
+
 }

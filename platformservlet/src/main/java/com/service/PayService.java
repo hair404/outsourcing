@@ -7,12 +7,11 @@ import com.dao.ProjectRepository;
 import com.model.*;
 import com.type.*;
 import com.utils.alipay.AlipayTools;
-import com.utils.alipay.OrderInfo;
+import com.utils.alipay.PayInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,7 +62,7 @@ public class PayService {
 
     private String pay(int typeId, double amount, PayType type, String description) {
         Payment payment = new Payment();
-        OrderInfo orderInfo = new OrderInfo();
+        PayInfo payInfo = new PayInfo();
 
         payment.setOrderId(UUID.randomUUID().toString().replace("-", ""));
         payment.setState(PayState.WAIT);
@@ -72,11 +71,11 @@ public class PayService {
         payment.setAmount(amount);
         paymentRepository.save(payment);
 
-        orderInfo.setOutTradeNo(payment.getOrderId());
-        orderInfo.setSubject(description);
-        orderInfo.setTotalAmount(amount);
+        payInfo.setOutTradeNo(payment.getOrderId());
+        payInfo.setSubject(description);
+        payInfo.setTotalAmount(amount);
 
-        return AlipayTools.pay(orderInfo, url + "/alipay/callback", url + "/alipay/closeSelf");
+        return AlipayTools.pay(payInfo, url + "/alipay/callback", url + "/alipay/closeSelf");
     }
 
     public String payInAdvanced(int projectId, double amount) {

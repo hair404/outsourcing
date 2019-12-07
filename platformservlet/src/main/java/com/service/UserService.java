@@ -1,16 +1,18 @@
 package com.service;
 
+import com.common.result.ResultCode;
 import com.dao.*;
 import com.model.*;
-import com.type.*;
+import com.type.UserType;
+import com.type.UserValidState;
+import com.type.VerificationState;
+import com.type.VerificationType;
 import com.utils.OSSTools;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import javax.annotation.Resource;
-import javax.swing.text.html.Option;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -322,5 +324,28 @@ public class UserService {
         userRepository.save(user);
 
         return "success";
+    }
+
+    /**
+     * 设置支付宝账号
+     *
+     * @param userId  UID
+     * @param account 支付宝账号
+     * @return
+     */
+    public ResultCode setAlipayAccount(int userId, String account) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return ResultCode.NOT_FOUND_USER;
+        }
+        User user = optionalUser.get();
+
+        //设置支付宝账号
+        user.setAlipay(account);
+
+        //保存数据
+        userRepository.save(user);
+
+        return ResultCode.OK;
     }
 }

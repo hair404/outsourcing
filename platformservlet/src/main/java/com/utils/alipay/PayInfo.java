@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OrderInfo {
+public class PayInfo {
 
     //订单号
     private String outTradeNo;

@@ -3,6 +3,7 @@ package com.model;
 import javax.persistence.*;
 
 import com.type.UserType;
+import com.type.UserValidState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,9 @@ public class User {
     @Column(name = "is_student")
     private boolean student;
 
+    //是否被删除
+    private boolean deleted = false;
+
     @Transient
     public UserType getType() {
         return UserType.fromId(type);
@@ -40,5 +44,15 @@ public class User {
     @Transient
     public void setType(UserType type) {
         this.type = type.getId();
+    }
+
+    @Transient
+    public UserValidState getValidState() {
+        return UserValidState.fromId(isValid);
+    }
+
+    @Transient
+    public void setValidState(UserValidState userValidState) {
+        this.isValid = userValidState.getId();
     }
 }

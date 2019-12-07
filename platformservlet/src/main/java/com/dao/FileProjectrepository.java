@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import com.model.FileProject;
 
-public interface File_projectRepository extends JpaRepository<FileProject, Long>{
+public interface FileProjectrepository extends JpaRepository<FileProject, Long>{
 	
 	@Query("select u.prj_id from com.model.FileProject u where u.prj_id =:prj_id")
 	public Integer get_prj_id(@Param("prj_id") Integer prj_id);

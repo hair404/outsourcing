@@ -37,6 +37,8 @@ public class NotificationDataProcessor {
                 return "detail/" + json.getString("solrId");
             case JUMP_USER:
                 return "display/" + json.getString("id");
+            case CENTER:
+                return "center";
         }
         return "";
     }

@@ -17,4 +17,9 @@ public class PermissionService {
         Optional<Project> op = projectRepository.findById(projectId);
         return op.filter(project -> project.getCompanyID() == companyId).isPresent();
     }
+
+    public boolean checkStudioProject(int studioId, int projectId) {
+        Optional<Project> op = projectRepository.findById(projectId);
+        return op.filter(project -> project.getStudioID() == studioId).isPresent();
+    }
 }

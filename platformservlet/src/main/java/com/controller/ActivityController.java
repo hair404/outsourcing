@@ -2,14 +2,10 @@ package com.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-import com.annotation.AuthIgnore;
 import com.type.PictureType;
 import com.utils.FileTools;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,27 +18,27 @@ import com.dao.ActivityRepository;
 import com.service.ActivityService;
 import com.utils.JsonUtils;
 
+import javax.annotation.Resource;
+
 @RestController
 public class ActivityController {
 
-    @Autowired
-    ActivityService as;
-    @Autowired
+    @Resource
+    ActivityService activityService;
+    @Resource
     ActivityRepository ar;
 
-    @AuthIgnore
     @PostMapping("activity_register")
-    public void register_activity(@RequestParam("img") MultipartFile file, @RequestParam("url") String url) {
-        as.register_activity(file, url);
+    public String register_activity(@RequestParam("img") MultipartFile file, @RequestParam("url") String url) throws IOException {
+        activityService.registerActivity(file, url);
+        return "success";
     }
 
-    @AuthIgnore
     @PostMapping("activity")
     public String activity() {
         return JsonUtils.objectToJson(ar.findAll());
     }
 
-    @AuthIgnore
     @GetMapping(value = "/activity_img/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_activity_img(@PathVariable String filename) {
         try {

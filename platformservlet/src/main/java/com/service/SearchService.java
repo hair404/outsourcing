@@ -2,10 +2,10 @@ package com.service;
 
 import com.common.result.SolrDocumentPage;
 import com.dao.*;
-import com.model.AdProject;
-import com.model.AdStudio;
+import com.model.Advertisement;
 import com.model.Project;
 import com.model.User;
+import com.type.AdType;
 import com.type.ProjectSortType;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,13 +37,10 @@ public class SearchService {
     private ProjectRepository projectRepository;
 
     @Resource
-    private AdProjectRepository adProjectRepository;
-
-    @Resource
     private UserRepository userRepository;
 
     @Resource
-    private AdStudioRepository adStudioRepository;
+    private AdvertisementRepository advertisementRepository;
 
     @Resource
     private TagRepository tagRepository;
@@ -195,28 +192,28 @@ public class SearchService {
             return 0;
         }
         User user = optionalUser.get();
-        Optional<AdProject> optionalAdProject = adProjectRepository.findByPrjId(project.getId());
-        if (!optionalAdProject.isPresent()) {
+        Optional<Advertisement> optionalAdvertisement = advertisementRepository.findByTypeAndTypeId(AdType.PROJECT.getId(), project.getId());
+        if (!optionalAdvertisement.isPresent()) {
             return user.isStudent() ? 1 : 0;
         }
-        AdProject adProject = optionalAdProject.get();
+        Advertisement advertisement = optionalAdvertisement.get();
         if (user.isStudent()) {
-            return (int) adProject.getAd_price() * 2;
+            return (int) advertisement.getPrice() * 2;
         } else {
-            return (int) adProject.getAd_price();
+            return (int) advertisement.getPrice();
         }
     }
 
     private int weightStudio(User user) {
-        Optional<AdStudio> optionalAdStudio = adStudioRepository.findById(user.getId());
-        if (!optionalAdStudio.isPresent()) {
+        Optional<Advertisement> optionalAdvertisement = advertisementRepository.findByTypeAndTypeId(AdType.PROJECT.getId(), user.getId());
+        if (!optionalAdvertisement.isPresent()) {
             return user.isStudent() ? 1 : 0;
         }
-        AdStudio adStudio = optionalAdStudio.get();
+        Advertisement advertisement = optionalAdvertisement.get();
         if (user.isStudent()) {
-            return (int) (adStudio.getAd_price() * 2);
+            return (int) (advertisement.getPrice() * 2);
         } else {
-            return (int) adStudio.getAd_price();
+            return (int) advertisement.getPrice();
         }
     }
 }

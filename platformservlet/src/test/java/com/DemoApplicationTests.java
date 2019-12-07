@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DemoApplicationTests {
 
     public static void main(String[] args) throws InterruptedException {
-        GoEasyNotification.notify(5+"","asd","sadsa");
+        GoEasyNotification.notify(4+"","asd","sadsa");
     }
 }
 

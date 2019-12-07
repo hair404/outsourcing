@@ -1,14 +1,11 @@
 package com.service;
 
+import com.dao.AdvertisementRepository;
 import com.dao.ChildFormRepository;
 import com.dao.PaymentRepository;
 import com.dao.ProjectRepository;
-import com.model.ChildForm;
-import com.model.Payment;
-import com.model.Project;
-import com.type.ActionType;
-import com.type.PayState;
-import com.type.PayType;
+import com.model.*;
+import com.type.*;
 import com.utils.alipay.AlipayTools;
 import com.utils.alipay.OrderInfo;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,16 +32,21 @@ public class PayService {
     private ProjectRepository projectRepository;
 
     @Resource
+    private AdvertisementRepository advertisementRepository;
+
+    @Resource
     private NotificationService notificationService;
 
     @Resource
     private ProjectService projectService;
 
+    @Resource
+    private UserService userService;
+
     /**
      * 支付定金
      *
      * @param projectId 项目ID
-     * @param amount    金额数量
      * @return 支付宝付款界面
      */
     public String payDepositToStudio(int projectId) {
@@ -85,6 +87,10 @@ public class PayService {
         return pay(partId, amount, PayType.STEP, "步骤款");
     }
 
+    public String payStudioAd(int studioId, double amount) {
+        return pay(studioId, amount, PayType.AD_STUDIO, "推广费");
+    }
+
     /**
      * 更新支付状态
      *
@@ -103,13 +109,16 @@ public class PayService {
                     Optional<ChildForm> opChildForm = childFormRepository.findById(payment.getTypeId());
                     if (opChildForm.isPresent()) {
                         ChildForm childForm = opChildForm.get();
-                        if (childForm.getPayPrice() - childForm.getPrice() < 0.01) {
+                        if (Math.abs(childForm.getPayPrice() - childForm.getPrice()) < 0.01) {
                             childForm.setState(9);
                         } else {
                             childForm.setState(4);
                         }
                         childFormRepository.save(childForm);
                         projectService.nextStep(childForm.getProjectId());
+
+                        Optional<Project> optionalProject = projectService.getProject(childForm.getProjectId());
+                        optionalProject.ifPresent(project -> notificationService.notify(project.getStudioID(), "公司支付进度款", "有一个公司支付了你项目的进度款，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id())));
                     }
                     break;
                 case PAY_IN_ADVANCED:
@@ -119,7 +128,7 @@ public class PayService {
                         project.setIspia(1);
                         projectRepository.save(project);
                         checkPayState(project);
-                        notificationService.notify(project.getStudioID(), "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, "{solrId:{0}}".replace("{0}", project.getSolr_id()));
+                        notificationService.notify(project.getStudioID(), "系统通知", "一个工作室完成了进度表的确认工作", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
                     }
                     break;
                 case DEPOSIT_TO_STUDIO:
@@ -130,6 +139,7 @@ public class PayService {
                         project.setRestDeposit((float) payment.getAmount());
                         projectRepository.save(project);
                         checkPayState(project);
+                        notificationService.notify(project.getStudioID(), "公司已经支付定价", "一个公司支付了定价，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
                     }
                     break;
                 case DEPOSIT_TO_COMPANY:
@@ -139,6 +149,19 @@ public class PayService {
                         project.setHasPaid(1);
                         projectRepository.save(project);
                         checkPayState(project);
+                        notificationService.notify(project.getStudioID(), "工作室已经支付押金", "一个工作室支付了押金，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
+                    }
+                    break;
+                case AD_STUDIO:
+                    Optional<User> studio = userService.getUser(payment.getTypeId());
+                    if (studio.isPresent()) {
+                        Advertisement advertisement = new Advertisement();
+                        advertisement.setTypeId(payment.getTypeId());
+                        advertisement.setPrice((int) payment.getAmount());
+                        advertisement.setState(AdState.PADDING);
+                        advertisement.setType(AdType.STUDIO);
+                        advertisementRepository.save(advertisement);
+                        notificationService.notify(advertisement.getTypeId(), "推广开始审核", "我们将以最快的速度通知您", ActionType.CENTER,"");
                     }
                     break;
             }

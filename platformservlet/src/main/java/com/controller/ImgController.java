@@ -2,7 +2,6 @@ package com.controller;
 
 import java.io.File;
 
-import com.annotation.AuthIgnore;
 import com.common.PictureCommon;
 import com.service.UserService;
 import com.type.PictureType;
@@ -70,7 +69,6 @@ public class ImgController {
         return "false";
     }
 
-    @AuthIgnore
     @GetMapping(value = "/userimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_user_img(@PathVariable String filename) {
         try {
@@ -80,7 +78,6 @@ public class ImgController {
         }
     }
 
-    @AuthIgnore
     @GetMapping(value = "/avatar/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_user_avatar(@PathVariable String filename) {
         try {
@@ -90,7 +87,6 @@ public class ImgController {
         }
     }
 
-    @AuthIgnore
     @GetMapping(value = "/prjimg/{filename:.+}", produces = "application/octet-stream;charset = utf-8")
     public ResponseEntity<?> get_prj_img(@PathVariable String filename) {
         try {

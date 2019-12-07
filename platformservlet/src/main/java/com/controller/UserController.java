@@ -3,7 +3,7 @@ package com.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.annotation.AuthIgnore;
+import com.common.Environment;
 import com.dao.*;
 import com.dp.NotificationDataProcessor;
 import com.dp.UserDataProcessor;
@@ -16,15 +16,18 @@ import com.service.ProjectService;
 import com.service.TagService;
 import com.service.UserService;
 import com.type.UserType;
+import com.type.VerificationType;
 import com.utils.Code;
 import com.utils.JsonUtils;
 import com.utils.UuidUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,11 +38,7 @@ public class UserController {
     @Resource
     private UserRepository userRepository;
     @Resource
-    private TagService tagService;
-    @Resource
     private UserDao userDao;
-    @Resource
-    private TagDao tagDao;
     @Resource
     private ProjectRepository projectRepository;
     @Resource
@@ -59,7 +58,6 @@ public class UserController {
     @Resource
     private UserDataProcessor userDataProcessor;
 
-    @AuthIgnore
     @PostMapping("register")
     public String register(@RequestParam("name") String name, @RequestParam("phone") String tel,
                            @RequestParam("password") String password, @RequestParam("email") String email,
@@ -81,17 +79,15 @@ public class UserController {
             return "fail";
     }
 
-    @AuthIgnore
     @RequestMapping("list")
     public java.util.List<User> list() {
         return userRepository.findAll();
     }
 
-    @AuthIgnore
     @PostMapping(value = "login")
     public String login(@RequestParam("name") String tel, @RequestParam("password") String password,
                         @RequestParam(name = "code", required = false) String code, @RequestParam("type") Integer type,
-                        HttpServletRequest request, HttpServletResponse response) {
+                        HttpServletRequest request) {
         try {
             HttpSession session = request.getSession(true);
             String sessionCode = (String) session.getAttribute("code");
@@ -100,14 +96,17 @@ public class UserController {
                 if (account == null) {
                     return "fail";
                 }
-                if (account.getPassword().equals(password) && userService.checkCode(code, sessionCode)) {
+                if (!Environment.DEBUG && !userService.checkCode(code, sessionCode)) {
+                    return "CodeError";
+                }
+                if (account.getPassword().equals(password)) {
                     session.setMaxInactiveInterval(24 * 60 * 60);
                     session.setAttribute("id", account.getId());
                     session.setAttribute("tel", account.getTel());
                     session.setAttribute("type", type);
                     return "success";
                 }
-            } else if (type == UserType.ADMIN.getId()) {
+            } else if (type == UserType.ADMIN.getId() || type == UserType.EXPERT.getId()) {
                 Admin admin = ar.findByAccount(tel);
                 if (admin.getPassword().equals(password)) {
                     session.setMaxInactiveInterval(24 * 60 * 60);
@@ -138,7 +137,6 @@ public class UserController {
         return "success";
     }
 
-    @AuthIgnore
     @RequestMapping("info")
     public String info(@RequestParam("type") String type, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
         HttpSession session = request.getSession();
@@ -208,7 +206,6 @@ public class UserController {
         return json;
     }
 
-    @AuthIgnore
     @PostMapping("display_info")
     public JSONObject display(HttpServletRequest request, @RequestParam("id") Integer id,
                               @RequestParam("first") Integer first) {
@@ -252,5 +249,23 @@ public class UserController {
         }
         int id = (int) session.getAttribute("id");
         return notificationDataProcessor.getNotifications(id);
+    }
+
+    @PostMapping("verify")
+    public String verify(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("type") int typeId) throws IOException {
+        HttpSession session = request.getSession();
+        if (session.getAttribute("id") == null) {
+            return "NoPermission";
+        }
+
+        int id = (int) session.getAttribute("id");
+
+        VerificationType verificationType = VerificationType.fromId(typeId);
+
+        if (verificationType == VerificationType.UNKNOWN) {
+            return "UnsupportedType";
+        }
+
+        return userService.uploadVerification(id, verificationType, file);
     }
 }

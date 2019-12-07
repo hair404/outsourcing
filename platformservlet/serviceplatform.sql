@@ -461,10 +461,10 @@ INSERT INTO `project` VALUES ('7', 'ddd', '1', '1', 'http://localhost:8080/prjim
 INSERT INTO `project` VALUES ('8', '人工智能', '1', '1', 'http://localhost:8080/prjimg/KwQ6nXCx.jpg', '', '1', '12345', '2019-11-21', '2019-12-20', '开发', '1', '0', 'project', '0', 'KwQ6nXCx', '0', '0', '0', '12', '0', '0', null, null, '0', null, null, null, null, null);
 
 -- ----------------------------
--- Table structure for `refund`
+-- Table structure for `complain`
 -- ----------------------------
-DROP TABLE IF EXISTS `refund`;
-CREATE TABLE `refund` (
+DROP TABLE IF EXISTS `complain`;
+CREATE TABLE `complain` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `money` float NOT NULL,
   `project_id` int(11) NOT NULL,
@@ -477,14 +477,14 @@ CREATE TABLE `refund` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of refund
+-- Records of complain
 -- ----------------------------
-INSERT INTO `refund` VALUES ('1', '12', '3', '4', '1', '1', '卧槽', '0');
-INSERT INTO `refund` VALUES ('2', '12', '3', '4', '1', '1', 'wjdbaw', '0');
-INSERT INTO `refund` VALUES ('3', '12', '3', '4', '1', '1', 'wjdbaw', '0');
-INSERT INTO `refund` VALUES ('4', '12', '3', '4', '1', '1', 'dawdaw', '0');
-INSERT INTO `refund` VALUES ('5', '12', '3', '4', '1', '1', 'dakjbw', '0');
-INSERT INTO `refund` VALUES ('6', '12', '3', '4', '1', '0', 'djkabw', '0');
+INSERT INTO `complain` VALUES ('1', '12', '3', '4', '1', '1', '卧槽', '0');
+INSERT INTO `complain` VALUES ('2', '12', '3', '4', '1', '1', 'wjdbaw', '0');
+INSERT INTO `complain` VALUES ('3', '12', '3', '4', '1', '1', 'wjdbaw', '0');
+INSERT INTO `complain` VALUES ('4', '12', '3', '4', '1', '1', 'dawdaw', '0');
+INSERT INTO `complain` VALUES ('5', '12', '3', '4', '1', '1', 'dakjbw', '0');
+INSERT INTO `complain` VALUES ('6', '12', '3', '4', '1', '0', 'djkabw', '0');
 
 -- ----------------------------
 -- Table structure for `tag`

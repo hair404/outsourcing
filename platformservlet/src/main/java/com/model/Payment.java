@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -31,6 +32,8 @@ public class Payment {
 
     //定金-项目id 首付款-项目id 进度款-步骤id
     private int typeId;
+
+    private Date time = new Date();
 
     @Transient
     public PayState getState() {

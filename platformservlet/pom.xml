@@ -199,6 +199,13 @@
             <artifactId>goeasy-sdk</artifactId>
             <version>0.3.8</version>
         </dependency>
+
+        <!-- 阿里云OSS -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.8.0</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,202 +1,141 @@
 package com.service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.model.Advertisement;
+import com.type.AdState;
+import com.type.AdType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.dao.AdProjectRepository;
-import com.dao.AdStudioRepository;
+import com.dao.AdvertisementRepository;
 import com.dao.ProjectRepository;
 import com.dao.TagDao;
 import com.dao.UserRepository;
-import com.model.AdProject;
-import com.model.AdStudio;
-import com.model.Project;
-import com.model.User;
-import com.utils.JsonUtils;
+
+import javax.annotation.Resource;
 
 @Service
 public class AdService {
 
-	@Autowired
-	AdProjectRepository apr;
-	@Autowired
-	AdStudioRepository asr;
-	@Autowired
-	UserRepository ur;
-	@Autowired
-	ProjectRepository pr;
-	@Autowired
-	TagDao tagDao;
+    @Resource
+    AdvertisementRepository advertisementRepository;
+    @Autowired
+    UserRepository ur;
+    @Autowired
+    ProjectRepository pr;
+    @Autowired
+    TagDao tagDao;
 
-	public String recommend_ad_project(int first) {
-		Integer page = first / 20;
-		Sort sort = new Sort(Direction.DESC, "weight");
-		final Pageable pageable = PageRequest.of(page, 20, sort);
-		return JsonUtils.objectToJson(apr.findAll(pageable).getContent());
-	}
+    @Resource
+    UserService userService;
 
-	public String recommend_ad_studio(int first) {
-		Integer page = first / 20;
-		Sort sort = new Sort(Direction.DESC, "weight");
-		final Pageable pageable = PageRequest.of(page, 20, sort);
-		return JsonUtils.objectToJson(asr.findAll(pageable).getContent());
-	}
+    public String recommend_ad_project(int first) {
+//        Integer page = first / 20;
+//        Sort sort = new Sort(Direction.DESC, "weight");
+//        final Pageable pageable = PageRequest.of(page, 20, sort);
+//        return JsonUtils.objectToJson(apr.findAll(pageable).getContent());
+        return "";
+    }
 
-	public void insert_ad_project(float ad_price, Integer prj_id) {
-		Project prj = pr.get_info(prj_id);
-		AdProject ap = new AdProject();
-		ap.setPrjname(prj.getPrjname());
-		ap.setDueTime(prj.getDeadline());
-		ap.setAd_price(ad_price);
-		ap.setTag(prj.getTag());
-		ap.setSubtag(prj.getSubtag());
-		ap.setPrice(prj.getPrice());
-		ap.setImg(prj.getImg());
-		ap.setWeight(weight(ad_price));
-		ap.setPrjId(prj_id);
-		ap.setSolrid(prj.getSolr_id());
-		ap.setState(0);
-		apr.save(ap);
-	}
+    public List<Integer> recommendAdStudio(int first, int end) {
+        Map<Integer, Integer> moneyMap = new HashMap<>();
+        advertisementRepository.findAllByType(AdType.STUDIO.getId()).forEach(it -> {
+            if (userService.isStudent(it.getTypeId())) {
+                moneyMap.put(it.getTypeId(), moneyMap.getOrDefault(it.getTypeId(), 0) + it.getPrice() * 2);
+            } else {
+                moneyMap.put(it.getTypeId(), moneyMap.getOrDefault(it.getTypeId(), 0) + it.getPrice());
+            }
+        });
+        List<Integer> studioIds = new ArrayList<>(moneyMap.keySet());
+        studioIds.sort((o1, o2) -> moneyMap.get(o2).compareTo(moneyMap.get(o1)));
+        if (end > studioIds.size()) {
+            end = studioIds.size();
+        }
+        return studioIds.subList(first, end);
+    }
 
-	public Float weight(Float ad_price) {
-		return ad_price / 1000;
-	}
+    public void insert_ad_project(float ad_price, Integer prj_id) {
+//        Project prj = pr.get_info(prj_id);
+//        AdProject ap = new AdProject();
+//        ap.setPrjname(prj.getPrjname());
+//        ap.setDueTime(prj.getDeadline());
+//        ap.setAd_price(ad_price);
+//        ap.setTag(prj.getTag());
+//        ap.setSubtag(prj.getSubtag());
+//        ap.setPrice(prj.getPrice());
+//        ap.setImg(prj.getImg());
+//        ap.setWeight(weight(ad_price));
+//        ap.setPrjId(prj_id);
+//        ap.setSolrid(prj.getSolr_id());
+//        ap.setState(0);
+//        apr.save(ap);
+    }
 
-	public void insert_ad_studio(float ad_price, Integer account_id) {
-		AdStudio as = new AdStudio();
-		User ui = ur.getInfoById(account_id);
-		as.setAccount_id(account_id);
-		as.setAvatar(ui.getAvatar());
-		as.setAd_price(ad_price);
-		as.setTag(tagDao.QueryTag(account_id).toString());
-		as.setEmail(ui.getEmail());
-		as.setWeight(weight(ad_price));
-		as.setTel(ui.getTel());
-		as.setImg(ui.getImg());
-		as.setUsername(ui.getUsername());
-		as.setSolrid(ui.getSolr_id());
-		as.setCredit(ui.getCredit());
-		as.setState(0);
-		asr.save(as);
-	}
+    public Boolean isProject(String solr_id) {
+//        if (apr.findBySolrId(solr_id) != null)
+//            return true;
+//        else
+//            return false;
+        return true;
+    }
 
-	public Boolean isProject(String solr_id) {
-		if (apr.findBySolrId(solr_id) != null)
-			return true;
-		else
-			return false;
-	}
+    public JSONArray ad() {
 
-	public JSONArray ad() {
+        JSONArray array = new JSONArray();
+//        List<AdProject> p = apr.findAll();
+//        List<AdStudio> s = adStudioRepository.findAll();
+//        for (int i = 0; i < p.size(); i++) {
+//            JSONObject ad = new JSONObject();
+//            AdProject project = p.get(i);
+//            ad.put("id", project.getId());
+//            ad.put("name", project.getPrjname());
+//            ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
+//            ad.put("type", 0);
+//            ad.put("money", project.getAd_price());
+//            ad.put("solr_id", project.getSolrid());
+//            ad.put("state", project.getState());
+//            array.add(ad);
+//        }
+//        for (int i = 0; i < s.size(); i++) {
+//            JSONObject ad = new JSONObject();
+//            AdStudio studio = s.get(i);
+//            ad.put("id", studio.getId());
+//            ad.put("name", studio.getUsername());
+//            ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
+//            ad.put("type", 1);
+//            ad.put("money", studio.getAd_price());
+//            ad.put("solr_id", studio.getSolrid());
+//            ad.put("state", studio.getState());
+//            array.add(ad);
+//        }
+        return array;
+    }
 
-		JSONArray array = new JSONArray();
-		List<AdProject> p = apr.findAll();
-		List<AdStudio> s = asr.findAll();
-		for (int i = 0; i < p.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdProject project = p.get(i);
-			ad.put("id", project.getId());
-			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
-			ad.put("type", 0);
-			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolrid());
-			ad.put("state", project.getState());
-			array.add(ad);
-		}
-		for (int i = 0; i < s.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdStudio studio = s.get(i);
-			ad.put("id", studio.getId());
-			ad.put("name", studio.getUsername());
-			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
-			ad.put("type", 1);
-			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolrid());
-			ad.put("state", studio.getState());
-			array.add(ad);
-		}
-		return array;
-	}
+    public List<Advertisement> getAll() {
+        List<Advertisement> advertisementList = new ArrayList<>();
+        advertisementRepository.findAll().forEach(advertisementList::add);
+        return advertisementList;
+    }
 
-	public JSONArray adP() {
-		JSONArray array = new JSONArray();
-		List<AdProject> p = apr.findAll();
-		for (int i = 0; i < p.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdProject project = p.get(i);
-			ad.put("id", project.getId());
-			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
-			ad.put("type", 0);
-			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolrid());
-			ad.put("state", project.getState());
-			array.add(ad);
-		}
-		return array;
-	}
+    public List<Advertisement> getByType(AdType adType) {
+        return new ArrayList<>(advertisementRepository.findAllByType(adType.getId()));
+    }
 
-	public JSONArray adS() {
-		JSONArray array = new JSONArray();
-		List<AdStudio> s = asr.findAll();
-		for (int i = 0; i < s.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdStudio studio = s.get(i);
-			ad.put("id", studio.getId());
-			ad.put("name", studio.getUsername());
-			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
-			ad.put("type", 1);
-			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolrid());
-			ad.put("state", studio.getState());
-			array.add(ad);
-		}
-		return array;
-	}
-	public JSONArray adP(String text) {
-		text = '%'+text+'%';
-		JSONArray array = new JSONArray();
-		List<AdProject> p = apr.findByPrjnameLike(text);
-		for (int i = 0; i < p.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdProject project = p.get(i);
-			ad.put("id", project.getId());
-			ad.put("name", project.getPrjname());
-			ad.put("belong", pr.findCompanyNameById(project.getPrjId()));
-			ad.put("type", 0);
-			ad.put("money", project.getAd_price());
-			ad.put("solr_id", project.getSolrid());
-			ad.put("state", project.getState());
-			array.add(ad);
-		}
-		return array;
-	}
-	public JSONArray adS(String text) {
-		text = '%'+text +'%';
-		JSONArray array = new JSONArray();
-		List<AdStudio> s = asr.findByUsernameLike(text);
-		for (int i = 0; i < s.size(); i++) {
-			JSONObject ad = new JSONObject();
-			AdStudio studio = s.get(i);
-			ad.put("id", studio.getId());
-			ad.put("name", studio.getUsername());
-			ad.put("belong", ur.findUsernameById(studio.getAccount_id()));
-			ad.put("type", 1);
-			ad.put("money", studio.getAd_price());
-			ad.put("solr_id", studio.getSolrid());
-			ad.put("state", studio.getState());
-			array.add(ad);
-		}
-		return array;
-	}
+    public String judge(int advertisementId, AdState adState) {
+        Optional<Advertisement> op = advertisementRepository.findById(advertisementId);
+        if (!op.isPresent()) {
+            return "NotFound";
+        }
+        Advertisement advertisement = op.get();
+        if (advertisement.getState() != AdState.PADDING) {
+            return "hasJudge";
+        }
+        advertisement.setState(adState);
+        advertisementRepository.save(advertisement);
+        return "success";
+    }
+
 }

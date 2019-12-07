@@ -12,8 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "refund")
-public class Refund {
+public class Complain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,4 +26,5 @@ public class Refund {
     private Integer type;
     private Integer state = 0;
     private String name;
+    private int expert;
 }

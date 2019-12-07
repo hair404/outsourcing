@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dao.AdProjectRepository;
 import com.dao.ProjectDao;
 import com.dao.ProjectRepository;
 import com.dao.UserRepository;
@@ -34,8 +33,6 @@ public class ProjectController {
     ProjectDao projectDao;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    AdProjectRepository adpr;
     @Autowired
     ProjectRepository projectRepository;
 

@@ -1,17 +1,18 @@
 package com.service;
 
 import com.dao.*;
-import com.model.Notification;
-import com.model.Tag;
-import com.type.ActionType;
-import com.type.UserType;
-import com.utils.GoEasyNotification;
+import com.model.*;
+import com.type.*;
+import com.utils.OSSTools;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
-import com.model.Member;
-import com.model.User;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.annotation.Resource;
+import javax.swing.text.html.Option;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -30,6 +31,9 @@ public class UserService {
 
     @Resource
     private TagRepository tagRepository;
+
+    @Resource
+    private VerificationRepository verificationRepository;
 
 
     public boolean ifExsit(String tel) {
@@ -66,6 +70,7 @@ public class UserService {
         user.setAvatar("/avatar/default.jpg");
         userRepository.save(user);
     }
+
 
     /**
      * 计算某类所有用户的主观打分
@@ -226,5 +231,96 @@ public class UserService {
 
     public Optional<User> getUser(int userId) {
         return userRepository.findById(userId);
+    }
+
+    public boolean isStudent(int userId) {
+        Optional<User> op = userRepository.findById(userId);
+        return op.map(User::isStudent).orElse(false);
+    }
+
+    public String uploadVerification(int userId, VerificationType type, MultipartFile file) throws IOException {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return "NotFound";
+        }
+        User user = optionalUser.get();
+        user.setValidState(UserValidState.PENDING);
+
+        String uuid = UUID.randomUUID().toString();
+        Verification verification = new Verification();
+        verification.setImage("user/verification/image/" + userId + "/" + uuid + ".jpg");
+        verification.setState(VerificationState.PENDING);
+        verification.setUserId(userId);
+        verification.setType(type);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Thumbnails.of(file.getInputStream()).scale(1.0f).outputFormat("jpeg").toOutputStream(byteArrayOutputStream);
+
+
+        List<Verification> verificationList = verificationRepository.findAllByUserId(userId);
+        verificationList.forEach(it -> it.setState(VerificationState.CANCEL));
+
+        OSSTools.uploadFile("user/verification/image/" + userId + "/" + uuid + ".jpg", byteArrayOutputStream.toByteArray());
+        verificationRepository.saveAll(verificationList);
+        verificationRepository.save(verification);
+        userRepository.save(user);
+        return "success";
+    }
+
+    public List<Verification> getAllVerification() {
+        return (List<Verification>) verificationRepository.findAll();
+    }
+
+    /**
+     * 保存身份认证审核结果
+     *
+     * @param vid    审核ID
+     * @param result 审核结果
+     * @return
+     */
+    public String judgeVerification(int vid, boolean result) {
+        Optional<Verification> optionalVerification = verificationRepository.findById(vid);
+        if (!optionalVerification.isPresent()) {
+            return "NotFound";
+        }
+        Verification verification = optionalVerification.get();
+
+        Optional<User> optionalUser = userRepository.findById(verification.getUserId());
+        if (!optionalUser.isPresent()) {
+            return "NotFound";
+        }
+        User user = optionalUser.get();
+
+        //判断状态是否为等待
+        if (verification.getState() != VerificationState.PENDING) {
+            return "CanNotJudge";
+        }
+
+        //设置Verification状态
+        verification.setState(result ? VerificationState.PASS : VerificationState.REJECT);
+        //设置User中的认证状态
+        user.setValidState(result ? UserValidState.PASS : UserValidState.REJECT);
+
+        //保存数据
+        verificationRepository.save(verification);
+        userRepository.save(user);
+
+        return "success";
+    }
+
+    public String deleteUser(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return "NotFound";
+        }
+        User user = optionalUser.get();
+
+        //设置账户状态为删除
+        user.setDeleted(true);
+
+        //保存数据
+        userRepository.save(user);
+
+        return "success";
     }
 }

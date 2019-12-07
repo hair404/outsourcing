@@ -6,8 +6,9 @@ public enum ActionType {
     UNKNOWN(-1),
     JUMP_PROJECT(0),
     // solr_id 项目的solr_id
-    JUMP_USER(1);
+    JUMP_USER(1),
     // id 用户id
+    CENTER(2);
 
     @Getter
     private int id;
@@ -26,7 +27,7 @@ public enum ActionType {
     }
 
     public static String generateJumpProjectParams(String solrId) {
-        return "{\"solrId:\":\"{0}\"}".replace("{0}", solrId);
+        return "{\"solrId\":\"{0}\"}".replace("{0}", solrId);
     }
 
 }

@@ -3,6 +3,8 @@ package com.service;
 import java.io.File;
 import java.io.IOException;
 
+import com.common.PictureCommon;
+import com.type.PictureType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,23 +12,18 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dao.ActivityRepository;
 import com.model.Activity;
 
+import javax.annotation.Resource;
+
 @Service
 public class ActivityService {
-	@Autowired
-	ActivityRepository ar;
-	public void register_activity(MultipartFile file, String url) {
-		String fileName = file.getOriginalFilename();
-		String filePath = "F:/img/activity_img/";
-		File dest = new File(filePath + fileName);
-		String img_url = "/activity_img/" + fileName;
-		try {
-			Activity ac = new Activity();
-			ac.setUrl(url);
-			ac.setImg(img_url);
-			ar.save(ac);
-			file.transferTo(dest);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-  }
+	@Resource
+	private ActivityRepository activityRepository;
+	public void registerActivity(MultipartFile file, String url) throws IOException {
+		File dest = PictureCommon.saveImage(file, PictureType.ACTIVITY);
+		String img_url = "/activity_img/" + dest.getName();
+		Activity activity = new Activity();
+		activity.setUrl(url);
+		activity.setImg(img_url);
+		activityRepository.save(activity);
+	}
 }

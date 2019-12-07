@@ -4,6 +4,7 @@ import com.dao.BidRepository;
 import com.dao.ProjectRepository;
 import com.model.Bid;
 import com.model.Project;
+import com.type.ActionType;
 import com.type.BidState;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,28 @@ public class BidService {
     @Resource
     private ProjectRepository projectRepository;
 
-    public void bid(Project project, int studioId, int quote) {
+    @Resource
+    private NotificationService notificationService;
+
+    public String bid(int projectId, int studioId, int quote) {
+
+        Optional<Project> op = projectRepository.findById(projectId);
+        if (!op.isPresent()) {
+            return "NotFound";
+        }
+
+        Project project = op.get();
+
+        if (project.getState() != 1) {
+            return "fail";
+        }
+
+        Optional<Bid> optionalBid = bidRepository.getByProjectIdAndStudioId(projectId, studioId);
+
+        if (optionalBid.isPresent()) {
+            return "fail";
+        }
+
         Bid bid = new Bid();
         bid.setCompanyId(project.getCompanyID());
         bid.setProjectId(project.getId());
@@ -28,6 +50,7 @@ public class BidService {
         bid.setQuote(quote);
         bid.setStudioId(studioId);
         bidRepository.save(bid);
+        return "success";
     }
 
     public String pick(int projectId, int studioId) {
@@ -57,6 +80,9 @@ public class BidService {
         project.setPrice((float) bid.getQuote());
         project.setState(2);
         projectRepository.save(project);
+
+        notificationService.notify(studioId, "您中标了", "您投标的一个项目成功中标，点击查看详情", ActionType.JUMP_PROJECT, ActionType.generateJumpProjectParams(project.getSolr_id()));
+
         return "success";
     }
 }

@@ -30,7 +30,7 @@
       :ctg="ctg"
     />
     <v-content>
-      <keep-alive include="search,detail,show">
+      <keep-alive include="search,show,center,manage">
         <router-view
           :info="info"
           :infoLoaded="infoLoaded"
@@ -39,6 +39,7 @@
           :ctg_="ctgEmit"
           :subctg_="subctgEmit"
           :snackbar="snackbar"
+          :receivedNotice="receivedNotice"
         />
       </keep-alive>
     </v-content>
@@ -70,7 +71,8 @@ export default {
         open: false,
         color: 'primary',
         text: '错误'
-      }
+      },
+      receivedNotice: false
     }
   },
   methods: {
@@ -84,11 +86,17 @@ export default {
             this.$goEasy.subscribe({
               channel: String(response.data.id), // 替换为您自己的channel
               onMessage: function (message) {
-                var notification = new Notification(JSON.parse(message.content).title, {
-                  body: JSON.parse(message.content).content
-                })
-                notification.onclick = function () {
-                  this.$router.push(message.content.url)
+                this.receivedNotice = true
+                if (Notification) {
+                  var notification = new Notification(JSON.parse(message.content).title, {
+                    body: JSON.parse(message.content).content
+                  })
+                  notification.onclick = function () {
+                    this.$router.push(message.content.url)
+                  }
+                } else {
+                  // eslint-disable-next-line
+                  if (plus) plus.push.createMessage(JSON.parse(message.content).title, null, { title: JSON.parse(message.content).title })
                 }
               }
             })

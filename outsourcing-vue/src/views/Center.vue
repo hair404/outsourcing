@@ -7,14 +7,16 @@
     <v-dialog
       max-width="400"
       v-model="dialog.open"
-      :persistent="myinfo.isValid === 0"
+      :persistent="myinfo.isValid !== 1"
     >
       <template v-if="dialog.state === 0">
         <v-card>
-          <v-card-title>{{info.type === 1 ? '上传身份证':'上传营业执照'}}</v-card-title>
+          <v-card-title>上传营业执照</v-card-title>
           <v-card-text>
+            <p v-if="myinfo.isValid === 2">您已经上传过一次，再次上传将会覆盖原有记录</p>
+            <p v-if="myinfo.isValid === 3">您的证件无效，请再次上传</p>
             <v-file-input
-              :label="info.type === 1 ? '身份证正面':'上传营业执照'"
+              label="上传营业执照"
               v-model="file0"
               accept="image/*"
               filled
@@ -186,7 +188,7 @@
                 v-model="prj.pia"
                 label="首付款"
                 type="Number"
-                :rules="[v => (v>0 && v<parseInt(prj.price)) || '大于0且小于总价']"
+                :rules="[v => (v>0 && v<parseInt(0.1*prj.price)) || '大于0且小于'+prj.price*0.1+'（总价百分之10）']"
                 required
               ></v-text-field>
             </v-form>
@@ -209,7 +211,7 @@
             <div class="title mb-2">你在首页时间以及权重将会由你付的金额决定</div>
             <v-select
               v-model="price"
-              :items="[{text:'￥100',value:100},{text:'￥300',value:300},{text:'￥1000',value:1000}]"
+              :items="[{text:'￥1000',value:1000},{text:'￥3000',value:3000},{text:'￥10000',value:10000}]"
               color="primary"
               label="快速选择"
               outlined
@@ -257,7 +259,7 @@
     </v-dialog>
 
     <div :class="cardClass === true?'v-card v-sheet theme--light':''">
-      <v-row>
+      <v-row style="height: 800px">
         <v-col
           cols="3"
           class="d-none d-md-flex"
@@ -288,12 +290,11 @@
 
         <v-col
           :cols="(state === 1 && cardClass)?9:''"
-          style="height: 800px"
           :class="state === 0? 'py-0':''"
         >
           <template v-if="state === 0">
             <v-card
-              height="800"
+              :style="info.type === 0 ? 'height: 510px' : 'height: 800px'"
               class="mx-auto"
             >
               <v-parallax
@@ -350,17 +351,17 @@
                   <div class="grey--text ml-4">{{myinfo.credit}}</div>
                 </v-row>
 
-                <v-icon>mdi-email</v-icon>
+                <v-icon class="my-4">mdi-email</v-icon>
 
-                <div class="my-4 mr-4 subtitle-1 black--text d-inline-block">
+                <div class="ml-4 subtitle-1 black--text d-inline-block">
                   {{myinfo.email}}
                 </div>
 
                 <br>
 
-                <v-icon>mdi-phone</v-icon>
+                <v-icon class="my-4">mdi-phone</v-icon>
 
-                <div class="my-4 subtitle-1 black--text d-inline-block">
+                <div class="ml-4 subtitle-1 black--text d-inline-block">
                   {{myinfo.tel}}
                 </div>
 
@@ -376,7 +377,7 @@
                   <v-list>
                     <v-list-item-group
                       color="primary"
-                      style="height: 220px;overflow-y: auto"
+                      style="height: 200px;overflow-y: auto"
                     >
                       <v-list-item
                         v-for="(item, i) in member"
@@ -393,7 +394,7 @@
                 </v-card-text>
               </template>
 
-              <v-card-actions>
+              <v-card-actions style="position: absolute;bottom: 0px">
                 <v-btn
                   color="deep-purple accent-4"
                   text
@@ -428,6 +429,11 @@
             </v-card>
           </template>
 
+          <p
+            v-if="state!=0"
+            class="display-1 mt-8 mb-8"
+          >{{tabs[state].name}}</p>
+
           <template v-if="state === 1">
             <v-row>
               <v-select
@@ -448,7 +454,7 @@
               >发布项目</v-btn>
             </v-row>
             <LoadCard
-              style="height: 700px;overflow-y: auto"
+              style="height: 580px;overflow-y: auto"
               :type="1"
               address="my_prj"
               :extraParam="utils.toFormData({'state':proSelect})"
@@ -483,15 +489,16 @@
             <v-list-item-group
               style="height: 700px;overflow-y: auto"
               color="primary"
+              class="mr-12"
             >
               <v-list-item
                 v-for="(item, i) in message"
                 :key="i"
-                @click="this.router.push(item.url)"
+                @click="$router.push('/'+item.url)"
               >
                 <v-list-item-content>
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>{{ item.content }}</v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -502,11 +509,35 @@
               :info="info"
               :myinfo="myinfo"
               :snackbar="snackbar"
-              class="mt-12"
+              class="mt-6 mr-6"
             />
           </template>
 
           <template v-if="state === 4">
+            <v-text-field
+              v-model="alipay"
+              outlined
+              class="d-inline-block mr-4"
+              style="width: 80%"
+              color="primary"
+              label="你的支付宝账号"
+            ></v-text-field>
+            <v-btn
+              outlined
+              color="primary"
+              @click="updateAlipay()"
+            >更新</v-btn>
+            <Table
+              ref="table"
+              :data="money"
+              :headers="[{ text: '流水号', value: 'id' }, { text: '金额', value: 'amount' }, { text: '类型', value: 'typeName' }, { text: '目标', value: 'target' }, { text: '时间', value: 'timeFormatted' }]"
+              itemkey="id"
+              class="mr-12"
+              isCompany
+            ></Table>
+          </template>
+
+          <template v-if="state === 5">
             <v-btn
               outlined
               color="primary"
@@ -557,6 +588,7 @@ import LoadCard from '../components/LoadCard'
 import Info from '../components/Info'
 
 export default {
+  name: 'center',
   components: {
     Table,
     LoadCard,
@@ -578,7 +610,7 @@ export default {
       state: 0,
       cardClass: true,
       myinfo: {},
-      tabs: [{ name: '个人信息', icon: 'mdi-account' }, { name: '我的项目', icon: 'mdi-progress-wrench' }, { name: '我的消息', icon: 'mdi-bell' }, { name: '编辑信息', icon: 'mdi-account-edit' }],
+      tabs: [{ name: '个人信息', icon: 'mdi-account' }, { name: '我的项目', icon: 'mdi-progress-wrench' }, { name: '我的消息', icon: 'mdi-bell' }, { name: '编辑信息', icon: 'mdi-account-edit' }, { name: '资金管理', icon: 'mdi-cash' }],
       file: null,
       avatar: null,
       overlay: false,
@@ -587,11 +619,13 @@ export default {
       proSelect: 0,
       message: [],
       member: [],
+      money: [],
       mem: { name: '', info: '', tel: '', email: '' },
       prj: { prjname: '', tag: 0, subtag: 0, file: null, info: '', deadline: new Date().toISOString().substr(0, 10), price: '', pia: '' },
       ctgValue: [],
       headers: [{ text: '名字', value: 'name' }, { text: '介绍', value: 'info' }, { text: '邮箱', value: 'email' }, { text: '电话', value: 'tel' }],
-      price: 0
+      price: 0,
+      alipay: ''
     }
   },
   methods: {
@@ -669,7 +703,7 @@ export default {
             this.snackbar.open = true
           })
       } else if (a === 3) {
-        fd.append('type', 2)
+        fd.append('type', this.info.type)
         fd.append('file', this.file0)
         Axios.post(this.utils.baseURL + '/verify', fd)
           .then(response => {
@@ -709,10 +743,8 @@ export default {
         .then(response => {
           if (response.data) {
             var id = window.open('', '_blank', 'height=800,width=1000')
-            id.onload = function () {
-              id.document.body.innerHTML = response.data
-              id.document.forms[0].submit()
-            }
+            id.document.body.innerHTML = response.data
+            id.document.forms[0].submit()
           }
         })
         .catch(error => {
@@ -729,6 +761,21 @@ export default {
           this.$router.push({ path: '/Login' })
         }
       }).catch(error => { console.log(error) })
+    },
+    updateAlipay () {
+      Axios.post(this.utils.baseURL + '/payment/bind', 'account=' + this.alipay).then(response => {
+        if (response.data.code > 0) {
+          this.snackbar.color = 'green'
+          this.snackbar.text = '成功'
+          this.snackbar.open = true
+        } else
+          throw ''
+      }).catch(error => {
+        console.log(error)
+        this.snackbar.color = 'error'
+        this.snackbar.text = '服务器错误'
+        this.snackbar.open = true
+      })
     }
   },
   created () {
@@ -738,7 +785,7 @@ export default {
 
     Axios.post(this.utils.baseURL + '/center').then(response => {
       this.myinfo = response.data
-      if (response.data.isValid === 0) {
+      if (response.data.isValid !== 1) {
         this.dialog.open = true
         this.dialog.state = 0
       }
@@ -746,6 +793,14 @@ export default {
 
     Axios.get(this.utils.baseURL + '/notify').then(response => {
       this.message = response.data
+    }).catch(error => { console.log(error) })
+
+    Axios.get(this.utils.baseURL + '/payment/info').then(response => {
+      this.money = response.data.content.list
+      this.money.forEach((item) => {
+        item.amount *= item.income * 2 - 1
+      })
+      this.alipay = response.data.content.account
     }).catch(error => { console.log(error) })
 
     if ((this.info.type === 1) && (this.tabs.length === 4)) {
@@ -759,6 +814,14 @@ export default {
     state: function (newS, oldS) {
       if (newS === undefined)
         this.state = oldS
+      if (newS === 4)
+        Axios.get(this.utils.baseURL + '/payment/info').then(response => {
+          this.money = response.data.content.list
+          this.money.forEach((item) => {
+            item.amount *= item.income * 2 - 1
+          })
+          this.alipay = response.data.content.account
+        }).catch(error => { console.log(error) })
     },
     infoLoaded: function (loaded) {
       if (loaded === true)

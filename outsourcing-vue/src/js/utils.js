@@ -4,7 +4,7 @@ import Axios from 'axios'
 
 const type = ['企业', '工作室', '管理员', '游客']
 
-const ctg = [
+var ctg = [
   {
     name: '全部'
   },
@@ -32,7 +32,7 @@ const ctg = [
 function refreshCtg() {
   Axios.post(baseURL + '/getCtg')
     .then(response => {
-      if (response.data) ctg.response.data
+      if (response.data) ctg = response.data
     })
     .catch(error => {
       console.log(error)
@@ -63,7 +63,7 @@ function getTextValue(a, b, callback) {
 
 var baseURL =
   process.env.NODE_ENV === 'production'
-    ? 'http://192.168.1.222:8080'
+    ? 'http://47.94.212.141:8080/Platform'
     : '/Platform'
 
 Array.prototype.contain = function(val) {

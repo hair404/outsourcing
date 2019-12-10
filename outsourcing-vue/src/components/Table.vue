@@ -42,31 +42,23 @@
 
       <template v-slot:item.action="{ item }">
         <template v-if="callback && isCallback(item)">
-          <v-btn
+
+          <v-icon
             v-if="typeof callback === 'function'"
-            fab
-            small
-            color="primary"
+            @click.stop="callback(item)"
           >
-            <v-icon @click.stop="callback(item)">
-              {{callbackIcon}}
-            </v-icon>
-          </v-btn>
-          <v-btn
-            fab
-            small
-            class="mr-2"
-            color="primary"
+            {{typeof callback === 'function'?callbackIcon(item):callbackIcon}}
+          </v-icon>
+
+          <v-icon
             v-else
+            class="mr-2"
+            v-for="(call, i) in callback"
+            :key="i"
+            @click.stop="call(item)"
           >
-            <v-icon
-              v-for="(call, i) in callback"
-              :key="i"
-              @click.stop="call(item)"
-            >
-              {{callbackIcon[i]}}
-            </v-icon>
-          </v-btn>
+            {{callbackIcon[i]}}
+          </v-icon>
         </template>
       </template>
     </v-data-table>
@@ -93,7 +85,7 @@ export default {
       default: () => { return true }
     },
     callback: [Function, Array],
-    callbackIcon: [String, Array],
+    callbackIcon: [String, Array, Function],
     itemperPage: {
       type: Number,
       default: 100

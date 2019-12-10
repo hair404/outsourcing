@@ -139,24 +139,24 @@
       <v-card v-if="dialog.state===4">
         <v-card-title>验证图片</v-card-title>
         <v-card-text>
-          <v-img :src="utils.baseURL+clickedrow.img"></v-img>
+          <v-img :src="clickedrow.img"></v-img>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
-            @click="action(1,[clickedrow,1])"
+            @click="action(7,[clickedrow,1])"
           >通过</v-btn>
           <v-btn
             color="primary"
             text
-            @click="action(0,[clickedrow,1])"
+            @click="action(7,[clickedrow,0])"
           >不通过</v-btn>
           <v-btn
             color="primary"
             text
-            @click="$router.push({name:'display',params:{id:clickedrow.id}})"
+            @click="$router.push({name:'display',params:{id:clickedrow.userId}})"
           >查看信息</v-btn>
         </v-card-actions>
       </v-card>
@@ -165,7 +165,7 @@
 
     <ConfirmDialog :CDialog="CDialog"></ConfirmDialog>
 
-    <v-card height="fit-content">
+    <v-card height="800px">
       <v-row>
         <v-col
           cols="3"
@@ -209,10 +209,10 @@
               <v-col>
                 <v-select
                   v-model="select"
-                  :items="utils.getTextValue(types)"
+                  :items="utils.getTextValue(status)"
                   width="100%"
                   color="primary"
-                  label="类型"
+                  label="验证类型"
                   outlined
                 ></v-select>
               </v-col>
@@ -256,12 +256,12 @@
               ref="table"
               :data="dataUser"
               :headers="headers"
-              :callback="(item)=>{(CDialog.callback = (()=>{action(0,item)})) && (CDialog.open = true)}"
+              :callback="(item)=>{item.state !== '通过'?((clickedrow = item),(dialog.open = true),(dialog.state = 4)):((CDialog.callback = (()=>{action(0,item)})) && (CDialog.open = true))}"
               itemkey="id"
               issort
-              callbackIcon="mdi-trash-can-outline"
+              :callbackIcon="(item)=>{return item.state !== '通过'?'mdi-face-recognition':'mdi-trash-can-outline'}"
               :itemperPage="10"
-              :rowCallback="(item)=>{item.img?clickedrow = item&&(dialog.open = true)&&(dialog.state = 4):$router.push({name:'display',params:{id:item.id}})}"
+              :rowCallback="(item)=>{state !== '通过'?((clickedrow = item),(dialog.open = true),(dialog.state = 4)):((CDialog.callback = (()=>{action(0,item)})) && (CDialog.open = true))}"
             ></Table>
             <v-fab-transition>
               <v-btn
@@ -299,7 +299,7 @@
               <v-col>
                 <v-select
                   v-model="select"
-                  :items="utils.getTextValue(['项目','工作室'])"
+                  :items="utils.getTextValue(['全部','项目','工作室'])"
                   width="100%"
                   color="primary"
                   label="类型"
@@ -330,9 +330,9 @@
               itemkey="id"
               issort
               :callbackIcon="['mdi-check','mdi-close']"
-              :rowCallback="(item)=>{$router.push(item.type === 0?{name:'display',params:{id:item.solr_id}}:{name:'detail',params:{id:item.solr_id}})}"
+              :rowCallback="(item)=>{$router.push(item.type === '工作室'?{name:'display',params:{id:item.solr_id}}:{name:'detail',params:{id:item.solr_id}})}"
               :itemperPage="10"
-              :isCallback="item=>{return item.state === '未通过'}"
+              :isCallback="item=>{return item.state === ADstate[0]}"
             ></Table>
           </template>
 
@@ -422,7 +422,7 @@
                             <v-icon>mdi-trash-can-outline</v-icon>
                           </v-list-item-icon>
                         </v-list-item>
-                        <v-list-item @click="(addsubctg = false) && (dialog.open = true) && (dialog.state = 3)">
+                        <v-list-item @click="(addsubctg = false) , (dialog.open = true) , (dialog.state = 3)">
                           <v-icon style="position: relative;left: calc(50% - 12px)">mdi-plus</v-icon>
                         </v-list-item>
                       </v-list-item-group>
@@ -430,7 +430,7 @@
                   </v-card>
                 </v-col>
                 <v-col>
-                  <v-card v-if="selectCtg !== undefined">
+                  <v-card v-if="ctg[selectCtg] !== undefined">
                     <v-list>
                       <v-list-item-group color="primary">
                         <v-list-item
@@ -493,6 +493,7 @@ import Table from '../components/Table'
 import ConfirmDialog from '../components/ConfirmDialog'
 
 export default {
+  name: 'manage',
   props: {
     info: Object,
     infoLoaded: Boolean,
@@ -520,6 +521,7 @@ export default {
         callback: null
       },
       state: 0,
+      status: ['全部', '通过', '等待审核', '拒绝', '取消'],
       tabs: [{ name: '用户管理', icon: 'mdi-account-badge-outline' },
         { name: '广告管理', icon: 'mdi-post-outline' },
         { name: '资金流', icon: 'mdi-cash-usd-outline' },
@@ -531,9 +533,9 @@ export default {
       text: '',
       types: ['全部', '企业', '工作室'],
       moneyType: ['全部', '首付款', '押金', '阶段款', '广告投放退款', '延误罚款', '赔款'],
-      headers: [{ text: '用户id', value: 'id' }, { text: '用户名', value: 'username' }, { text: '类型', value: 'type' }],
-      headersAD: [{ text: '广告id', value: 'id' }, { text: '名字', value: 'name' }, { text: '所属', value: 'belong' }, { text: '金额', value: 'money' }, { text: '类型', value: 'type' }, { text: '状态', value: 'state' }],
-      ADstate: ['未通过', '通过'],
+      headers: [{ text: '用户id', value: 'userId' }, { text: '用户名', value: 'username' }, { text: '类型', value: 'type' }, { text: '状态', value: 'state' }],
+      headersAD: [{ text: '广告id', value: 'id' }, { text: '名字', value: 'belong' }, { text: '金额', value: 'money' }, { text: '类型', value: 'type' }, { text: '状态', value: 'state' }],
+      ADstate: ['暂未审批', '通过', '未通过'],
       headersMoney: [{ text: 'id', value: 'id' }, { text: '金额', value: 'money' }, { text: '用途', value: 'usage' }, { text: '付款方', value: 'from' }, { text: '收钱方', value: 'to' }],
       headersActivity: [{ text: 'id', value: 'id' }, { text: '活动名', value: 'name' }, { text: '地址', value: 'url' }],
       activity: {
@@ -591,7 +593,8 @@ export default {
                 this.snackbar.text = '服务器错误'
                 this.snackbar.open = true
               })
-          }
+          } else
+            throw 'error'
         })
         .catch(error => {
           console.log(error)
@@ -604,7 +607,8 @@ export default {
       var extra = ''
       switch (a) {
         case 0:
-          extra += 'isVerified=' + this.selectVerified + '&'
+          extra += 'type=' + this.selectVerified + '&' + 'status=' + this.select + '&text=' + this.text
+          break
         // eslint-disable-next-line
         case 1:
         case 2:
@@ -618,8 +622,14 @@ export default {
           if (response.data) {
             response.data.forEach((item, i) => {
               this.$set(b, i, item)
-              b[i].type = utils.type[item.type]
-              b[i].state = this.ADstate[item.state]
+              if (this.state === 1)
+                b[i].type = utils.type[item.type - 1]
+              else
+                b[i].type = utils.type[item.type]
+              if (this.state === 0)
+                b[i].state = this.status[item.state]
+              else
+                b[i].state = this.ADstate[item.state]
             })
           }
         })
@@ -651,7 +661,7 @@ export default {
           extra += 'id=' + e.id
           break
         case 1:
-          extra += 'solr_id=' + e[0].id + '&do=' + e[1]
+          extra += 'id=' + e[0].id + '&do=' + e[1]
           break
         case 5:
           extra += 'id=' + e[0].id + '&do=' + e[1]
@@ -714,10 +724,10 @@ export default {
     this.ctg = utils.ctg.slice(1)
 
     if (this.info && this.info.type)
-      if (this.info.type === 2 || this.info.type === 3) {
-        this.dialog.open = true
-      } else
+      if (this.info.type === 0 || this.info.type === 1) {
         this.$router.push('/home')
+      } else
+        this.dialog.open = false
     else
       this.dialog.open = true
   },

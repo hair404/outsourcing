@@ -33,6 +33,10 @@
             height="170"
             :src="utils.baseURL + item.img"
           >
+            <div
+              style="height: 170px;position: absolute;width: 100%;top: 0;z-index: -1;"
+              class="fill-height bottom-gradient"
+            ></div>
             <v-card-title>
               <v-avatar v-if="type === 0">
                 <img :src="utils.baseURL+item.avatar" />
@@ -49,7 +53,7 @@
           </v-img>
           <v-card-text class="text--primary">
             <div
-              v-if="item.credit"
+              v-if="item.credit != undefined"
               style="overflow-x: auto;"
             >
               <div style="display: inline-flex">
@@ -207,7 +211,12 @@ export default {
         this.update()
       }
     },
-    isLoaded: function () {
+    isLoaded: function (newV) {
+      if (newV) {
+        this.$forceUpdate()
+        console.log('dawdwdaw')
+      }
+      console.log(newV)
       this.cards = this.cardsProp
     },
     page: function () {
@@ -226,6 +235,24 @@ export default {
 <style scoped>
 .grid {
   width: 25%;
+}
+
+.bottom-gradient {
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.4) 0%,
+    transparent 72px
+  );
+}
+
+.repeating-gradient {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 0, 0, 0.25),
+    rgba(255, 0, 0, 0.25) 5px,
+    rgba(0, 0, 255, 0.25) 5px,
+    rgba(0, 0, 255, 0.25) 10px
+  );
 }
 
 @media screen and (max-width: 960px) {

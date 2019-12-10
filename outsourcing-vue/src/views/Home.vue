@@ -19,8 +19,8 @@
                 align="center"
                 justify="center"
               >
-                <v-parallax
-                  style="width:100%"
+                <v-img
+                  style="min-width:100%"
                   :src="utils.baseURL + '' + item.img"
                 />
               </v-row>

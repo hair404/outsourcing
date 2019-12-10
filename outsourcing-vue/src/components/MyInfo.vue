@@ -82,6 +82,7 @@
         <v-btn
           color="primary"
           text
+          @click="$router.push('/display/'+ info.id)"
         >
           展示页面
         </v-btn>

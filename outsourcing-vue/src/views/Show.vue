@@ -7,13 +7,13 @@
         :src="utils.baseURL + displayinfo.img"
       >
         <v-icon
-          color="grey"
+          color="white"
           class="ml-4 my-4"
           style="position: absolute;top: 0px;"
           @click="$router.back()"
         >mdi-arrow-left</v-icon>
         <v-card-title>
-          <v-avatar>
+          <v-avatar class="mr-4">
             <img :src="utils.baseURL + displayinfo.avatar" />
           </v-avatar>
           {{displayinfo.username}}
@@ -63,7 +63,7 @@
         ></LoadCard>
       </v-tab-item>
 
-      <v-tab-item>
+      <v-tab-item v-if="displayinfo.bid">
         <LoadCard
           :isLoaded="isloaded"
           :cardsProp="bid"
@@ -91,10 +91,11 @@
 <script>
 import axios from 'axios'
 import LoadCard from '../components/LoadCard'
+import Table from '../components/Table'
 
 export default {
   name: 'show',
-  components: { LoadCard },
+  components: { LoadCard, Table },
   data () {
     return {
       displayinfo: {},
@@ -128,6 +129,9 @@ export default {
     }
   },
   created () {
+    this.loaddisplayinfo()
+  },
+  mounted () {
     this.loaddisplayinfo()
   }
 }

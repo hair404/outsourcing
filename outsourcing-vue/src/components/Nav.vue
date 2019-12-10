@@ -4,7 +4,10 @@
       <v-card min-height="100px">
         <v-card-title style="display: inline-block">消息</v-card-title>
         <v-card-title style="display: inline-block;float:right">
-          <v-btn text>清除通知</v-btn>
+          <v-btn
+            @click="clear()"
+            text
+          >清除通知</v-btn>
         </v-card-title>
         <div
           v-if="message.length === 0"
@@ -100,17 +103,20 @@
         <v-list class="d-none d-sm-flex">
           <v-subheader style="float:left">消息</v-subheader>
           <v-subheader style="float:right">
-            <v-btn text>清除通知</v-btn>
+            <v-btn
+              @click="clear()"
+              text
+            >清除通知</v-btn>
           </v-subheader>
           <v-list-item-group color="primary">
             <v-list-item
               v-for="(item, i) in message"
               :key="i"
-              @click="this.router.push(item.url)"
+              @click="$router.push('/'+item.url)"
             >
               <v-list-item-content>
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
-                <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ item.content }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -180,20 +186,25 @@
                 @click="if(window.innerWidth < 600) dialog = true"
               >消息</div>
             </template>
-            <v-list class="d-none d-sm-flex">
-              <v-subheader style="float:left">消息</v-subheader>
-              <v-subheader style="float:right">
-                <v-btn text>清除通知</v-btn>
-              </v-subheader>
+            <v-list class="d-none d-sm-block">
+              <div style="height: 48px">
+                <v-subheader style="float:left">消息</v-subheader>
+                <v-subheader style="float:right">
+                  <v-btn
+                    @click="clear()"
+                    text
+                  >清除通知</v-btn>
+                </v-subheader>
+              </div>
               <v-list-item-group color="primary">
                 <v-list-item
                   v-for="(item, i) in message"
                   :key="i"
-                  @click="this.router.push(item.url)"
+                  @click="$router.push('/'+item.url)"
                 >
                   <v-list-item-content>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ item.body }}</v-list-item-subtitle>
+                    <v-list-item-subtitle>{{ item.content }}</v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
               </v-list-item-group>
@@ -263,7 +274,7 @@
             v-for="(item,i) in menu"
             :key="i"
           >
-            <v-list-item-title @click="$emit('keyword', i-1) && $router.push({path:item.path})">{{item.name}}</v-list-item-title>
+            <v-list-item-title @click="$emit('keyword', i-1), $router.push(item.path)">{{item.name}}</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -327,7 +338,7 @@ export default {
     return {
       drawer: null,
       searchBar: false,
-      menu: [{ name: '首页', path: '/home' }, { name: '全部招标', path: '/search' }, { name: '全部工作室', path: '/search' }],
+      menu: [{ name: '首页', path: 'home' }, { name: '全部招标', path: 'search' }, { name: '全部工作室', path: 'search' }],
       menuSelected: 0,
       keywords: '',
       dialog: false,
@@ -343,6 +354,14 @@ export default {
         this.$emit('keyword', [this.keywords])
         this.$router.push({ path: '/search' })
       }
+    },
+    clear () {
+      Axios.post(this.utils.baseURL + '/clearNotify')
+        .then(response => {
+          if (response.data === 'success')
+            this.message = []
+        })
+        .catch(error => { console.log(error) })
     }
   },
   created () {

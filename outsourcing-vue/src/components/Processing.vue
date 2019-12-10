@@ -62,7 +62,7 @@
             <template v-if="punishSelect === 0">
               <v-text-field
                 v-model="money"
-                :rules="[v => v < 100 && v > 0 || '必须小于100大于0']"
+                :rules="[v => v <= 30 && v > 0 || '必须小于30大于0']"
                 type="Number"
                 label="金额百分比"
                 required
@@ -124,16 +124,20 @@
         <v-expansion-panel-header disable-icon-rotate>
           {{getName(item,i)}}
           <template v-slot:actions>
-            <div class="text--secondary mr-4">截止时间：{{new Date(new Date().setDate(new Date().getDate()+item.time)).toLocaleDateString().replace(/\//g, "-") }}</div>
+            <div class="text--secondary mr-4">截止时间：{{ item.deadline }}</div>
             <v-icon :color="state[item.state].color">{{state[item.state].icon}}</v-icon>
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           {{item.info}}
+          <div>进度款：￥{{item.price}}</div>
           <div v-if="item.state === 3 && type === 0">对方已经延误，可以进行处罚</div>
           <div v-if="(item.state === 4 && type === 0)||(item.state === 7 && type === 1)">对方可能在<Countdown :deadline="item.deadline"></Countdown>内发起申诉</div>
-          <div v-if="item.state === 4 && type === 1">你被扣{{item.money}}%的进度款，你可以选择在<Countdown :deadline="item.deadline"></Countdown>内发起申诉</div>
-          <div v-if="item.state === 7 && type === 0">你被扣{{item.money}}%的押金由于延误支付进度款，你可以选择在<Countdown :deadline="item.deadline"></Countdown>内发起申诉</div>
+          <div
+            v-if="item.state === 4 && type === 1"
+            style="color:red"
+          >处罚款：￥{{item.price - item.payPrice}}</div>
+          <div v-if="item.state === 7 && type === 0">您被扣{{item.money}}%的押金由于延误支付进度款，你可以选择在<Countdown :deadline="item.deadline"></Countdown>内发起申诉</div>
           <div v-if="item.state === 8">现在处于处理申诉状态，请耐心等候</div>
 
           <div style="float: right">
@@ -199,7 +203,7 @@
               color="green"
               class="mr-4"
               @click="$emit('submit',6,{stepid:item.part}) || (stepid = item.part)"
-            >付款({{item.price}})</v-btn>
+            >付款({{item.payPrice}})</v-btn>
             <div
               v-if="item.state === 5 && type === 1"
               class="text--secondary mr-4"
@@ -269,10 +273,11 @@ export default {
       window: window,
       reason: '',
       punishCompany: [{ text: '减少进度款', value: 0 }, { text: '延长时间', value: 1 }, { text: '取消', value: 2 }],
-      punishStudio: ['扣押金', '延长时间', '取消'],
+      punishStudio: [{ text: '扣押金', value: 0 }, { text: '延长时间', value: 1 }, { text: '取消', value: 2 }],
       punishSelect: 0,
       progress: 0,
-      uploadProgress: 0
+      uploadProgress: 0,
+      money: 0
     }
   },
   methods: {

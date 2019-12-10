@@ -35,10 +35,10 @@
       </v-card>
     </v-dialog>
 
-    <v-form class="wrapper">
+    <v-form>
       <template v-for="(item,i) in editinfo">
         <v-text-field
-          v-if="i !== 2"
+          v-if="i !== 2 && i !== 4"
           :key="i"
           v-model="item.value"
           type="text"
@@ -49,7 +49,7 @@
         <div
           :key="i"
           style="height: 70px;overflow-x: auto;"
-          v-else-if="info.type === 1"
+          v-else-if="info.type === 1 && i === 2"
         >
           <div style="display: inline-flex">
             <v-chip
@@ -83,6 +83,19 @@
               </v-list>
             </v-menu>
           </div>
+        </div>
+        <div
+          :key="i"
+          v-else-if="i === 4"
+        >
+          <v-textarea
+            :key="i"
+            v-model="item.value"
+            type="text"
+            :label="item[Object.keys(item)[0]]"
+            required
+            filled
+          />
         </div>
       </template>
       <v-btn

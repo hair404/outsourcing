@@ -17,11 +17,11 @@
 
       <v-card-actions class="py-3 ">
         <v-icon
-          v-if="(prjinfo.hasPaid || prjinfo.isdeposit) != 0"
+          v-if="info.type === 0 ? prjinfo.isdeposit === 1 : prjinfo.hasPaid === 1"
           color="green"
         >mdi-check</v-icon>
         <v-btn
-          :disabled="(prjinfo.hasPaid || prjinfo.isdeposit) != 0"
+          :disabled="info.type === 0 ? prjinfo.isdeposit === 1 : prjinfo.hasPaid === 1"
           color="primary"
           text
           outlined

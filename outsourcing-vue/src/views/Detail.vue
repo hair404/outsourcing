@@ -21,7 +21,7 @@
           <v-btn
             color="primary"
             text
-            @click="info.type === 0?action(0, { studioid: id }, () => { state = 2 }):action(0,{quote:quote}) && (dialog = false)"
+            @click="info.type === 0?action(0, { studioid: id }, () => { state = 2 }):action(0,{quote:quote},()=>{}) && (dialog = false)"
           >确认</v-btn>
           <v-btn
             color="primary"
@@ -211,7 +211,7 @@
             class="mr-4"
           >{{infoLoaded===true?utils.ctg[projectInfo.tag + 1].name:''}}</v-chip>
           <v-chip
-            v-if="utils.ctg[projectInfo.tag + 1].subctg"
+            v-if="(infoLoaded===true && utils.ctg[projectInfo.tag + 1].subctg === undefined) ?true:false"
             outlined
           >{{infoLoaded===true ? ( utils.ctg[projectInfo.tag + 1].subctg[projectInfo.subtag]):''}}</v-chip>
         </v-col>
@@ -314,25 +314,38 @@
                       ref="table"
                       :data="table"
                       :isCompany="info.type === 0?true : false"
-                      :isPriceCol="(info.type === 1 && projectInfo.isform === 0)||(info.type == 0 && projectInfo.isform === 1 && projectInfo.issetprice === 0)"
+                      :isPriceCol="(info.type === 1 && projectInfo.isform === 0)||(info.type === 1 && projectInfo.isform === 1 && projectInfo.issetprice === 1)||(info.type == 0 && projectInfo.isform === 1 && projectInfo.issetprice === 0)"
                       :headers="headers"
                       itemkey="name"
                     ></Table>
                     <v-btn
                       v-if="info.type === 1 && projectInfo.isform === 1 && projectInfo.issetprice === 1"
                       color="primary"
-                      class="my-4"
+                      style="margin-right: 10px"
                       outlined
                       @click="action(4,{},()=>{state = 3})"
                     >确认</v-btn>
                     <v-btn
                       v-else
                       color="primary"
-                      class="my-4"
+                      style="margin-right: 10px"
                       outlined
                       @click="submitTable()"
                     >提交</v-btn>
-
+                    <v-btn
+                      v-if="state === 2 && info.type === 1 && projectInfo.isform === 0"
+                      outlined
+                      color="error"
+                      style="margin-right: 10px"
+                      @click="deleteItem()"
+                    >删除所选</v-btn>
+                    <v-btn
+                      v-if="state === 2 && info.type === 1 && projectInfo.isform === 0"
+                      outlined
+                      color="primary"
+                      style="margin-right: 10px"
+                      @click.stop="dialog = true"
+                    >添加</v-btn>
                   </div>
                   <v-card
                     v-else
@@ -396,6 +409,33 @@
                   :prjinfo="projectInfo"
                   @submit="action"
                 ></Comment>
+
+                <v-card
+                  v-if="(i+1) === 5 && state === 9"
+                  class="mx-auto"
+                  max-width="600"
+                  max-height="400"
+                  outlined
+                >
+                  <div
+                    class="display-1"
+                    style="text-align: center;padding-top: 80px"
+                  >处于最终审核状态，审核完成后所有进度款都将被打入工作室账户</div>
+                  <v-card-subtitle
+                    class="headline"
+                    style="text-align: center"
+                  >在<Countdown
+                      class="headline d-inline-block"
+                      :deadline="projectInfo.countdown"
+                    ></Countdown>之前可以申诉</v-card-subtitle>
+                  <v-btn
+                    outlined
+                    class="mx-auto"
+                    color="error"
+                    style="display: block"
+                    @click="dialog = true"
+                  >申诉</v-btn>
+                </v-card>
               </v-stepper-content>
             </template>
           </v-stepper>
@@ -497,7 +537,8 @@ export default {
   },
   props: {
     info: Object,
-    snackbar: Object
+    snackbar: Object,
+    receivedNotice: Boolean
   },
   data () {
     return {
@@ -544,6 +585,7 @@ export default {
     getinfo () {
       axios.post(this.utils.baseURL + '/project_info', 'id=' + this.$route.params.id)
         .then(response => {
+          this.infoLoaded = false
           this.projectInfo = response.data
           this.state = response.data.state
           this.quote = response.data.price
@@ -632,12 +674,14 @@ export default {
               this.snackbar.color = 'green'
               this.snackbar.text = '成功'
               this.snackbar.open = true
+              this.getinfo()
               callback()
             } else;
           else if (response.data[0] === '<') {
             var id = window.open('', '_blank', 'height=800,width=1000')
             id.document.body.innerHTML = response.data
             id.document.forms[0].submit()
+            this.getinfo()
           } else {
             this.snackbar.color = 'error'
             this.snackbar.text = '服务器错误'
@@ -651,7 +695,12 @@ export default {
         })
     }
   },
-  activated () {
+  watch: {
+    receivedNotice: function () {
+      this.getinfo()
+    }
+  },
+  mounted () {
     this.getinfo()
   }
 }

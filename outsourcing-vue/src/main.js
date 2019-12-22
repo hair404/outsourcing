@@ -3,12 +3,15 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 import axios from 'axios'
+import qs from 'qs'
 import utils from './js/utils'
 import GoEasy from 'goeasy'
 
 Vue.config.productionTip = false
 
 Vue.prototype.utils = utils
+Vue.prototype.axios = axios
+Vue.prototype.qs = qs
 
 axios.defaults.crossDomain = true
 axios.defaults.withCredentials = true
@@ -17,13 +20,13 @@ Vue.prototype.$goEasy = new GoEasy({
   host: 'hangzhou.goeasy.io', // 应用所在的区域地址，杭州：hangzhou.goeasy.io，新加坡：singapore.goeasy.io
   appkey: 'BS-a4ed6edd774b4e66bd3205a7788f85c5', // 替换为您的应用appkey
   forceTLS: false,
-  onConnected: function () {
+  onConnected: function() {
     console.log('连接成功！')
   },
-  onDisconnected: function () {
+  onDisconnected: function() {
     console.log('连接断开！')
   },
-  onConnectFailed: function () {
+  onConnectFailed: function() {
     console.log('连接失败或错误！')
   }
 })
